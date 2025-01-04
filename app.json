@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "aquabox_app",
-    "slug": "aquabox_app",
+    "name": "bodymaker_app",
+    "slug": "bodymaker_app",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
@@ -15,7 +15,8 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.tokio2.bodymaker_app"
     },
     "web": {
       "bundler": "metro",
@@ -32,10 +33,20 @@
           "resizeMode": "contain",
           "backgroundColor": "#ffffff"
         }
-      ]
+      ],
+      "expo-video"
     ],
     "experiments": {
       "typedRoutes": true
-    }
+    },
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "1f5d0c99-4ef9-4f20-a804-74906c7ec605"
+      }
+    },
+    "owner": "tokio2"
   }
 }
