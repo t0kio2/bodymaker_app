@@ -3,7 +3,7 @@ import React, { useState } from 'react'
 import DateTimePicker from '@react-native-community/datetimepicker'
 import Icon from 'react-native-vector-icons/FontAwesome5'
 
-const TimePicker = () => {
+const TimePicker = (value: any) => {
   const [date, setDate] = useState(new Date())
   const [timePickerVisible, setTimePickerVisible] = useState<boolean>(Platform.OS === 'ios')
   const timeOptions: Intl.DateTimeFormatOptions = {

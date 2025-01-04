@@ -1,5 +1,5 @@
-import { Text, ScrollView, TouchableOpacity, View, Switch } from 'react-native'
-import React, { useState } from 'react'
+import { Text, ScrollView, TouchableOpacity, View, Switch, Alert } from 'react-native'
+import React, { useEffect, useState } from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
 
 import FormField from '@/components/FormField'
@@ -7,10 +7,13 @@ import TimePicker from '@/components/TimePicker'
 import CustomButton from '@/components/CustomButton'
 import { DAY_OF_WEEK } from '@/constants/common'
 import { router } from 'expo-router'
+import AsyncStorage from '@react-native-async-storage/async-storage'
+import { Item } from '@/types'
 
 const Create = () => {
   const [selectedDays, setSelectedDays] = useState<string[]>([])
   const [isEveryday, setIsEveryday] = useState(false)
+  const [items, setItems] = useState<any>([])
 
   const toggleSwitch = () => {
     const nextState = !isEveryday
@@ -27,12 +30,68 @@ const Create = () => {
     })
   }
 
+  const loadData = async () => {
+    try {
+      const data = await AsyncStorage.getItem('items')
+      console.log(data)
+      if (data !== null) {
+        setItems(JSON.parse(data))
+      }
+    } catch (error) {
+      console.error(error)
+      throw new Error('Failed to load data')
+    }
+  }
+  useEffect(() => {
+    // AsyncStorage.clear()
+    loadData()
+  }, [])
+  const saveData = async () => {
+    console.log('title: ', form.title)
+    console.log('video: ', form.video)
+    console.log('schedule: ', selectedDays)
+    const data = {
+      id: Date.now().toString(),
+      title: form.title, 
+      video: form.video,
+      thumbnail: form.thumbnail,
+      schedule: {
+        recurring: selectedDays, // For weekly: 0=Sunday, 1=Monday, etc.
+        time: '19:00',
+      },
+      goal: 'まずは2習慣継続!',
+      createdAt: Date.now(),
+    }
+    try {
+      const updatedItems = items ? [...items, data] : [data]
+      await AsyncStorage.setItem('items', JSON.stringify(updatedItems))
+      Alert.alert('登録しました！頑張りましょう！')
+      router.replace('/home?updated=true')
+    } catch (error) {
+      console.error(error)
+      throw new Error('Failed to save data')
+    }
+  }
+
+  const [form, setForm] = useState<Item>({
+    id: Date.now().toString(),
+    title: '', 
+    video: '',
+    thumbnail: '',
+    schedule: {
+      recurring: [],
+      time: '',
+    },
+    goal: '',
+    createdAt: '',
+  })
+
   return (
     <SafeAreaView>
       <ScrollView className='px-4 my-6'>
         <FormField
           title='習慣名'
-          value=''
+          value={form.title}
           placeholder='習慣名を入力'
           handleChangeText={() => {}}
           containerStyle='mb-4'
@@ -74,7 +133,7 @@ const Create = () => {
         <View className='mt-10'>
           <FormField
             title='動画URL'
-            value=''
+            value={form.video}
             placeholder='URLを入力'
             handleChangeText={() => {}}
             containerStyle='mb-4'
@@ -82,7 +141,7 @@ const Create = () => {
         </View>
         <CustomButton
           title='登録'
-          handlePress={() => {}}
+          handlePress={saveData}
           // containerStyle='mt-7'
           containerStyle='mt-7 bg-primary'
         />

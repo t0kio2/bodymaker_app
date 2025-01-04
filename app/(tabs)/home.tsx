@@ -1,52 +1,36 @@
-import { FlatList, Image, Linking, RefreshControl, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { Alert, FlatList, Image, Linking, RefreshControl, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import Modal from 'react-native-modal'
-import React, { useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import Icon from 'react-native-vector-icons/FontAwesome5'
 import Entypo from 'react-native-vector-icons/Entypo'
 // import { VideoView } from 'expo-video' // TODO: 使わなければuninstall
 import Recurring from '@/components/Recurring'
-import { router } from 'expo-router'
+import { router, useLocalSearchParams } from 'expo-router'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 
 const Home = () => {
-  const data = [
-    {
-      id: 1,
-      title: '顔痩せトレーニング', 
-      video: 'https://www.youtube.com/watch?v=NV5fKANMzfU',
-      thumbnail: 'https://i.ytimg.com/vi/NV5fKANMzfU/hqdefault.jpg',
-      schedule: {
-        recurring: [1, 3, 5], // For weekly: 0=Sunday, 1=Monday, etc.
-        time: '19:00',
-      },
-      goal: 'まずは2習慣継続!',
-      createdAt: '2022-01-01T00:00:00Z',
-    },
-    {
-      id: 2,
-      title: '顔痩せトレーニング', 
-      video: 'https://www.youtube.com/watch?v=NV5fKANMzfU',
-      thumbnail: 'https://i.ytimg.com/vi/NV5fKANMzfU/hqdefault.jpg',
-      schedule: {
-        recurring: [1, 3, 5], // For weekly: 0=Sunday, 1=Monday, etc.
-        time: '19:00',
-      },
-      goal: 'まずは2習慣継続!',
-      createdAt: '2022-01-01T00:00:00Z',
-    },
-    {
-      id: 3,
-      title: '顔痩せトレーニング', 
-      video: 'https://www.youtube.com/watch?v=NV5fKANMzfU',
-      thumbnail: 'https://i.ytimg.com/vi/NV5fKANMzfU/hqdefault.jpg',
-      schedule: {
-        recurring: [1, 3, 5], // For weekly: 0=Sunday, 1=Monday, etc.
-        time: '19:00',
-      },
-      goal: 'まずは2習慣継続!',
-      createdAt: '2022-01-01T00:00:00Z',
+  const [items, setItems] = useState<any>([])
+  const params = useLocalSearchParams()
+
+  useEffect(() => {
+    // AsyncStorage.clear()
+    loadData()
+  }, [params?.updated])
+
+  const loadData = async () => {
+    try {
+      const data = await AsyncStorage.getItem('items')
+      if (data !== null) {
+        console.log('data: ', JSON.parse(data))
+        setItems(JSON.parse(data))
+      }
+    } catch (error) {
+      console.error(error)
+      throw new Error('Failed to load data')
     }
-  ]
+  }
+
   const formatDate = (dateStr: string) => {
     // ISO形式の日付文字列をDateオブジェクトに変換
     const date = new Date(dateStr);
@@ -72,18 +56,30 @@ const Home = () => {
   }
   const handleEdit = () => {
     setIsModalVisible(false)
-    // router.push('/edit')
+    router.push('/create')
   }
-  const handleDelete = () => {
-    setIsModalVisible(false)
+  const handleDelete = async (id: string) => {
+    const updatedItems = items.filter((item: any) => item.id !== id)
+    try {
+      await AsyncStorage.setItem('items', JSON.stringify(updatedItems))
+      setItems(updatedItems)
+      Alert.alert('削除しました')
+    } catch (error) {
+      throw new Error('Failed to delete item')
+    } finally {
+      setIsModalVisible(false)
+    }
   }
   return (
     // デバイス毎に余白をよしなにしてくれる
     <SafeAreaView className='h-full'>
       <FlatList
         // className='border border-red-500'
-        data={ data}
-        keyExtractor={item => item.id.toString()}
+        data={ items }
+        keyExtractor={item => {
+          console.log('item: ', typeof item)
+          return item.id
+        }}
         renderItem={({ item }) => (
           <View className='flex-col m-2'>
             <View className='flex-row items-center'>
@@ -108,7 +104,7 @@ const Home = () => {
                   <Text className='text-lg'>{item.title}</Text>
                   {/* カレンダーアイコン */}
                   <View className='flex-col'>
-                    <Recurring schedule={item.schedule} className='mr-1' />
+                    {/* <Recurring schedule={item.schedule} className='mr-1' /> */}
                     <Text className='mt-1'>開始日 {formatDate(item.createdAt)}</Text>
                   </View>
                 </View>
@@ -144,7 +140,7 @@ const Home = () => {
                   <TouchableOpacity onPress={handleEdit} className="mb-2">
                     <Text className="text-blue-500 text-lg">編集</Text>
                   </TouchableOpacity>
-                  <TouchableOpacity onPress={handleDelete}>
+                  <TouchableOpacity onPress={() => handleDelete(item.id)}>
                     <Text className="text-red-500 text-lg">削除</Text>
                   </TouchableOpacity>
                 </View>

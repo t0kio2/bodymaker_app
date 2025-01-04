@@ -9,9 +9,6 @@ type VideoPlayer = {
 }
 
 const VideoPlayer = ({ source, videoRef, continerStyle }: VideoPlayer) => {
-  console.log('source:', source)
-  console.log('videoRef:', videoRef)
-
   const player = useVideoPlayer(source, (player) => {
     player.loop = true
     player.play()
