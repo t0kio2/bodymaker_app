@@ -8,13 +8,14 @@ import Entypo from 'react-native-vector-icons/Entypo'
 import Recurring from '@/components/Recurring'
 import { router, useLocalSearchParams } from 'expo-router'
 import AsyncStorage from '@react-native-async-storage/async-storage'
+import { Item } from '@/types'
 
 const Home = () => {
   const [items, setItems] = useState<any>([])
+  const [itemOnModal, setItemOnModal] = useState<Item | null>(null)
   const params = useLocalSearchParams()
 
   useEffect(() => {
-    // AsyncStorage.clear()
     loadData()
   }, [params?.updated])
 
@@ -41,6 +42,7 @@ const Home = () => {
   }
 
   const openYouTube = (video: string) => {
+    if (!video) return
     Linking.openURL(video).catch(err => {
       throw new Error('Failed to open YouTube', err)
     })
@@ -48,19 +50,21 @@ const Home = () => {
 
   const [isModalVisible, setIsModalVisible] = useState(false)
   const [iconPosition, setIconPosition] = useState({ x: 0, y: 0 })
-  const showDialog = (e: any) => {
+  const showDialog = (e: any, item: Item) => {
     const { pageX, pageY } = e.nativeEvent
     setIconPosition({ x: pageX, y: pageY })
     setIsModalVisible(true)
+    // モーダルで対象とするアイテムを保持
+    setItemOnModal(item)
   }
-  const handleEdit = (id: string) => {
+  const handleEdit = () => {
     setIsModalVisible(false)
-    router.push(`/edit?id=${id}`)
+    router.push(`/edit?id=${itemOnModal?.id}`)
   }
-  const handleDelete = async (id: string, title: string) => {
-    console.log('delete: ', id)
+  const handleDelete = async () => {
+    if (!itemOnModal) return
     Alert.alert(
-      title, // タイトル
+      itemOnModal.title, // タイトル
       '削除してもよろしいですか？', // メッセージ
       [ // ボタン
         {
@@ -72,7 +76,7 @@ const Home = () => {
           text: 'OK',
           onPress: async () => {
             setIsModalVisible(false)
-            const updatedItems = items.filter((item: any) => item.id !== id)
+            const updatedItems = items.filter((item: any) => item.id !== itemOnModal.id)
             try {
               await AsyncStorage.setItem('items', JSON.stringify(updatedItems))
               setItems(updatedItems)
@@ -128,7 +132,7 @@ const Home = () => {
               {/* 3点リーダー */}
               <TouchableOpacity
                 className='h-full absolute right-0 top-1'
-                onPress={(e) => showDialog(e)}
+                onPress={(e) => showDialog(e, item)}
               >
                 <Entypo
                   name='dots-three-vertical'
@@ -150,13 +154,12 @@ const Home = () => {
                 }}
                 useNativeDriver={true} // チラつき防止
                 hideModalContentWhileAnimating={true} // チラつき防止
-
               >
                 <View className="bg-white p-2 rounded shadow-lg">
-                  <TouchableOpacity onPress={() => handleEdit(item.id)} className="mb-2">
+                  <TouchableOpacity onPress={() => handleEdit()} className="mb-2">
                     <Text className="text-blue-500 text-lg">編集</Text>
                   </TouchableOpacity>
-                  <TouchableOpacity onPress={() => handleDelete(item.id, item.title)}>
+                  <TouchableOpacity onPress={() => handleDelete()}>
                     <Text className="text-red-500 text-lg">削除</Text>
                   </TouchableOpacity>
                 </View>

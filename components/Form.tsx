@@ -26,7 +26,6 @@ const Form = ({ mode }: { mode: 'create' | 'edit'}) => {
   })
 
   useEffect(() => {
-    // AsyncStorage.clear()
     loadData()
   }, [id])
 
