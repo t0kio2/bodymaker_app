@@ -22,7 +22,6 @@ const Home = () => {
     try {
       const data = await AsyncStorage.getItem('items')
       if (data !== null) {
-        console.log('data: ', JSON.parse(data))
         setItems(JSON.parse(data))
       }
     } catch (error) {
@@ -54,21 +53,39 @@ const Home = () => {
     setIconPosition({ x: pageX, y: pageY })
     setIsModalVisible(true)
   }
-  const handleEdit = () => {
+  const handleEdit = (id: string) => {
     setIsModalVisible(false)
     router.push('/create')
   }
-  const handleDelete = async (id: string) => {
-    const updatedItems = items.filter((item: any) => item.id !== id)
-    try {
-      await AsyncStorage.setItem('items', JSON.stringify(updatedItems))
-      setItems(updatedItems)
-      Alert.alert('削除しました')
-    } catch (error) {
-      throw new Error('Failed to delete item')
-    } finally {
-      setIsModalVisible(false)
-    }
+  const handleDelete = async (id: string, title: string) => {
+    console.log('delete: ', id)
+    Alert.alert(
+      title, // タイトル
+      '削除してもよろしいですか？', // メッセージ
+      [ // ボタン
+        {
+          text: 'キャンセル',
+          style: 'cancel',
+          onPress: () => setIsModalVisible(false)
+        },
+        {
+          text: 'OK',
+          onPress: async () => {
+            setIsModalVisible(false)
+            const updatedItems = items.filter((item: any) => item.id !== id)
+            try {
+              await AsyncStorage.setItem('items', JSON.stringify(updatedItems))
+              setItems(updatedItems)
+              Alert.alert('削除しました')
+            } catch (error) {
+              throw new Error('Failed to delete item')
+            } finally {
+              setIsModalVisible(false)
+            }
+          }
+        }
+      ]
+    )
   }
   return (
     // デバイス毎に余白をよしなにしてくれる
@@ -77,7 +94,6 @@ const Home = () => {
         // className='border border-red-500'
         data={ items }
         keyExtractor={item => {
-          console.log('item: ', typeof item)
           return item.id
         }}
         renderItem={({ item }) => (
@@ -104,7 +120,7 @@ const Home = () => {
                   <Text className='text-lg'>{item.title}</Text>
                   {/* カレンダーアイコン */}
                   <View className='flex-col'>
-                    {/* <Recurring schedule={item.schedule} className='mr-1' /> */}
+                    <Recurring schedule={item.schedule} className='mr-1' />
                     <Text className='mt-1'>開始日 {formatDate(item.createdAt)}</Text>
                   </View>
                 </View>
@@ -137,10 +153,10 @@ const Home = () => {
 
               >
                 <View className="bg-white p-2 rounded shadow-lg">
-                  <TouchableOpacity onPress={handleEdit} className="mb-2">
+                  <TouchableOpacity onPress={() => handleEdit(item.id)} className="mb-2">
                     <Text className="text-blue-500 text-lg">編集</Text>
                   </TouchableOpacity>
-                  <TouchableOpacity onPress={() => handleDelete(item.id)}>
+                  <TouchableOpacity onPress={() => handleDelete(item.id, item.title)}>
                     <Text className="text-red-500 text-lg">削除</Text>
                   </TouchableOpacity>
                 </View>

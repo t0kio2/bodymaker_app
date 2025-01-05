@@ -1,78 +1,14 @@
-import { Text, ScrollView, TouchableOpacity, View, Switch, Alert } from 'react-native'
+import { ScrollView, Alert } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
-
-import FormField from '@/components/FormField'
-import TimePicker from '@/components/TimePicker'
-import CustomButton from '@/components/CustomButton'
-import { DAY_OF_WEEK } from '@/constants/common'
 import { router } from 'expo-router'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { Item } from '@/types'
+import { getDayNumber, getThumbnailFromVideo } from '@/lib/utils'
+import Form from '@/components/Form'
 
 const Create = () => {
-  const [selectedDays, setSelectedDays] = useState<string[]>([])
-  const [isEveryday, setIsEveryday] = useState(false)
   const [items, setItems] = useState<any>([])
-
-  const toggleSwitch = () => {
-    const nextState = !isEveryday
-    setSelectedDays(nextState ? DAY_OF_WEEK : [])
-    setIsEveryday(nextState)
-  }
-
-  const toggleDays = (day: string) => {
-    setSelectedDays(prev => {
-      const updated = prev.includes(day) ? prev.filter(d => d !== day) : [...prev, day]
-      const isSelectedAll = updated.length === DAY_OF_WEEK.length
-      setIsEveryday(isSelectedAll)
-      return updated
-    })
-  }
-
-  const loadData = async () => {
-    try {
-      const data = await AsyncStorage.getItem('items')
-      console.log(data)
-      if (data !== null) {
-        setItems(JSON.parse(data))
-      }
-    } catch (error) {
-      console.error(error)
-      throw new Error('Failed to load data')
-    }
-  }
-  useEffect(() => {
-    // AsyncStorage.clear()
-    loadData()
-  }, [])
-  const saveData = async () => {
-    console.log('title: ', form.title)
-    console.log('video: ', form.video)
-    console.log('schedule: ', selectedDays)
-    const data = {
-      id: Date.now().toString(),
-      title: form.title, 
-      video: form.video,
-      thumbnail: form.thumbnail,
-      schedule: {
-        recurring: selectedDays, // For weekly: 0=Sunday, 1=Monday, etc.
-        time: '19:00',
-      },
-      goal: 'まずは2習慣継続!',
-      createdAt: Date.now(),
-    }
-    try {
-      const updatedItems = items ? [...items, data] : [data]
-      await AsyncStorage.setItem('items', JSON.stringify(updatedItems))
-      Alert.alert('登録しました！頑張りましょう！')
-      router.replace('/home?updated=true')
-    } catch (error) {
-      console.error(error)
-      throw new Error('Failed to save data')
-    }
-  }
-
   const [form, setForm] = useState<Item>({
     id: Date.now().toString(),
     title: '', 
@@ -85,70 +21,73 @@ const Create = () => {
     goal: '',
     createdAt: '',
   })
+  const [errors, setErrors] = useState<any>({
+    title: '',
+    video: '',
+  })
+
+  const handleChange = (field: string, value: string) => {
+    console.log('field: ', field, 'value: ', value)
+    setForm((prev) => ({ ...prev, [field]: value }))
+  }
+
+  const loadData = async () => {
+    try {
+      const data = await AsyncStorage.getItem('items')
+      if (data !== null) {
+        setItems(JSON.parse(data))
+      }
+    } catch (error) {
+      console.error(error)
+      throw new Error('Failed to load data')
+    }
+  }
+  useEffect(() => {
+    // AsyncStorage.clear()
+    loadData()
+  }, [])
+  const handleSubmit = async (time: string, selectedDays: []) => {
+    if (!validateForm()) return Alert.alert('入力内容に不備があります')
+    const selectedDaysNumber = selectedDays.map((e: string) => getDayNumber(e))
+    const data = {
+      id: Date.now().toString(),
+      title: form.title, 
+      video: form.video,
+      thumbnail: getThumbnailFromVideo(form.video),
+      schedule: {
+        recurring: selectedDaysNumber, // For weekly: 0=Sunday, 1=Monday, etc.
+        time: time,
+      },
+      goal: 'まずは2習慣継続!',
+      createdAt: Date.now(),
+    }
+    console.log('data: ', data)
+    try {
+      const updatedItems = items ? [...items, data] : [data]
+      await AsyncStorage.setItem('items', JSON.stringify(updatedItems))
+      Alert.alert('登録しました！頑張りましょう！')
+      router.replace('/home?updated=true')
+    } catch (error) {
+      console.error(error)
+      throw new Error('Failed to save data')
+    }
+  }
+
+  const validateForm = () => {
+    if (!form.title) {
+      setErrors({ title: '習慣名を入力してください' })
+      return false
+    }
+    return true
+  }
 
   return (
     <SafeAreaView>
       <ScrollView className='px-4 my-6'>
-        <FormField
-          title='習慣名'
-          value={form.title}
-          placeholder='習慣名を入力'
-          handleChangeText={() => {}}
-          containerStyle='mb-4'
-        />
-        <View className='mt-5'>
-          <TimePicker />
-        </View>
-        <View className='mt-5 flex-row items-center'>
-          <Text>毎日</Text>
-          <View className=''>
-            <Switch
-              trackColor={{true: '#3b82f6'}}
-              thumbColor={isEveryday ? '#d1d5db' : '#f4f3f4'}
-              ios_backgroundColor="#d1d5db"
-              onValueChange={toggleSwitch}
-              value={isEveryday}
-            />
-          </View>
-        </View>
-        <View className='mt-2 flex-row flex-wrap justify-center gap-2'>
-          {DAY_OF_WEEK.map((day, i) => (
-            <TouchableOpacity
-              key={i}
-              className={`px-4 bg-[#D9D9D9] rounded-full w-12 h-12
-              justify-center items-center
-              ${selectedDays.includes(day) ? 'bg-blue-500' : 'bg-gray-300'}
-              `}
-              onPress={() => toggleDays(day)}
-            >
-              <Text
-                className={`text-base font-bold ${
-                  selectedDays.includes(day) ? "text-white" : "text-black"
-                }`}
-              >{day}</Text>
-            </TouchableOpacity>
-          ))}
-        </View>
-        
-        <View className='mt-10'>
-          <FormField
-            title='動画URL'
-            value={form.video}
-            placeholder='URLを入力'
-            handleChangeText={() => {}}
-            containerStyle='mb-4'
-          />
-        </View>
-        <CustomButton
-          title='登録'
-          handlePress={saveData}
-          // containerStyle='mt-7'
-          containerStyle='mt-7 bg-primary'
-        />
-        <CustomButton
-          title='とじる'
-          handlePress={() => router.replace('/home')}
-          containerStyle='mt-2 bg-gray-500'
+        <Form
+          formData={form}
+          handleChange={handleChange}
+          handleSubmit={handleSubmit}
         />
       </ScrollView>
     </SafeAreaView>

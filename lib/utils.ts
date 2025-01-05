@@ -6,3 +6,20 @@ export const getDaysOfWeek = (dayNumber: number) => {
   }
   return DAY_OF_WEEK[dayNumber]
 }
+
+export const getDayNumber = (day: string) => {
+  const dayNumber = DAY_OF_WEEK.indexOf(day)
+  if (dayNumber === -1) {
+    throw new Error('Invalid day name')
+  }
+  return dayNumber
+}
+
+
+export const getThumbnailFromVideo = (videoURL: string) => {
+  if (!videoURL) return ''
+  const videoId = videoURL.split('v=')[1]?.split('&')[0]
+  if (!videoId) return ''
+  const thumbnailURL = `https://img.youtube.com/vi/${videoId}/mqdefault.jpg`
+  return thumbnailURL
+}
