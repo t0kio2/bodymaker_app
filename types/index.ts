@@ -8,5 +8,5 @@ export interface Item {
     time: string
   }
   goal: string
-  createdAt: string
+  createdAt: Date
 }
