@@ -55,7 +55,7 @@ const Home = () => {
   }
   const handleEdit = (id: string) => {
     setIsModalVisible(false)
-    router.push('/create')
+    router.push(`/edit?id=${id}`)
   }
   const handleDelete = async (id: string, title: string) => {
     console.log('delete: ', id)

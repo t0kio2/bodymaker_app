@@ -1,21 +1,107 @@
-import { View, Text, Switch, TouchableOpacity } from 'react-native'
-import React, { useState } from 'react'
+import { View, Text, Switch, TouchableOpacity, Alert } from 'react-native'
+import React, { useEffect, useState } from 'react'
 import FormField from './FormField'
 import TimePicker from './TimePicker'
 import { DAY_OF_WEEK } from '@/constants/common'
 import CustomButton from './CustomButton'
-import { router } from 'expo-router'
+import { router, useLocalSearchParams } from 'expo-router'
+import AsyncStorage from '@react-native-async-storage/async-storage'
+import { Item } from '@/types'
+import { getDayNumber, getThumbnailFromVideo } from '@/lib/utils'
 
-interface FormProps {
-  formData: any
-  handleChange: (field: string, value: string) => void
-  handleSubmit: Function
-}
-
-const Form = ({ formData, handleChange, handleSubmit }: FormProps) => {
+const Form = ({ mode }: { mode: 'create' | 'edit'}) => {
+  const { id } = useLocalSearchParams()
   const [time, setTime] = useState<any>('')
   const [selectedDays, setSelectedDays] = useState<string[]>([])
   const [isEveryday, setIsEveryday] = useState(false)
+  const [items, setItems] = useState<any>([])
+  const [formData, setFormData] = useState({
+    title: '', 
+    video: '',
+    goal: '',
+  })
+  const [errors, setErrors] = useState<any>({
+    title: '',
+    video: '',
+  })
+
+  useEffect(() => {
+    // AsyncStorage.clear()
+    loadData()
+  }, [id])
+
+  const loadData = async () => {
+    try {
+      const data = await AsyncStorage.getItem('items')
+      if (data === null) return
+      const parseData = JSON.parse(data)
+      setItems(parseData)
+      if (mode === 'edit' && id) {
+        const targetItem = parseData.find((item: Item) => item.id === id)
+        if (targetItem) {
+          setFormData({
+            title: targetItem.title,
+            video: targetItem.video,
+            goal: targetItem.goal,
+          })
+          setTime(targetItem.schedule.time)
+          setSelectedDays(targetItem.schedule.recurring.map((day: number) => DAY_OF_WEEK[day]))
+          isEverydayChecked(targetItem.schedule.recurring) && setIsEveryday(true)
+        }
+      }
+    } catch (error) {
+      console.error(error)
+      throw new Error('Failed to load data')
+    }
+  }
+
+  const handleChange = (field: string, value: string) => {
+    setFormData((prev) => ({ ...prev, [field]: value }))
+  }
+
+
+  const handleSubmit = async (time: string, selectedDays: string[]) => {
+    if (!validateForm()) {
+      return Alert.alert(
+        '入力内容に不備があります',
+        errors.title
+      )
+    }
+
+    const selectedDaysNumber = selectedDays.map((e: string) => getDayNumber(e))
+    const data: Item = {
+      id: mode === 'create' ? Date.now().toString() : id as string,
+      title: formData.title,
+      video: formData.video,
+      thumbnail: getThumbnailFromVideo(formData.video),
+      schedule: {
+        // For weekly: 0=Sunday, 1=Monday, etc.
+        recurring: selectedDaysNumber,
+        time: time,
+      },
+      goal: 'まずは2習慣継続!',
+      createdAt: new Date(),
+    }
+    const updatedItems = mode === 'create'
+      ? [...items, data]
+      : items.map((item: Item) => item.id === id ? data : item)
+    try {
+      await AsyncStorage.setItem('items', JSON.stringify(updatedItems))
+      Alert.alert('登録しました！頑張りましょう！')
+      router.replace('/home?updated=true')
+    } catch (error) {
+      console.error(error)
+      throw new Error('Failed to save data')
+    }
+  }
+  
+  const validateForm = () => {
+    if (!formData.title) {
+      setErrors({ title: '習慣名を入力してください' })
+      return false
+    }
+    return true
+  }
   
   const toggleSwitch = () => {
     const nextState = !isEveryday
@@ -26,11 +112,13 @@ const Form = ({ formData, handleChange, handleSubmit }: FormProps) => {
   const toggleDays = (day: string) => {
     setSelectedDays(prev => {
       const updated = prev.includes(day) ? prev.filter(d => d !== day) : [...prev, day]
-      const isSelectedAll = updated.length === DAY_OF_WEEK.length
+      const isSelectedAll = isEverydayChecked(updated)
       setIsEveryday(isSelectedAll)
       return updated
     })
   }
+
+  const isEverydayChecked = (data: string[]) => data.length === DAY_OF_WEEK.length
   return (
     <>
       <FormField
@@ -87,7 +175,7 @@ const Form = ({ formData, handleChange, handleSubmit }: FormProps) => {
         />
       </View>
       <CustomButton
-        title='登録'
+        title={mode === 'create' ? '登録' : '更新'}
         handlePress={() => handleSubmit(time, selectedDays)}
         // containerStyle='mt-7'
         containerStyle='mt-7 bg-primary'
