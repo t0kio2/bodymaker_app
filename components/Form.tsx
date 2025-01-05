@@ -8,6 +8,7 @@ import { router, useLocalSearchParams } from 'expo-router'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { Item } from '@/types'
 import { getDayNumber, getThumbnailFromVideo, isEverydayChecked } from '@/lib/utils'
+import { registerPushNotification } from '@/lib/pushNotification'
 
 const Form = ({ mode }: { mode: 'create' | 'edit'}) => {
   const { id } = useLocalSearchParams()
@@ -87,6 +88,10 @@ const Form = ({ mode }: { mode: 'create' | 'edit'}) => {
     try {
       await AsyncStorage.setItem('items', JSON.stringify(updatedItems))
       Alert.alert('登録しました！頑張りましょう！')
+
+      // Push通知の登録
+      await registerPushNotification()
+
       router.replace('/home?updated=true')
     } catch (error) {
       console.error(error)

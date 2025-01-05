@@ -8,11 +8,17 @@ import { Session } from '@supabase/supabase-js'
 import { supabase } from '@/lib/supabase'
 import Auth from '@/components/Auth'
 import CustomButton from '@/components/CustomButton'
+import { Button } from '@rneui/themed'
+import { registerPushNotification, requestPermissionAsync } from '@/lib/pushNotification'
 
-const App = () => {
-  const [session, setSession] = useState<Session | null>(null)
+export default function App () {
+  useEffect(() => {
+    requestPermissionAsync()
+  })
+  return <Redirect href="/home" />
 
   // WIP: 認証機能
+  // const [session, setSession] = useState<Session | null>(null)
   // useEffect(() => {
   //   supabase.auth.getSession().then(({ data: { session } }) => {
   //     setSession(session)
@@ -24,7 +30,6 @@ const App = () => {
 
   // WIP: 認証機能 (https://supabase.com/docs/guides/getting-started/tutorials/with-expo-react-native?queryGroups=auth-store&auth-store=async-storage)
   // if (session && session?.user) return <Redirect href="/home" />
-  return <Redirect href="/home" />
 
   return (
     <SafeAreaView className='h-full'>
@@ -41,5 +46,3 @@ const App = () => {
     </SafeAreaView>
   )
 }
-
-export default App
