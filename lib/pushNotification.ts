@@ -20,6 +20,15 @@ export const registerPushNotification = async () => {
   })
 }
 
+export const getAllSchedule = async () => {
+  const schedules = await Notifications.getAllScheduledNotificationsAsync()
+  const trigger = schedules.map((schedule) => {
+    return schedule.trigger
+  })
+  console.log('スケジュールされた通知', trigger)
+  return trigger
+}
+
 const schedulePushNotification = async (item: Item, weekday: number) => {
   const [hour, minute] = item.schedule.time.split(':').map(Number)
 
@@ -29,6 +38,7 @@ const schedulePushNotification = async (item: Item, weekday: number) => {
       body: '時間です！行動を始めましょう！',
     },
     trigger: {
+      type: Notifications.SchedulableTriggerInputTypes.CALENDAR,
       weekday,
       hour,
       minute,

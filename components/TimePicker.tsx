@@ -34,9 +34,9 @@ const TimePicker: React.FC<TimePickerProps> = ({ value, handleTimeChange }) => {
                 size={20}
                 color='#161622'
                 style={{ width: 24, textAlign: "center" }}
-                className='flex'
+                className='flex mr-1'
               />
-              <Text className='text-4xl'>{value || '選択されていません'}</Text>
+              <Text className='text-4xl'>{value || '00:00'}</Text>
             </View>
           </TouchableOpacity>
       }

@@ -1,15 +1,15 @@
 import { Text, View } from 'react-native'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect } from 'react'
 import "./../global.css"
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { ScrollView } from 'react-native'
 import { Redirect, router } from 'expo-router'
+import CustomButton from '@/components/CustomButton'
+import { requestPermissionAsync } from '@/lib/pushNotification'
+
 import { Session } from '@supabase/supabase-js'
 import { supabase } from '@/lib/supabase'
 import Auth from '@/components/Auth'
-import CustomButton from '@/components/CustomButton'
-import { Button } from '@rneui/themed'
-import { registerPushNotification, requestPermissionAsync } from '@/lib/pushNotification'
 
 export default function App () {
   useEffect(() => {

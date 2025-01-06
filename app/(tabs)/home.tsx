@@ -117,7 +117,7 @@ const Home = () => {
                 >
                   <Image
                     source={{ uri: item.thumbnail }}
-                    className='w-36 h-24'
+                    className='w-36 h-24 rounded-xl'
                   />
                 </TouchableOpacity>
                 <View className='flex-col'>

@@ -15,7 +15,6 @@ const CustomButton = ({
       className={`
         bg-primary
         rounded-xl
-        h-[100px]
         min-h-[62px]
         justify-center
         items-center

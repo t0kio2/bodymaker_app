@@ -1,6 +1,7 @@
-import { Text, TouchableOpacity, } from 'react-native'
+import { Alert, Text, TouchableOpacity, } from 'react-native'
 import { Tabs } from 'expo-router'
 import Icon from 'react-native-vector-icons/FontAwesome5'
+import { getAllSchedule } from '@/lib/pushNotification'
 
 const TabLayout = () => {
   return (
@@ -29,10 +30,13 @@ const TabLayout = () => {
             ),
             headerRight: () => (
               <TouchableOpacity
-                onPress={() => {}}
+                onPress={async () => {
+                  const schedule = await getAllSchedule()
+                  Alert.alert('Schedule', JSON.stringify(schedule))
+                }}
                 className="mr-4"
               >
-                <Text>hello</Text>
+                <Text>Right</Text>
               </TouchableOpacity>
             ),
             headerLeft: () => (
@@ -40,7 +44,7 @@ const TabLayout = () => {
                 onPress={() => {}}
                 className="ml-4"
               >
-                <Text>hello</Text>
+                <Text>Left</Text>
               </TouchableOpacity>
             ),
           })}
