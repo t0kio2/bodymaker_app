@@ -10,3 +10,12 @@ export interface Item {
   goal: string
   createdAt: Date
 }
+
+export interface Schedule {
+  id: string,
+  title: string,
+  schedule: {
+    recurring: number[]
+    time: string
+  }
+}

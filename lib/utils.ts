@@ -15,6 +15,7 @@ export const getDayNumber = (day: string) => {
   return dayNumber
 }
 
+export const isEverydayChecked = (data: string[]) => data.length === DAY_OF_WEEK.length
 
 export const getThumbnailFromVideo = (videoURL: string) => {
   if (!videoURL) return ''
