@@ -35,8 +35,13 @@ export default function RootLayout() {
         <Stack.Screen name="(auth)" options={{ headerShown: false }} />
         <Stack.Screen name="create"
           options={{ 
-            presentation: 'modal',
             title: '習慣の作成',
+            headerBackTitle: '戻る',
+        }} />
+        <Stack.Screen name="edit"
+          options={{ 
+            title: '習慣の編集',
+            headerBackTitle: '戻る',
         }} />
         <Stack.Screen name="+not-found" />
       </Stack>

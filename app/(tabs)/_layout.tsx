@@ -2,6 +2,7 @@ import { Alert, Text, TouchableOpacity, } from 'react-native'
 import { Tabs } from 'expo-router'
 import Icon from 'react-native-vector-icons/FontAwesome5'
 import { getAllSchedule } from '@/lib/pushNotification'
+import * as Notifications from 'expo-notifications'
 
 const TabLayout = () => {
   return (
@@ -36,15 +37,17 @@ const TabLayout = () => {
                 }}
                 className="mr-4"
               >
-                <Text>Right</Text>
+                <Text>show push</Text>
               </TouchableOpacity>
             ),
             headerLeft: () => (
               <TouchableOpacity
-                onPress={() => {}}
+                onPress={() => {
+                  Notifications.cancelAllScheduledNotificationsAsync()
+                }}
                 className="ml-4"
               >
-                <Text>Left</Text>
+                <Text>delete push</Text>
               </TouchableOpacity>
             ),
           })}

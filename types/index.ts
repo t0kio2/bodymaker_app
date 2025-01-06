@@ -11,11 +11,7 @@ export interface Item {
   createdAt: Date
 }
 
-export interface Schedule {
+export interface Notification {
   id: string,
-  title: string,
-  schedule: {
-    recurring: number[]
-    time: string
-  }
+  itemId: string
 }

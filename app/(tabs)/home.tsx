@@ -9,6 +9,7 @@ import Recurring from '@/components/Recurring'
 import { router, useLocalSearchParams } from 'expo-router'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { Item } from '@/types'
+import { deleteNotificationById } from '@/lib/pushNotification'
 
 const Home = () => {
   const [items, setItems] = useState<any>([])
@@ -76,6 +77,7 @@ const Home = () => {
           text: 'OK',
           onPress: async () => {
             setIsModalVisible(false)
+            deleteNotificationById(itemOnModal.id)
             const updatedItems = items.filter((item: any) => item.id !== itemOnModal.id)
             try {
               await AsyncStorage.setItem('items', JSON.stringify(updatedItems))
@@ -140,30 +142,6 @@ const Home = () => {
                   color='#161622'
                 />
               </TouchableOpacity>
-              <Modal
-                isVisible={isModalVisible}
-                onBackdropPress={() => setIsModalVisible(false)}
-                backdropOpacity={0.1}
-                animationInTiming={1} // アニメーション無効
-                animationOutTiming={1} // アニメーション無効
-                style={{
-                  margin: 0,
-                  position: "absolute",
-                  top: iconPosition.y,
-                  left: iconPosition.x - 60, // ダイアログの横位置調整
-                }}
-                useNativeDriver={true} // チラつき防止
-                hideModalContentWhileAnimating={true} // チラつき防止
-              >
-                <View className="bg-white p-2 rounded shadow-lg">
-                  <TouchableOpacity onPress={() => handleEdit()} className="mb-2">
-                    <Text className="text-blue-500 text-lg">編集</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity onPress={() => handleDelete()}>
-                    <Text className="text-red-500 text-lg">削除</Text>
-                  </TouchableOpacity>
-                </View>
-              </Modal>
             </View>
           </View>
         )}
@@ -171,8 +149,32 @@ const Home = () => {
         ListEmptyComponent={<Text>Empty</Text>}
         refreshControl={<RefreshControl refreshing={false} onRefresh={() => {}} />}
       />
+      <Modal
+        isVisible={isModalVisible}
+        onBackdropPress={() => setIsModalVisible(false)}
+        backdropOpacity={0.1}
+        animationInTiming={1} // アニメーション無効
+        animationOutTiming={1} // アニメーション無効
+        style={{
+          margin: 0,
+          position: "absolute",
+          top: iconPosition.y,
+          left: iconPosition.x - 60, // ダイアログの横位置調整
+        }}
+        useNativeDriver={true} // チラつき防止
+        hideModalContentWhileAnimating={true} // チラつき防止
+      >
+        <View className="bg-white p-2 rounded shadow-lg">
+          <TouchableOpacity onPress={() => handleEdit()} className="mb-2">
+            <Text className="text-blue-500 text-lg">編集</Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => handleDelete()}>
+            <Text className="text-red-500 text-lg">削除</Text>
+          </TouchableOpacity>
+        </View>
+      </Modal>
       <TouchableOpacity
-        className='absolute bottom-8 right-8 shadow-lg w-16 h-16 bg-[#161622] rounded-full
+        className='absolute bottom-8 right-8 shadow-lg w-20 h-20 bg-[#161622] rounded-full
         flex items-center justify-center'
         onPress={() => router.push('/create')}
       >
