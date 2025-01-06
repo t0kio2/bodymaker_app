@@ -8,7 +8,7 @@ import { router, useLocalSearchParams } from 'expo-router'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { Item } from '@/types'
 import { getDayNumber, getThumbnailFromVideo, isEverydayChecked } from '@/lib/utils'
-import { registerPushNotification } from '@/lib/pushNotification'
+import { registerNotification } from '@/lib/pushNotification'
 
 const Form = ({ mode }: { mode: 'create' | 'edit'}) => {
   const { id } = useLocalSearchParams()
@@ -90,7 +90,7 @@ const Form = ({ mode }: { mode: 'create' | 'edit'}) => {
       Alert.alert('登録しました！頑張りましょう！')
 
       // Push通知の登録
-      await registerPushNotification()
+      await registerNotification(data)
 
       router.replace('/home?updated=true')
     } catch (error) {
@@ -149,18 +149,18 @@ const Form = ({ mode }: { mode: 'create' | 'edit'}) => {
           />
         </View>
       </View>
-      <View className='mt-2 flex-row flex-wrap justify-center gap-2'>
+      <View className='mt-3 flex-row flex-wrap justify-center gap-1'>
         {DAY_OF_WEEK.map((day, i) => (
           <TouchableOpacity
             key={i}
-            className={`px-4 bg-[#D9D9D9] rounded-full w-12 h-12
+            className={`px-4 bg-[#D9D9D9] rounded-full w-14 h-14
             justify-center items-center
             ${selectedDays.includes(day) ? 'bg-blue-500' : 'bg-gray-300'}
             `}
             onPress={() => toggleDays(day)}
           >
             <Text
-              className={`text-base font-bold ${
+              className={`text-xl font-bold ${
                 selectedDays.includes(day) ? "text-white" : "text-black"
               }`}
             >{day}</Text>
