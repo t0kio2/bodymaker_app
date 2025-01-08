@@ -37,3 +37,15 @@ yarn-error.*
 
 app-example
 .env
+
+# iOS
+ios/
+
+# Android
+android/
+
+# Pods (iOS)
+ios/Pods/
+
+# Gradle cache (Android)
+android/.gradle/
