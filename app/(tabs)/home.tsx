@@ -10,6 +10,7 @@ import { router, useLocalSearchParams } from 'expo-router'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { Item } from '@/types'
 import { deleteNotificationById } from '@/lib/pushNotification'
+import realm from '@/lib/realmManager'
 
 const Home = () => {
   const [items, setItems] = useState<any>([])
@@ -23,6 +24,8 @@ const Home = () => {
   const loadData = async () => {
     try {
       const data = await AsyncStorage.getItem('items')
+      const trainingMenus = realm.objects('TrainingMenu')
+      console.log('trainingMenus', trainingMenus)
       if (data !== null) {
         setItems(JSON.parse(data))
       }
@@ -146,7 +149,7 @@ const Home = () => {
           </View>
         )}
         // ListHeaderComponent={<Text>Header</Text>}
-        ListEmptyComponent={<Text>Empty</Text>}
+        ListEmptyComponent={<Text>習慣が登録されていません。登録しましょう！</Text>}
         refreshControl={<RefreshControl refreshing={false} onRefresh={() => {}} />}
       />
       <Modal
