@@ -1,18 +1,17 @@
-import { Alert, FlatList, Image, Linking, RefreshControl, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { Alert, FlatList, Image, Linking, RefreshControl, Text, TouchableOpacity, View } from 'react-native'
 import Modal from 'react-native-modal'
 import React, { useEffect, useRef, useState } from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import Icon from 'react-native-vector-icons/FontAwesome5'
 import Entypo from 'react-native-vector-icons/Entypo'
-// import { VideoView } from 'expo-video' // TODO: 使わなければuninstall
 import Recurring from '@/components/Recurring'
 import { router, useLocalSearchParams } from 'expo-router'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { Item } from '@/types'
 import { deleteNotificationById } from '@/lib/pushNotification'
-import realm from '@/lib/realmManager'
+import { insertData } from '@/lib/localDatabase'
 
-const Home = () => {
+export default function Home() {
   const [items, setItems] = useState<any>([])
   const [itemOnModal, setItemOnModal] = useState<Item | null>(null)
   const params = useLocalSearchParams()
@@ -22,10 +21,11 @@ const Home = () => {
   }, [params?.updated])
 
   const loadData = async () => {
+    // sqlite3テスト
+    await insertData()
+
     try {
       const data = await AsyncStorage.getItem('items')
-      const trainingMenus = realm.objects('TrainingMenu')
-      console.log('trainingMenus', trainingMenus)
       if (data !== null) {
         setItems(JSON.parse(data))
       }
@@ -186,12 +186,3 @@ const Home = () => {
     </SafeAreaView>
   )
 }
-
-const styles = StyleSheet.create({
-  video: {
-    width: 50,
-    height: 50,
-  },
-});
-
-export default Home
