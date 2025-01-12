@@ -10,8 +10,12 @@ import { requestPermissionAsync } from '@/lib/pushNotification'
 import { Session } from '@supabase/supabase-js'
 import { supabase } from '@/lib/supabase'
 import Auth from '@/components/Auth'
+import { useDatabase } from '@/hooks/useDatabase'
 
 export default function App () {
+  // データベース初期化
+  useDatabase()
+  
   useEffect(() => {
     requestPermissionAsync()
   })

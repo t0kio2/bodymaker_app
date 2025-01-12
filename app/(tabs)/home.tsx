@@ -9,7 +9,7 @@ import { router, useLocalSearchParams } from 'expo-router'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { Item } from '@/types'
 import { deleteNotificationById } from '@/lib/pushNotification'
-import { insertData } from '@/lib/localDatabase'
+import { useDatabase } from '@/hooks/useDatabase'
 
 export default function Home() {
   const [items, setItems] = useState<any>([])
@@ -21,9 +21,6 @@ export default function Home() {
   }, [params?.updated])
 
   const loadData = async () => {
-    // sqlite3テスト
-    await insertData()
-
     try {
       const data = await AsyncStorage.getItem('items')
       if (data !== null) {

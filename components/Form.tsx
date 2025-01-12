@@ -9,6 +9,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage'
 import { Item } from '@/types'
 import { getDayNumber, getThumbnailFromVideo, isEverydayChecked } from '@/lib/utils'
 import { registerNotification } from '@/lib/pushNotification'
+import { openDatabaseAsync } from '@/database/db'
+import { insertItem } from '@/database/queries'
 
 const Form = ({ mode }: { mode: 'create' | 'edit'}) => {
   const { id } = useLocalSearchParams()
@@ -69,8 +71,7 @@ const Form = ({ mode }: { mode: 'create' | 'edit'}) => {
     }
 
     const selectedDaysNumber = selectedDays.map((e: string) => getDayNumber(e))
-    const data: Item = {
-      id: mode === 'create' ? Date.now().toString() : id as string,
+    const item: Omit<Item, 'id'> = {
       title: formData.title,
       video: formData.video,
       thumbnail: getThumbnailFromVideo(formData.video),
@@ -82,15 +83,20 @@ const Form = ({ mode }: { mode: 'create' | 'edit'}) => {
       goal: 'まずは2習慣継続!',
       createdAt: new Date(),
     }
-    const updatedItems = mode === 'create'
-      ? [...items, data]
-      : items.map((item: Item) => item.id === id ? data : item)
+    // const updatedItems = mode === 'create'
+    //   ? [...items, item]
+    //   : items.map((item: Item) => item.id === id ? item : item)
     try {
-      await AsyncStorage.setItem('items', JSON.stringify(updatedItems))
-      Alert.alert('登録しました！頑張りましょう！')
+      // await AsyncStorage.setItem('items', JSON.stringify(updatedItems))
+      // Alert.alert('登録しました！頑張りましょう！')
 
-      // Push通知の登録
-      await registerNotification(data)
+      // // Push通知の登録
+      // await registerNotification(data)
+
+      const db = await openDatabaseAsync()
+      console.log("db: ", db)
+      await insertItem(db, item)
+      Alert.alert('登録しました！頑張りましょう！')
 
       router.replace('/home?updated=true')
     } catch (error) {
