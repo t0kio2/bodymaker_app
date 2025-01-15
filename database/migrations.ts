@@ -40,6 +40,7 @@ export const applyMigrations = async (db: any) => {
 const performMigrations = async (db: any, currentVersion: number) => {
   if (currentVersion < 1) {
     console.log('No initial migrations needed')
+    return
   }
   /*
     新規テーブル追加等、バージョンアップに伴うマイグレーションを追加

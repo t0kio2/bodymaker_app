@@ -1,7 +1,7 @@
 // 初期スキーマを適用する
 export const applyInitialSchema = async (db: any) => {
   try {
-    await db.withTransactionAsync(async (txn: any) => {
+    await db.withTransactionAsync(async () => {
       /*
         txn.runAsync(
           SQL文,
@@ -10,7 +10,7 @@ export const applyInitialSchema = async (db: any) => {
       */
       // items テーブル作成
       try {
-        await txn.runAsync(
+        await db.execAsync(
           `CREATE TABLE IF NOT EXISTS items (
             id INTEGER PRIMARY KEY AUTOINCREMENT,  -- 自動インクリメント ID
             title TEXT NOT NULL,
@@ -30,7 +30,7 @@ export const applyInitialSchema = async (db: any) => {
 
       // notifications テーブル作成
       try {
-        await txn.runAsync(
+        await db.execAsync(
           `CREATE TABLE IF NOT EXISTS notifications (
             id INTEGER PRIMARY KEY AUTOINCREMENT,  -- 自動インクリメント ID
             itemId INTEGER NOT NULL,
