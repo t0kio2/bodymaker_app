@@ -10,19 +10,20 @@ export const getItems = async (db: any, setItems: any) => {
       console.log('Items fetched')
     })
   } catch (error) {
-    console.error(error)
     throw error
   }
 }
 
 export const insertItem = async (db: any, item: Omit<Item, 'id'>) => {
+  console.log('Inserting item:', item)
+  console.log('items.title:', item.title)
   try {
     await db.withTransactionAsync(async () => {
       await db.execAsync(
         `INSERT INTO items (title, video, thumbnail, goal, schedule, createdAt)
         VALUES (?, ?, ?, ?, ?, ?);`,
         [
-          item.title,
+          item.title || 'No title',
           item.video,
           item.thumbnail,
           JSON.stringify(item.schedule),
@@ -30,11 +31,8 @@ export const insertItem = async (db: any, item: Omit<Item, 'id'>) => {
           item.createdAt.toISOString(),
         ]
       )
-      console.log('Item inserted')
     })
-    
   } catch (error) {
-    console.error(error)
     throw error
   }
 }
