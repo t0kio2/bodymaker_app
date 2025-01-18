@@ -10,6 +10,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage'
 import { Item } from '@/types'
 import { deleteNotificationById } from '@/lib/pushNotification'
 import { useDatabase } from '@/hooks/useDatabase'
+import { getItems } from '@/database/queries'
+import { openDatabaseAsync } from '@/database/db'
 
 export default function Home() {
   const [items, setItems] = useState<any>([])
@@ -22,6 +24,8 @@ export default function Home() {
 
   const loadData = async () => {
     try {
+      const db = await openDatabaseAsync()
+      getItems(db, setItems)
       const data = await AsyncStorage.getItem('items')
       if (data !== null) {
         setItems(JSON.parse(data))
