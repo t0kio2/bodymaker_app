@@ -6,6 +6,7 @@ export const getItems = async (db: any, setItems: any) => {
       const items = await db.getAllAsync(
         `SELECT * FROM items;`
       )
+      console.log('items:', items)
       setItems(items)
       console.log('Items fetched')
     })
@@ -15,23 +16,21 @@ export const getItems = async (db: any, setItems: any) => {
 }
 
 export const insertItem = async (db: any, item: Omit<Item, 'id'>) => {
-  console.log('Inserting item:', item)
-  console.log('items.title:', item.title)
   try {
-    await db.withTransactionAsync(async () => {
-      await db.execAsync(
-        `INSERT INTO items (title, video, thumbnail, goal, schedule, createdAt)
-        VALUES (?, ?, ?, ?, ?, ?);`,
-        [
-          item.title || 'No title',
-          item.video,
-          item.thumbnail,
-          JSON.stringify(item.schedule),
-          item.goal,
-          item.createdAt.toISOString(),
-        ]
-      )
-    })
+    await db.execAsync('BEGIN;')
+    await db.runAsync(
+      `INSERT INTO items (title, video, thumbnail, schedule, goal, createdAt)
+      VALUES (?, ?, ?, ?, ?, ?);`,
+      [
+        item.title || 'No title',
+        item.video,
+        item.thumbnail,
+        JSON.stringify(item.schedule),
+        item.goal,
+        item.createdAt.toISOString(),
+      ]
+    )
+    db.execAsync('COMMIT;')
   } catch (error) {
     throw error
   }

@@ -7,11 +7,21 @@ import { deleteDatabaseAsync } from "expo-sqlite"
 import { useEffect } from "react"
 
 export const useDatabase = () => {
-  console.log('useDatabase hook called')
   useEffect(() => {
+    const deleteDB = async () => {
+      try {
+        await deleteDatabaseAsync('local_database.db');
+        console.log('Database deleted successfully');
+      } catch (error) {
+        console.error(error);
+      }
+    }
     const initDatabase = async () => {
       try {
-        const db = await openDatabaseAsync()
+        const db = await openDatabaseAsync() as any
+        await db.execAsync(`
+          PRAGMA journal_mode=WAL;
+        `)
         await applyInitialSchema(db)
         // マイグレーション適用
         await applyMigrations(db)
@@ -20,6 +30,7 @@ export const useDatabase = () => {
         throw new Error('Failed to open database')
       }
     }
+    deleteDB()
     initDatabase()
   }, []) // []を渡すことで初回レンダー時のみ実行される
 }
