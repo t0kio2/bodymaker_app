@@ -19,17 +19,16 @@ export const applyInitialSchema = async (db: any) => {
       FOREIGN KEY (itemId) REFERENCES items(id) ON DELETE CASCADE
     `
     await createTableIfNotExists(db, 'notifications', notificationsSchema)
-
+    // db.execAsync('COMMIT;')
     console.log('初期スキーマの適用が完了しました')
+    
   } catch (error) {
     console.error('初期スキーマの適用に失敗しました:', error)
-
     try {
       await db.execAsync('ROLLBACK')
     } catch (rollbackError) {
       console.error('ロールバックに失敗しました:', rollbackError)
     }
-
     throw error
   }
 }

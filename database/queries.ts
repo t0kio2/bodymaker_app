@@ -1,15 +1,15 @@
-import { Item } from "@/types"
+import { Item, Schedule } from "@/types"
 
-export const getItems = async (db: any, setItems: any) => {
+export const getItems = async (db: any): Promise<Item[]> => {
   try {
-    await db.withTransactionAsync(async () => {
-      const items = await db.getAllAsync(
-        `SELECT * FROM items;`
-      )
-      console.log('items:', items)
-      setItems(items)
-      console.log('Items fetched')
+    const items = await db.getAllAsync(
+      `SELECT * FROM items;`
+    )
+    items.forEach((item: any) => {
+      item.schedule = parseSchedule(item.schedule)
     })
+    console.log('getItems ** items:', items)
+    return items
   } catch (error) {
     throw error
   }
@@ -17,7 +17,6 @@ export const getItems = async (db: any, setItems: any) => {
 
 export const insertItem = async (db: any, item: Omit<Item, 'id'>) => {
   try {
-    await db.execAsync('BEGIN;')
     await db.runAsync(
       `INSERT INTO items (title, video, thumbnail, schedule, goal, createdAt)
       VALUES (?, ?, ?, ?, ?, ?);`,
@@ -30,7 +29,14 @@ export const insertItem = async (db: any, item: Omit<Item, 'id'>) => {
         item.createdAt.toISOString(),
       ]
     )
-    db.execAsync('COMMIT;')
+  } catch (error) {
+    throw error
+  }
+}
+
+const parseSchedule = (schedule: string) => {
+  try {
+    return JSON.parse(schedule)
   } catch (error) {
     throw error
   }

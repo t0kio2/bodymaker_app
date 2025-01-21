@@ -3,12 +3,14 @@ export interface Item {
   title: string
   video: string
   thumbnail: string
-  schedule: {
-    recurring: number[]
-    time: string
-  }
+  schedule: Schedule
   goal: string
   createdAt: Date
+}
+
+export interface Schedule {
+  recurring: number[]
+  time: string
 }
 
 export interface Notification {
