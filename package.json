@@ -34,6 +34,7 @@
     "expo-notifications": "~0.29.11",
     "expo-router": "~4.0.15",
     "expo-splash-screen": "~0.29.18",
+    "expo-sqlite": "~15.0.5",
     "expo-status-bar": "~2.0.0",
     "expo-symbols": "~0.2.0",
     "expo-system-ui": "~4.0.6",
@@ -51,8 +52,7 @@
     "react-native-web": "~0.19.13",
     "react-native-webview": "13.12.5",
     "realm": "^12.14.0",
-    "tailwindcss": "^3.4.17",
-    "expo-sqlite": "~15.0.5"
+    "tailwindcss": "^3.4.17"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",

@@ -19,9 +19,13 @@ export const useDatabase = () => {
     const initDatabase = async () => {
       try {
         const db = await openDatabaseAsync() as any
+        console.log('トランザクション状態: ', db.isInTransactionSync())
+
         await db.execAsync(`
           PRAGMA journal_mode=WAL;
         `)
+        console.log('トランザクション状態: ', db.isInTransactionSync())
+        
         await applyInitialSchema(db)
         // マイグレーション適用
         await applyMigrations(db)

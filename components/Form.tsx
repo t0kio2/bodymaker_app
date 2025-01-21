@@ -5,12 +5,11 @@ import TimePicker from './TimePicker'
 import { DAY_OF_WEEK } from '@/constants/common'
 import CustomButton from './CustomButton'
 import { router, useLocalSearchParams } from 'expo-router'
-import AsyncStorage from '@react-native-async-storage/async-storage'
 import { Item } from '@/types'
 import { getDayNumber, getThumbnailFromVideo, isEverydayChecked } from '@/lib/utils'
 import { registerNotification } from '@/lib/pushNotification'
 import { openDatabaseAsync } from '@/database/db'
-import { insertItem } from '@/database/queries'
+import { getItems, insertItem } from '@/database/queries'
 
 const Form = ({ mode }: { mode: 'create' | 'edit'}) => {
   const { id } = useLocalSearchParams()
@@ -34,12 +33,13 @@ const Form = ({ mode }: { mode: 'create' | 'edit'}) => {
 
   const loadData = async () => {
     try {
-      const data = await AsyncStorage.getItem('items')
-      if (data === null) return
-      const parseData = JSON.parse(data)
-      setItems(parseData)
+      const db = await openDatabaseAsync()
+      const items = await getItems(db)
+      if (items === null) return
+      console.log('******items:', items)
+      setItems(items)
       if (mode === 'edit' && id) {
-        const targetItem = parseData.find((item: Item) => item.id === id)
+        const targetItem = items.find((item: Item) => item.id === id)
         if (targetItem) {
           setFormData({
             title: targetItem.title,

@@ -25,10 +25,9 @@ export default function Home() {
   const loadData = async () => {
     try {
       const db = await openDatabaseAsync()
-      getItems(db, setItems)
-      const data = await AsyncStorage.getItem('items')
-      if (data !== null) {
-        setItems(JSON.parse(data))
+      const items = await getItems(db)
+      if (items !== null) {
+        setItems(items)
       }
     } catch (error) {
       console.error(error)
