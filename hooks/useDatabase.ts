@@ -10,7 +10,7 @@ export const useDatabase = () => {
   useEffect(() => {
     const deleteDB = async () => {
       try {
-        await deleteDatabaseAsync('local_database.db');
+        // await deleteDatabaseAsync('local_database.db');
         console.log('Database deleted successfully');
       } catch (error) {
         console.error(error);

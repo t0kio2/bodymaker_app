@@ -6,11 +6,10 @@ import Icon from 'react-native-vector-icons/FontAwesome5'
 import Entypo from 'react-native-vector-icons/Entypo'
 import Recurring from '@/components/Recurring'
 import { router, useLocalSearchParams } from 'expo-router'
-import AsyncStorage from '@react-native-async-storage/async-storage'
 import { Item } from '@/types'
 import { deleteNotificationById } from '@/lib/pushNotification'
 import { useDatabase } from '@/hooks/useDatabase'
-import { getItems } from '@/database/queries'
+import { deleteItem, getItems } from '@/database/queries'
 import { openDatabaseAsync } from '@/database/db'
 
 export default function Home() {
@@ -83,7 +82,8 @@ export default function Home() {
             deleteNotificationById(itemOnModal.id)
             const updatedItems = items.filter((item: any) => item.id !== itemOnModal.id)
             try {
-              await AsyncStorage.setItem('items', JSON.stringify(updatedItems))
+              const db = await openDatabaseAsync()
+              await deleteItem(db, itemOnModal.id)
               setItems(updatedItems)
               Alert.alert('削除しました')
             } catch (error) {
