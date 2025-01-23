@@ -9,14 +9,14 @@ import { Item } from '@/types'
 import { getDayNumber, getThumbnailFromVideo, isEverydayChecked } from '@/lib/utils'
 import { registerNotification } from '@/lib/pushNotification'
 import { openDatabaseAsync } from '@/database/db'
-import { getItems, insertItem } from '@/database/queries'
+import { getItemById, getItems, insertItem, updateItem } from '@/database/queries'
 
 const Form = ({ mode }: { mode: 'create' | 'edit'}) => {
   const { id } = useLocalSearchParams()
   const [time, setTime] = useState<any>('')
   const [selectedDays, setSelectedDays] = useState<string[]>([])
   const [isEveryday, setIsEveryday] = useState(false)
-  const [items, setItems] = useState<any>([])
+  const [item, setItem] = useState<Item>()
   const [formData, setFormData] = useState({
     title: '', 
     video: '',
@@ -34,22 +34,18 @@ const Form = ({ mode }: { mode: 'create' | 'edit'}) => {
   const loadData = async () => {
     try {
       const db = await openDatabaseAsync()
-      const items = await getItems(db)
-      if (items === null) return
-      console.log('******items:', items)
-      setItems(items)
+      const item = await getItemById(db, id)
+      if (item === null) return
+      setItem(item)
       if (mode === 'edit' && id) {
-        const targetItem = items.find((item: Item) => item.id === id)
-        if (targetItem) {
-          setFormData({
-            title: targetItem.title,
-            video: targetItem.video,
-            goal: targetItem.goal,
-          })
-          setTime(targetItem.schedule.time)
-          setSelectedDays(targetItem.schedule.recurring.map((day: number) => DAY_OF_WEEK[day]))
-          isEverydayChecked(targetItem.schedule.recurring) && setIsEveryday(true)
-        }
+        setFormData({
+          title: item.title,
+          video: item.video,
+          goal: item.goal,
+        })
+        setTime(item.schedule.time)
+        setSelectedDays(item.schedule.recurring.map((day: number) => DAY_OF_WEEK[day]))
+        isEverydayChecked(item.schedule.recurring) && setIsEveryday(true)
       }
     } catch (error) {
       console.error(error)
@@ -69,7 +65,6 @@ const Form = ({ mode }: { mode: 'create' | 'edit'}) => {
         errors.title
       )
     }
-
     const selectedDaysNumber = selectedDays.map((e: string) => getDayNumber(e))
     const item: Omit<Item, 'id'> = {
       title: formData.title,
@@ -83,22 +78,24 @@ const Form = ({ mode }: { mode: 'create' | 'edit'}) => {
       goal: 'まずは2習慣継続!',
       createdAt: new Date(),
     }
-    // const updatedItems = mode === 'create'
-    //   ? [...items, item]
-    //   : items.map((item: Item) => item.id === id ? item : item)
     try {
-      // await AsyncStorage.setItem('items', JSON.stringify(updatedItems))
-      // Alert.alert('登録しました！頑張りましょう！')
-
       // // Push通知の登録
       // await registerNotification(data)
 
       const db = await openDatabaseAsync()
-      console.log("db: ", db)
-      await insertItem(db, item)
-      Alert.alert('登録しました！頑張りましょう！')
-
-      router.replace('/home?updated=true')
+      if (mode === 'create') {
+        await insertItem(db, item)
+        Alert.alert('登録しました！頑張りましょう！')
+        return
+      }
+      if (mode === 'edit' && id) {
+        const updatingItem = { ...item, id }
+        await updateItem(db, updatingItem)
+        router.replace('/home?updated=true')
+        return
+      }
+      Alert.alert('データの保存に失敗しました')
+      return
     } catch (error) {
       console.error(error)
       throw new Error('Failed to save data')
