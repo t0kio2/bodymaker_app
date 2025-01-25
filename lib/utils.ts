@@ -15,7 +15,7 @@ export const getDayNumber = (day: string) => {
   return dayNumber
 }
 
-export const isEverydayChecked = (data: number[]) => data.length === DAY_OF_WEEK.length
+export const isEverydayChecked = (days: string[] | number[]) => days.length === DAY_OF_WEEK.length
 
 export const getThumbnailFromVideo = (videoURL: string) => {
   if (!videoURL) return ''
@@ -23,4 +23,14 @@ export const getThumbnailFromVideo = (videoURL: string) => {
   if (!videoId) return ''
   const thumbnailURL = `https://img.youtube.com/vi/${videoId}/mqdefault.jpg`
   return thumbnailURL
+}
+
+export const  getStringId = (id: string | string[]): string | null => {
+  if (typeof id === 'string') {
+    return id
+  }
+  if (Array.isArray(id) && id.length > 0) {
+    return id[0]
+  }
+  return null
 }

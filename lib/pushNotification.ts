@@ -1,5 +1,5 @@
 import { Item, Notification } from '@/types'
-import AsyncStorage from '@react-native-async-storage/async-storage'
+// import AsyncStorage from '@react-native-async-storage/async-storage'
 import * as Notifications from 'expo-notifications'
 
 
@@ -32,38 +32,38 @@ export const registerNotification = async (item :Item) => {
     })
   )
   // 通知IDを保存
-  const notificationsStr = await AsyncStorage.getItem('notifications')
-  const notificationsStore = notificationsStr ? JSON.parse(notificationsStr) : []
-  notificationIds.forEach(async (notificationId) => {
-    const notification = {
-      id: notificationId,
-      itemId: item.id
-    } as Notification
-    await AsyncStorage.setItem(
-      'notifications',
-      JSON.stringify([...notificationsStore, notification])
-    )
+  // const notificationsStr = await AsyncStorage.getItem('notifications')
+  // const notificationsStore = notificationsStr ? JSON.parse(notificationsStr) : []
+  // notificationIds.forEach(async (notificationId) => {
+  //   const notification = {
+  //     id: notificationId,
+  //     itemId: item.id
+  //   } as Notification
+  //   await AsyncStorage.setItem(
+  //     'notifications',
+  //     JSON.stringify([...notificationsStore, notification])
+  //   )
     
-  })
+  // })
 }
 
 export const deleteNotificationById = async (itemId: string) => {
-  try {
-    const notificationsStr = await AsyncStorage.getItem('notifications')
-    const notifications = notificationsStr ? JSON.parse(notificationsStr) : []
-    const notificationIds = notifications.map(async (notification: Notification) => {
-      // 通知のキャンセル
-      if (notification.itemId === itemId) {
-        await Notifications.cancelScheduledNotificationAsync(notification.id)
-        return notification.id
-      }
-    })
-    const updatedNotifications = notifications.filter((notification: Notification) => notification.itemId !== itemId)
-    await AsyncStorage.setItem('notifications', JSON.stringify(updatedNotifications))
+  // try {
+  //   const notificationsStr = await AsyncStorage.getItem('notifications')
+  //   const notifications = notificationsStr ? JSON.parse(notificationsStr) : []
+  //   const notificationIds = notifications.map(async (notification: Notification) => {
+  //     // 通知のキャンセル
+  //     if (notification.itemId === itemId) {
+  //       await Notifications.cancelScheduledNotificationAsync(notification.id)
+  //       return notification.id
+  //     }
+  //   })
+  //   const updatedNotifications = notifications.filter((notification: Notification) => notification.itemId !== itemId)
+  //   await AsyncStorage.setItem('notifications', JSON.stringify(updatedNotifications))
 
-  } catch (error) {
-    throw new Error('通知のキャンセルに失敗しました') 
-  }
+  // } catch (error) {
+  //   throw new Error('通知のキャンセルに失敗しました') 
+  // }
 }
 
 export const getAllSchedule = async () => {

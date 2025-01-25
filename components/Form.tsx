@@ -6,10 +6,10 @@ import { DAY_OF_WEEK } from '@/constants/common'
 import CustomButton from './CustomButton'
 import { router, useLocalSearchParams } from 'expo-router'
 import { Item } from '@/types'
-import { getDayNumber, getThumbnailFromVideo, isEverydayChecked } from '@/lib/utils'
+import { getDayNumber, getStringId, getThumbnailFromVideo, isEverydayChecked } from '@/lib/utils'
 import { registerNotification } from '@/lib/pushNotification'
 import { openDatabaseAsync } from '@/database/db'
-import { getItemById, getItems, insertItem, updateItem } from '@/database/queries'
+import { getItemById, insertItem, updateItem } from '@/database/queries'
 
 const Form = ({ mode }: { mode: 'create' | 'edit'}) => {
   const { id } = useLocalSearchParams()
@@ -34,10 +34,13 @@ const Form = ({ mode }: { mode: 'create' | 'edit'}) => {
   const loadData = async () => {
     try {
       const db = await openDatabaseAsync()
-      const item = await getItemById(db, id)
+      const stringId = getStringId(id)
+      if (!stringId) return
+
+      const item = await getItemById(db, stringId)
       if (item === null) return
       setItem(item)
-      if (mode === 'edit' && id) {
+      if (mode === 'edit') {
         setFormData({
           title: item.title,
           video: item.video,
@@ -88,8 +91,11 @@ const Form = ({ mode }: { mode: 'create' | 'edit'}) => {
         Alert.alert('登録しました！頑張りましょう！')
         return
       }
-      if (mode === 'edit' && id) {
-        const updatingItem = { ...item, id }
+      if (mode === 'edit') {
+        const stringId = getStringId(id)
+        if (!stringId) return
+
+        const updatingItem = { ...item, id: stringId }
         await updateItem(db, updatingItem)
         router.replace('/home?updated=true')
         return
