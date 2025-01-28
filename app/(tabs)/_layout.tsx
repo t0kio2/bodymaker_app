@@ -52,6 +52,16 @@ const TabLayout = () => {
             ),
           })}
         />
+        <Tabs.Screen
+          name='calendar'
+          options={({ route }) => ({
+            title: route.params?.title || 'Calendar',
+            headerShown: true,
+            tabBarIcon: ({ color, focused }) => (
+              <Icon name='calendar' size={20} color={color} />
+            ),
+          })}
+        />
       </Tabs>
     </>
   )
