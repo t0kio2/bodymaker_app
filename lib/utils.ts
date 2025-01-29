@@ -25,7 +25,7 @@ export const getThumbnailFromVideo = (videoURL: string) => {
   return thumbnailURL
 }
 
-export const  getStringId = (id: string | string[]): string | null => {
+export const getStringId = (id: string | string[]): string | null => {
   if (typeof id === 'string') {
     return id
   }
@@ -33,4 +33,15 @@ export const  getStringId = (id: string | string[]): string | null => {
     return id[0]
   }
   return null
+}
+
+
+export const formatDate = (dateStr: string | Date) => {
+  // ISO形式の日付文字列をDateオブジェクトに変換
+  const date = new Date(dateStr);
+  // 年、月、日を取得
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0") // 月は0始まりなので+1
+  const day = String(date.getDate()).padStart(2, "0")
+  return `${year}/${month}/${day}`
 }
