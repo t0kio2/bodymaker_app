@@ -23,8 +23,8 @@ const TabLayout = () => {
       >
         <Tabs.Screen
           name='home'
-          options={({ route }) => ({
-            title: route.params?.title || 'Home',
+          options={{
+            title: 'Home',
             headerShown: true,
             tabBarIcon: ({ color, focused }) => (
               <Icon name='home' size={20} color={color} />
@@ -50,17 +50,17 @@ const TabLayout = () => {
                 <Text>delete push</Text>
               </TouchableOpacity>
             ),
-          })}
+          }}
         />
         <Tabs.Screen
           name='calendar'
-          options={({ route }) => ({
-            title: route.params?.title || 'Calendar',
+          options={{
+            title: 'Calendar',
             headerShown: true,
             tabBarIcon: ({ color, focused }) => (
               <Icon name='calendar' size={20} color={color} />
             ),
-          })}
+          }}
         />
       </Tabs>
     </>
