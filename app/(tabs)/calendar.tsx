@@ -1,4 +1,4 @@
-import { View, Text, SafeAreaView, FlatList, TouchableOpacity, Image, RefreshControl, Alert } from 'react-native'
+import { View, Text, SafeAreaView, FlatList, TouchableOpacity, Image, RefreshControl, Alert, ScrollView } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import Modal from 'react-native-modal'
 import {Calendar as CalendarComponent, LocaleConfig } from 'react-native-calendars'
@@ -11,6 +11,26 @@ import { router, useLocalSearchParams } from 'expo-router'
 import { deleteNotificationById } from '@/lib/pushNotification'
 import { openDatabaseAsync } from '@/database/db'
 import { deleteItem, getItems } from '@/database/queries'
+
+import Svg, { Rect } from 'react-native-svg';
+import { format, subDays } from 'date-fns';
+
+// 📌 42日分のサンプルデータ（6週間）
+const DAYS = 42;
+const COLS = 7; // 1週間の列数
+const BOX_SIZE = 18;
+const BOX_MARGIN = 4;
+
+
+const generateData = () => {
+  return Array.from({ length: DAYS }).map((_, i) => ({
+    date: format(subDays(new Date(), i), 'yyyy-MM-dd'),
+    value: Math.floor(Math.random() * 5), // 貢献度 0〜4
+  }));
+};
+
+const COLOR_MAP = ['#e0e0e0', '#c6e48b', '#7bc96f', '#239a3b', '#196127']; // 色の濃淡
+
 
 LocaleConfig.locales.jp = {
   monthNames: ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月'],
@@ -29,6 +49,8 @@ const markedDates = {
 
 
 const Calendar = () => {
+  const data = generateData();
+
   const [items, setItems] = useState<Item[]>([])
   const [itemOnModal, setItemOnModal] = useState<Item | null>(null)
 
@@ -99,6 +121,27 @@ const Calendar = () => {
   }
   return (
     <SafeAreaView className='h-full'>
+      <ScrollView horizontal>
+        <View style={{ padding: 10 }}>
+          <Svg width={(BOX_SIZE + BOX_MARGIN) * COLS} height={(BOX_SIZE + BOX_MARGIN) * (DAYS / COLS)}>
+            {data.map((d, i) => {
+              const row = Math.floor(i / COLS); // 行番号
+              const col = i % COLS; // 列番号
+              return (
+                <Rect
+                  key={d.date}
+                  x={col * (BOX_SIZE + BOX_MARGIN)}
+                  y={row * (BOX_SIZE + BOX_MARGIN)}
+                  width={BOX_SIZE}
+                  height={BOX_SIZE}
+                  fill={COLOR_MAP[d.value]}
+                  rx={4}
+                />
+              );
+            })}
+          </Svg>
+        </View>
+      </ScrollView>
       <CalendarComponent
         onDayPress={day => {
           console.log('selected day', day);
