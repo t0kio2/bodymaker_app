@@ -20,6 +20,14 @@ LocaleConfig.locales.jp = {
 }
 LocaleConfig.defaultLocale = 'jp'
 
+const markedDates = {
+  '2025-01-01': { selected: true, selectedColor: '#239a3b' },
+  '2025-01-02': { selected: true, selectedColor: '#7bc96f' },
+  '2025-01-03': { selected: true, selectedColor: '#c6e48b' },
+  '2025-01-04': { selected: true, selectedColor: '#e0e0e0' },
+}
+
+
 const Calendar = () => {
   const [items, setItems] = useState<Item[]>([])
   const [itemOnModal, setItemOnModal] = useState<Item | null>(null)
@@ -95,6 +103,7 @@ const Calendar = () => {
         onDayPress={day => {
           console.log('selected day', day);
         }}
+        markedDates={markedDates}
       />
       <Text>今日のトレーニング</Text>
       <FlatList
