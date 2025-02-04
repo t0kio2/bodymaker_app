@@ -97,7 +97,7 @@ const Form = ({ mode }: { mode: 'create' | 'edit'}) => {
 
         const updatingItem = { ...item, id: stringId }
         await updateItem(db, updatingItem)
-        router.replace('/home?updated=true')
+        router.replace('/calendar?updated=true')
         return
       }
       Alert.alert('データの保存に失敗しました')
@@ -194,7 +194,7 @@ const Form = ({ mode }: { mode: 'create' | 'edit'}) => {
       />
       <CustomButton
         title='とじる'
-        handlePress={() => router.replace('/home')}
+        handlePress={() => router.replace('/calendar')}
         containerStyle='mt-2 bg-gray-500'
       />
     </>

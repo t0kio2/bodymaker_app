@@ -8,12 +8,11 @@ import Recurring from '@/components/Recurring'
 import { router, useLocalSearchParams } from 'expo-router'
 import { Item } from '@/types'
 import { deleteNotificationById } from '@/lib/pushNotification'
-import { useDatabase } from '@/hooks/useDatabase'
 import { deleteItem, getItems } from '@/database/queries'
 import { openDatabaseAsync } from '@/database/db'
 import { formatDate } from '@/lib/utils'
 
-export default function Home() {
+export default function List() {
   const [items, setItems] = useState<Item[]>([])
   const [itemOnModal, setItemOnModal] = useState<Item | null>(null)
   const params = useLocalSearchParams()
