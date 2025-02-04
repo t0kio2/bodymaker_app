@@ -19,7 +19,7 @@ export default function App () {
   useEffect(() => {
     requestPermissionAsync()
   })
-  return <Redirect href="/home" />
+  return <Redirect href="/calendar" />
 
   // WIP: 認証機能
   // const [session, setSession] = useState<Session | null>(null)

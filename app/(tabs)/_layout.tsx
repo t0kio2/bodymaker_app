@@ -1,6 +1,8 @@
 import { Alert, Text, TouchableOpacity, } from 'react-native'
 import { Tabs } from 'expo-router'
 import Icon from 'react-native-vector-icons/FontAwesome5'
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
 import { getAllSchedule } from '@/lib/pushNotification'
 import * as Notifications from 'expo-notifications'
 
@@ -22,12 +24,22 @@ const TabLayout = () => {
         }}
       >
         <Tabs.Screen
-          name='home'
+          name='calendar'
           options={{
-            title: 'Home',
+            title: 'Calendar',
             headerShown: true,
             tabBarIcon: ({ color, focused }) => (
-              <Icon name='home' size={20} color={color} />
+              <Icon name='calendar' size={20} color={color} />
+            ),
+          }}
+        />
+        <Tabs.Screen
+          name='list'
+          options={{
+            title: 'List',
+            headerShown: true,
+            tabBarIcon: ({ color, focused }) => (
+              <MaterialCommunityIcons name='format-list-bulleted-square' size={25} color={color} />
             ),
             headerRight: () => (
               <TouchableOpacity
@@ -53,12 +65,12 @@ const TabLayout = () => {
           }}
         />
         <Tabs.Screen
-          name='calendar'
+          name='report'
           options={{
             title: 'Calendar',
             headerShown: true,
             tabBarIcon: ({ color, focused }) => (
-              <Icon name='calendar' size={20} color={color} />
+              <MaterialIcons name='insert-chart' size={25} color={color} />
             ),
           }}
         />
