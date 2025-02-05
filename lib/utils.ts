@@ -1,4 +1,5 @@
 import { DAY_OF_WEEK } from "@/constants/common"
+import { Linking } from "react-native"
 
 export const getDaysOfWeek = (dayNumber: number) => {
   if (dayNumber < 0 || dayNumber > 6) {
@@ -35,7 +36,6 @@ export const getStringId = (id: string | string[]): string | null => {
   return null
 }
 
-
 export const formatDate = (dateStr: string | Date) => {
   // ISO形式の日付文字列をDateオブジェクトに変換
   const date = new Date(dateStr);
@@ -44,4 +44,11 @@ export const formatDate = (dateStr: string | Date) => {
   const month = String(date.getMonth() + 1).padStart(2, "0") // 月は0始まりなので+1
   const day = String(date.getDate()).padStart(2, "0")
   return `${year}/${month}/${day}`
+}
+
+const openYouTube = (video: string) => {
+  if (!video) return
+  Linking.openURL(video).catch(err => {
+    throw new Error('Failed to open YouTube', err)
+  })
 }

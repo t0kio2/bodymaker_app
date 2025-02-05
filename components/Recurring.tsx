@@ -9,7 +9,7 @@ const Recurring = ({ schedule }: any) => {
       <View className='flex justify-end'>
         <MaterialIcons name='autorenew' size={20} color='#161622' />
       </View>
-      <Text className='ml-1  text-lg'>
+      <Text className='ml-1'>
         {
           isEverydayChecked(schedule.recurring)
           ? '毎日'
@@ -18,7 +18,7 @@ const Recurring = ({ schedule }: any) => {
           ))
         }
       </Text>
-      <Text className='ml-2 text-lg'>
+      <Text className='ml-2'>
         {schedule.time}
       </Text>
     </View>
