@@ -178,13 +178,14 @@ const Form = ({ mode }: { mode: 'create' | 'edit'}) => {
       </View>
       
       <View className='mt-10'>
-        <FormField
+        {/* TODO: 動画URLの入力フォームは後回し */}
+        {/* <FormField
           title='動画URL'
           value={formData.video}
           placeholder='URLを入力'
           handleChangeText={(e: string) => handleChange('video', e )}
           containerStyle='mb-4'
-        />
+        /> */}
       </View>
       <CustomButton
         title={mode === 'create' ? '登録' : '更新'}

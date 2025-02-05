@@ -65,27 +65,32 @@ const ItemCard = ({ item }: any) => {
   }
 
   return (
-    <View className='flex-col m-2'>
-      <View className='flex-row items-center'>
+    <>
+      <View className='flex-row items-center m-2 pb-2 border-b-[0.5px] border-b-gray-400'>
         {/* リオーダーアイコン */}
         <Icon
           name='align-justify'
           size={20}
-          color='#161622' 
+          color='#161622'
+          className='mr-6'
         />
-        <View className='flex-row ml-2'>
-          <View className='flex-col'>
-            <Text className='text-lg'>{item.title}</Text>
+        {/* メイン情報 */}
+        <View className='w-[160px] h-full'>
+          <View className='flex-1 justify-between'>
+            <Text className='text-xl mt-2'>{item.title}</Text>
             {/* カレンダーアイコン */}
-            <View className='flex-col'>
-              <Recurring schedule={item.schedule} className='mr-1' />
-              <Text className='mt-1'>開始日 {formatDate(item.createdAt)}</Text>
-            </View>
+            <Recurring schedule={item.schedule} className='mr-1' />
           </View>
+        </View>
+        {/* サブ情報 */}
+        <View className='ml-4'>
+          <Text className='mt-1'>継続率 60%</Text>
+          <Text className='mt-1'>クリアした回数 108回</Text>
+          <Text className='mt-1'>開始日 {formatDate(item.createdAt)}</Text>
         </View>
         {/* 3点リーダー */}
         <TouchableOpacity
-          className='h-full absolute right-0 top-1'
+          className='flex-1 h-full absolute right-0 top-1'
           onPress={(e) => showDialog(e, item)}
         >
           <Entypo
@@ -104,7 +109,7 @@ const ItemCard = ({ item }: any) => {
         style={{
           margin: 0,
           position: "absolute",
-          top: iconPosition.y,
+          top: iconPosition.y - 20,
           left: iconPosition.x - 60, // ダイアログの横位置調整
         }}
         useNativeDriver={true} // チラつき防止
@@ -119,7 +124,7 @@ const ItemCard = ({ item }: any) => {
           </TouchableOpacity>
         </View>
       </Modal>
-    </View>
+    </>
   )
 }
 

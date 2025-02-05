@@ -36,7 +36,7 @@ const TabLayout = () => {
         <Tabs.Screen
           name='list'
           options={{
-            title: 'List',
+            title: 'トレーニング一覧',
             headerShown: true,
             tabBarIcon: ({ color, focused }) => (
               <MaterialCommunityIcons name='format-list-bulleted-square' size={25} color={color} />

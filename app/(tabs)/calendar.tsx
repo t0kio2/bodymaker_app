@@ -3,7 +3,6 @@ import React, { useEffect, useState } from 'react'
 import Modal from 'react-native-modal'
 import {Calendar as CalendarComponent, LocaleConfig } from 'react-native-calendars'
 import { Item } from '@/types'
-import Icon from 'react-native-vector-icons/FontAwesome5'
 import Entypo from 'react-native-vector-icons/Entypo'
 import Recurring from '@/components/Recurring'
 import { formatDate } from '@/lib/utils'
@@ -11,6 +10,7 @@ import { router, useLocalSearchParams } from 'expo-router'
 import { deleteNotificationById } from '@/lib/pushNotification'
 import { openDatabaseAsync } from '@/database/db'
 import { deleteItem, getItems } from '@/database/queries'
+import ItemCard from '@/components/ItemCard'
 
 LocaleConfig.locales.jp = {
   monthNames: ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月'],
@@ -110,41 +110,9 @@ const Calendar = () => {
         data={ items }
         keyExtractor={ item => item.id.toString() }
         renderItem={({ item }) => (
-          <View className='flex-col m-2'>
-            <View className='flex-row items-center'>
-              <View className='flex-row ml-2'>
-                {/* サムネイル */}
-                <TouchableOpacity
-                  className='mr-2'
-                  onPress={() => { /* TODO */ }}
-                >
-                  <Image
-                    source={{ uri: item.thumbnail }}
-                    className='w-36 h-24 rounded-xl'
-                  />
-                </TouchableOpacity>
-                <View className='flex-col'>
-                  <Text className='text-lg'>{item.title}</Text>
-                  {/* カレンダーアイコン */}
-                  <View className='flex-col'>
-                    <Recurring schedule={item.schedule} className='mr-1' />
-                    <Text className='mt-1'>開始日 {formatDate(item.createdAt)}</Text>
-                  </View>
-                </View>
-              </View>
-              {/* 3点リーダー */}
-              <TouchableOpacity
-                className='h-full absolute right-0 top-1'
-                onPress={(e) => showDialog(e, item)}
-              >
-                <Entypo
-                  name='dots-three-vertical'
-                  size={20}
-                  color='#161622'
-                />
-              </TouchableOpacity>
-            </View>
-          </View>
+          <ItemCard
+            item={item}
+          />
         )}
         ListEmptyComponent={<Text>習慣が登録されていません。登録しましょう！</Text>}
         refreshControl={<RefreshControl refreshing={false} onRefresh={() => {}} />}
@@ -173,13 +141,6 @@ const Calendar = () => {
           </TouchableOpacity>
         </View>
       </Modal>
-      <TouchableOpacity
-        className='absolute bottom-8 right-8 shadow-lg w-20 h-20 bg-[#161622] rounded-full
-        flex items-center justify-center'
-        onPress={() => router.push('/create')}
-      >
-        <Icon name='plus' size={20} color='#FFF' />
-      </TouchableOpacity>
     </SafeAreaView>
   )
 }
