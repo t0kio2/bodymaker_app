@@ -1,4 +1,4 @@
-import { Item, Notification } from '@/types'
+import { Task, Notification } from '@/types'
 // import AsyncStorage from '@react-native-async-storage/async-storage'
 import * as Notifications from 'expo-notifications'
 
@@ -9,15 +9,15 @@ export const requestPermissionAsync = async () => {
   await Notifications.requestPermissionsAsync()
 }
 
-export const registerNotification = async (item :Item) => {
-  console.log('通知登録', item)
-  const [hour, minute] = item.schedule.time.split(':').map(Number)
+export const registerNotification = async (task :Task) => {
+  console.log('通知登録', task)
+  const [hour, minute] = task.schedule.time.split(':').map(Number)
   // 通知のスケジュール登録
   const notificationIds = await Promise.all(
-    item.schedule.recurring.map(async (weekday: number) => {
+    task.schedule.recurring.map(async (weekday: number) => {
       const notificationId = await Notifications.scheduleNotificationAsync({
         content: {
-          title: `${item.title}の時間です`,
+          title: `${task.title}の時間です`,
           body: '時間です！行動を始めましょう！',
         },
         trigger: {
@@ -32,14 +32,14 @@ export const registerNotification = async (item :Item) => {
     })
   )
   // 通知IDを保存
-  // const notificationsStr = await AsyncStorage.getItem('notifications')
+  // const notificationsStr = await AsyncStorage.getTask('notifications')
   // const notificationsStore = notificationsStr ? JSON.parse(notificationsStr) : []
   // notificationIds.forEach(async (notificationId) => {
   //   const notification = {
   //     id: notificationId,
-  //     itemId: item.id
+  //     taskId: task.id
   //   } as Notification
-  //   await AsyncStorage.setItem(
+  //   await AsyncStorage.setTask(
   //     'notifications',
   //     JSON.stringify([...notificationsStore, notification])
   //   )
@@ -47,19 +47,19 @@ export const registerNotification = async (item :Item) => {
   // })
 }
 
-export const deleteNotificationById = async (itemId: string) => {
+export const deleteNotificationById = async (taskId: string) => {
   // try {
-  //   const notificationsStr = await AsyncStorage.getItem('notifications')
+  //   const notificationsStr = await AsyncStorage.getTask('notifications')
   //   const notifications = notificationsStr ? JSON.parse(notificationsStr) : []
   //   const notificationIds = notifications.map(async (notification: Notification) => {
   //     // 通知のキャンセル
-  //     if (notification.itemId === itemId) {
+  //     if (notification.taskId === taskId) {
   //       await Notifications.cancelScheduledNotificationAsync(notification.id)
   //       return notification.id
   //     }
   //   })
-  //   const updatedNotifications = notifications.filter((notification: Notification) => notification.itemId !== itemId)
-  //   await AsyncStorage.setItem('notifications', JSON.stringify(updatedNotifications))
+  //   const updatedNotifications = notifications.filter((notification: Notification) => notification.taskId !== taskId)
+  //   await AsyncStorage.setTask('notifications', JSON.stringify(updatedNotifications))
 
   // } catch (error) {
   //   throw new Error('通知のキャンセルに失敗しました') 

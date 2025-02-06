@@ -1,45 +1,45 @@
-import { Item, Schedule } from "@/types"
+import { Task, Schedule } from "@/types"
 
-export const getItems = async (db: any): Promise<Item[]> => {
+export const getTasks = async (db: any): Promise<Task[]> => {
   try {
-    const items = await db.getAllAsync(
-      `SELECT * FROM items;`
+    const tasks = await db.getAllAsync(
+      `SELECT * FROM tasks;`
     )
-    items.forEach((item: any) => {
-      item.schedule = parseSchedule(item.schedule)
+    tasks.forEach((task: any) => {
+      task.schedule = parseSchedule(task.schedule)
     })
-    return items
+    return tasks
   } catch (error) {
     throw error
   }
 }
 
-export const getItemById = async (db: any, id: string): Promise<Item | null> => { 
+export const getTaskById = async (db: any, id: string): Promise<Task | null> => { 
   try {
-    const item = await db.getFirstAsync(
-      `SELECT * FROM items WHERE id = ?;`,
+    const task = await db.getFirstAsync(
+      `SELECT * FROM tasks WHERE id = ?;`,
       [id]
     )
-    if (!item) return null
-    item.schedule = parseSchedule(item.schedule)
-    return item
+    if (!task) return null
+    task.schedule = parseSchedule(task.schedule)
+    return task
   } catch (error) {
     throw error
   }
 }
 
-export const insertItem = async (db: any, item: Omit<Item, 'id'>) => {
+export const insertTask = async (db: any, task: Omit<Task, 'id'>) => {
   try {
     await db.runAsync(
-      `INSERT INTO items (title, video, thumbnail, schedule, goal, createdAt)
+      `INSERT INTO tasks (title, video, thumbnail, schedule, goal, createdAt)
       VALUES (?, ?, ?, ?, ?, ?);`,
       [
-        item.title,
-        item.video,
-        item.thumbnail,
-        JSON.stringify(item.schedule),
-        item.goal,
-        item.createdAt.toISOString(),
+        task.title,
+        task.video,
+        task.thumbnail,
+        JSON.stringify(task.schedule),
+        task.goal,
+        task.createdAt.toISOString(),
       ]
     )
   } catch (error) {
@@ -47,19 +47,19 @@ export const insertItem = async (db: any, item: Omit<Item, 'id'>) => {
   }
 }
 
-export const updateItem = async (db: any, item: Item) => {
+export const updateTask = async (db: any, task: Task) => {
   try {
     await db.runAsync(
-      `UPDATE items
+      `UPDATE tasks
       SET title = ?, video = ?, thumbnail = ?, schedule = ?, goal = ?
       WHERE id = ?;`,
       [
-        item.title,
-        item.video,
-        item.thumbnail,
-        JSON.stringify(item.schedule),
-        item.goal,
-        item.id,
+        task.title,
+        task.video,
+        task.thumbnail,
+        JSON.stringify(task.schedule),
+        task.goal,
+        task.id,
       ]
     )
   } catch (error) {
@@ -67,10 +67,10 @@ export const updateItem = async (db: any, item: Item) => {
   }
 }
 
-export const deleteItem = async (db: any, id: string) => {
+export const deleteTask = async (db: any, id: string) => {
   try {
     await db.runAsync(
-      `DELETE FROM items WHERE id = ?;`,
+      `DELETE FROM tasks WHERE id = ?;`,
       [id]
     )
   } catch (error) {

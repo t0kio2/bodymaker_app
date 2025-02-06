@@ -3,13 +3,13 @@ import React, { useEffect, useState } from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import Icon from 'react-native-vector-icons/FontAwesome5'
 import { router, useLocalSearchParams } from 'expo-router'
-import { Item } from '@/types'
-import { getItems } from '@/database/queries'
+import { Task } from '@/types'
+import { getTasks } from '@/database/queries'
 import { openDatabaseAsync } from '@/database/db'
-import ItemCard from '@/components/ItemCard'
+import TaskCard from '@/components/TaskCard'
 
 export default function List() {
-  const [items, setItems] = useState<Item[]>([])
+  const [tasks, setTasks] = useState<Task[]>([])
   const params = useLocalSearchParams()
 
   useEffect(() => {
@@ -19,9 +19,9 @@ export default function List() {
   const loadData = async () => {
     try {
       const db = await openDatabaseAsync()
-      const items = await getItems(db)
-      if (items !== null) {
-        setItems(items)
+      const tasks = await getTasks(db)
+      if (tasks !== null) {
+        setTasks(tasks)
       }
     } catch (error) {
       console.error(error)
@@ -34,11 +34,11 @@ export default function List() {
     <SafeAreaView className='h-full'>
       <FlatList
         // className='border border-red-500'
-        data={ items }
-        keyExtractor={ item => item.id.toString()}
+        data={ tasks }
+        keyExtractor={ task => task.id.toString()}
         renderItem={({ item }) => (
-          <ItemCard
-            item={item}
+          <TaskCard
+            task={item}
           />
         )}
         // ListHeaderComponent={<Text>Header</Text>}
