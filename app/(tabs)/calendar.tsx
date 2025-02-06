@@ -2,15 +2,15 @@ import { View, Text, SafeAreaView, FlatList, TouchableOpacity, Image, RefreshCon
 import React, { useEffect, useState } from 'react'
 import Modal from 'react-native-modal'
 import {Calendar as CalendarComponent, LocaleConfig } from 'react-native-calendars'
-import { Item } from '@/types'
+import { Task } from '@/types'
 import Entypo from 'react-native-vector-icons/Entypo'
 import Recurring from '@/components/Recurring'
 import { formatDate } from '@/lib/utils'
 import { router, useLocalSearchParams } from 'expo-router'
 import { deleteNotificationById } from '@/lib/pushNotification'
 import { openDatabaseAsync } from '@/database/db'
-import { deleteItem, getItems } from '@/database/queries'
-import ItemCard from '@/components/ItemCard'
+import { deleteTask, getTasks } from '@/database/queries'
+import TaskCard from '@/components/TaskCard'
 
 LocaleConfig.locales.jp = {
   monthNames: ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月'],
@@ -29,8 +29,8 @@ const markedDates = {
 
 
 const Calendar = () => {
-  const [items, setItems] = useState<Item[]>([])
-  const [itemOnModal, setItemOnModal] = useState<Item | null>(null)
+  const [tasks, setTasks] = useState<Task[]>([])
+  const [taskOnModal, setTaskOnModal] = useState<Task | null>(null)
 
   const [isModalVisible, setIsModalVisible] = useState(false)
   const [iconPosition, setIconPosition] = useState({ x: 0, y: 0 })
@@ -44,9 +44,9 @@ const Calendar = () => {
   const loadData = async () => {
     try {
       const db = await openDatabaseAsync()
-      const items = await getItems(db)
-      if (items !== null) {
-        setItems(items)
+      const tasks = await getTasks(db)
+      if (tasks !== null) {
+        setTasks(tasks)
       }
     } catch (error) {
       console.error(error)
@@ -54,21 +54,21 @@ const Calendar = () => {
     }
   }
 
-  const showDialog = (e: any, item: Item) => {
+  const showDialog = (e: any, task: Task) => {
     const { pageX, pageY } = e.nativeEvent
     setIconPosition({ x: pageX, y: pageY })
     setIsModalVisible(true)
     // モーダルで対象とするアイテムを保持
-    setItemOnModal(item)
+    setTaskOnModal(task)
   }
   const handleEdit = () => {
     setIsModalVisible(false)
-    router.push(`/edit?id=${itemOnModal?.id}`)
+    router.push(`/edit?id=${taskOnModal?.id}`)
   }
   const handleDelete = async () => {
-    if (!itemOnModal) return
+    if (!taskOnModal) return
     Alert.alert(
-      itemOnModal.title, // タイトル
+      taskOnModal.title, // タイトル
       '削除してもよろしいですか？', // メッセージ
       [ // ボタン
         {
@@ -80,15 +80,15 @@ const Calendar = () => {
           text: 'OK',
           onPress: async () => {
             setIsModalVisible(false)
-            deleteNotificationById(itemOnModal.id)
-            const updatedItems = items.filter((item: any) => item.id !== itemOnModal.id)
+            deleteNotificationById(taskOnModal.id)
+            const updatedTasks = tasks.filter((task: any) => task.id !== taskOnModal.id)
             try {
               const db = await openDatabaseAsync()
-              await deleteItem(db, itemOnModal.id)
-              setItems(updatedItems)
+              await deleteTask(db, taskOnModal.id)
+              setTasks(updatedTasks)
               Alert.alert('削除しました')
             } catch (error) {
-              throw new Error('Failed to delete item')
+              throw new Error('Failed to delete task')
             } finally {
               setIsModalVisible(false)
             }
@@ -107,11 +107,11 @@ const Calendar = () => {
       />
       <Text>今日のトレーニング</Text>
       <FlatList
-        data={ items }
-        keyExtractor={ item => item.id.toString() }
+        data={ tasks }
+        keyExtractor={ task => task.id.toString() }
         renderItem={({ item }) => (
-          <ItemCard
-            item={item}
+          <TaskCard
+            task={item}
           />
         )}
         ListEmptyComponent={<Text>習慣が登録されていません。登録しましょう！</Text>}

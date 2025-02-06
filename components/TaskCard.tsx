@@ -2,15 +2,15 @@ import { View, Text, TouchableOpacity, Image, Alert } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import Icon from 'react-native-vector-icons/FontAwesome5'
 import Recurring from './Recurring'
-import { Item } from '@/types'
+import { Task } from '@/types'
 import { router, useLocalSearchParams } from 'expo-router'
 import { formatDate } from '@/lib/utils'
 import Entypo from 'react-native-vector-icons/Entypo'
 import Modal from 'react-native-modal'
 import { deleteNotificationById } from '@/lib/pushNotification'
 
-const ItemCard = ({ item }: any) => {
-  const [itemOnModal, setItemOnModal] = useState<Item | null>(null)
+const TaskCard = ({ task }: any) => {
+  const [taskOnModal, setTaskOnModal] = useState<Task | null>(null)
   const [isModalVisible, setIsModalVisible] = useState(false)
   const [iconPosition, setIconPosition] = useState({ x: 0, y: 0 })
   const params = useLocalSearchParams()
@@ -19,22 +19,22 @@ const ItemCard = ({ item }: any) => {
 
   }, [params?.updated])
 
-  const showDialog = (e: any, item: Item) => {
+  const showDialog = (e: any, task: Task) => {
     const { pageX, pageY } = e.nativeEvent
     setIconPosition({ x: pageX, y: pageY })
     setIsModalVisible(true)
     // モーダルで対象とするアイテムを保持
-    setItemOnModal(item)
+    setTaskOnModal(task)
   }
 
   const handleEdit = () => {
     setIsModalVisible(false)
-    router.push(`/edit?id=${itemOnModal?.id}`)
+    router.push(`/edit?id=${taskOnModal?.id}`)
   }
   const handleDelete = async () => {
-    if (!itemOnModal) return
+    if (!taskOnModal) return
     Alert.alert(
-      itemOnModal.title, // タイトル
+      taskOnModal.title, // タイトル
       '削除してもよろしいですか？', // メッセージ
       [ // ボタン
         {
@@ -46,15 +46,15 @@ const ItemCard = ({ item }: any) => {
           text: 'OK',
           onPress: async () => {
             setIsModalVisible(false)
-            deleteNotificationById(itemOnModal.id)
-            // const updatedItems = items.filter((item: any) => item.id !== itemOnModal.id)
+            deleteNotificationById(taskOnModal.id)
+            // const updatedTasks = tasks.filter((task: any) => task.id !== taskOnModal.id)
             // try {
             //   const db = await openDatabaseAsync()
-            //   await deleteItem(db, itemOnModal.id)
-            //   setItems(updatedItems)
+            //   await deleteTask(db, taskOnModal.id)
+            //   setTasks(updatedTasks)
             //   Alert.alert('削除しました')
             // } catch (error) {
-            //   throw new Error('Failed to delete item')
+            //   throw new Error('Failed to delete task')
             // } finally {
             //   setIsModalVisible(false)
             // }
@@ -77,21 +77,21 @@ const ItemCard = ({ item }: any) => {
         {/* メイン情報 */}
         <View className='w-[160px] h-full'>
           <View className='flex-1 justify-between'>
-            <Text className='text-xl mt-2'>{item.title}</Text>
+            <Text className='text-xl mt-2'>{task.title}</Text>
             {/* カレンダーアイコン */}
-            <Recurring schedule={item.schedule} className='mr-1' />
+            <Recurring schedule={task.schedule} className='mr-1' />
           </View>
         </View>
         {/* サブ情報 */}
         <View className='ml-4'>
           <Text className='mt-1'>継続率 60%</Text>
           <Text className='mt-1'>クリアした回数 108回</Text>
-          <Text className='mt-1'>開始日 {formatDate(item.createdAt)}</Text>
+          <Text className='mt-1'>開始日 {formatDate(task.createdAt)}</Text>
         </View>
         {/* 3点リーダー */}
         <TouchableOpacity
           className='flex-1 h-full absolute right-0 top-1'
-          onPress={(e) => showDialog(e, item)}
+          onPress={(e) => showDialog(e, task)}
         >
           <Entypo
             name='dots-three-vertical'
@@ -128,4 +128,4 @@ const ItemCard = ({ item }: any) => {
   )
 }
 
-export default ItemCard
+export default TaskCard

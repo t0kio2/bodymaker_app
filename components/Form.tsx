@@ -5,18 +5,19 @@ import TimePicker from './TimePicker'
 import { DAY_OF_WEEK } from '@/constants/common'
 import CustomButton from './CustomButton'
 import { router, useLocalSearchParams } from 'expo-router'
-import { Item } from '@/types'
+import { Task } from '@/types'
 import { getDayNumber, getStringId, getThumbnailFromVideo, isEverydayChecked } from '@/lib/utils'
 import { registerNotification } from '@/lib/pushNotification'
 import { openDatabaseAsync } from '@/database/db'
-import { getItemById, insertItem, updateItem } from '@/database/queries'
+import { getTaskById, insertTask, updateTask } from '@/database/queries'
 
 const Form = ({ mode }: { mode: 'create' | 'edit'}) => {
   const { id } = useLocalSearchParams()
   const [time, setTime] = useState<any>('')
   const [selectedDays, setSelectedDays] = useState<string[]>([])
   const [isEveryday, setIsEveryday] = useState(false)
-  const [item, setItem] = useState<Item>()
+  const [pushNotification, setPushNotification] = useState(true)
+  const [task, setTask] = useState<Task>()
   const [formData, setFormData] = useState({
     title: '', 
     video: '',
@@ -37,18 +38,18 @@ const Form = ({ mode }: { mode: 'create' | 'edit'}) => {
       const stringId = getStringId(id)
       if (!stringId) return
 
-      const item = await getItemById(db, stringId)
-      if (item === null) return
-      setItem(item)
+      const task = await getTaskById(db, stringId)
+      if (task === null) return
+      setTask(task)
       if (mode === 'edit') {
         setFormData({
-          title: item.title,
-          video: item.video,
-          goal: item.goal,
+          title: task.title,
+          video: task.video,
+          goal: task.goal,
         })
-        setTime(item.schedule.time)
-        setSelectedDays(item.schedule.recurring.map((day: number) => DAY_OF_WEEK[day]))
-        isEverydayChecked(item.schedule.recurring) && setIsEveryday(true)
+        setTime(task.schedule.time)
+        setSelectedDays(task.schedule.recurring.map((day: number) => DAY_OF_WEEK[day]))
+        isEverydayChecked(task.schedule.recurring) && setIsEveryday(true)
       }
     } catch (error) {
       console.error(error)
@@ -69,7 +70,7 @@ const Form = ({ mode }: { mode: 'create' | 'edit'}) => {
       )
     }
     const selectedDaysNumber = selectedDays.map((e: string) => getDayNumber(e))
-    const item: Omit<Item, 'id'> = {
+    const task: Omit<Task, 'id'> = {
       title: formData.title,
       video: formData.video,
       thumbnail: getThumbnailFromVideo(formData.video),
@@ -87,7 +88,7 @@ const Form = ({ mode }: { mode: 'create' | 'edit'}) => {
 
       const db = await openDatabaseAsync()
       if (mode === 'create') {
-        await insertItem(db, item)
+        await insertTask(db, task)
         Alert.alert('登録しました！頑張りましょう！')
         return
       }
@@ -95,8 +96,8 @@ const Form = ({ mode }: { mode: 'create' | 'edit'}) => {
         const stringId = getStringId(id)
         if (!stringId) return
 
-        const updatingItem = { ...item, id: stringId }
-        await updateItem(db, updatingItem)
+        const updatingTask = { ...task, id: stringId }
+        await updateTask(db, updatingTask)
         router.replace('/calendar?updated=true')
         return
       }
@@ -131,6 +132,10 @@ const Form = ({ mode }: { mode: 'create' | 'edit'}) => {
     })
   }
 
+  const togglePushNotification = () => {
+    setPushNotification(prev => !prev)
+  }
+
   return (
     <>
       <FormField
@@ -145,18 +150,6 @@ const Form = ({ mode }: { mode: 'create' | 'edit'}) => {
           value={time}
           handleTimeChange={(e) => setTime(e)}
         />
-      </View>
-      <View className='mt-5 flex-row items-center'>
-        <Text>毎日</Text>
-        <View className=''>
-          <Switch
-            trackColor={{true: '#3b82f6'}}
-            thumbColor={isEveryday ? '#d1d5db' : '#f4f3f4'}
-            ios_backgroundColor="#d1d5db"
-            onValueChange={toggleSwitch}
-            value={isEveryday}
-          />
-        </View>
       </View>
       <View className='mt-3 flex-row flex-wrap justify-center gap-1'>
         {DAY_OF_WEEK.map((day, i) => (
@@ -176,21 +169,44 @@ const Form = ({ mode }: { mode: 'create' | 'edit'}) => {
           </TouchableOpacity>
         ))}
       </View>
+      <View className='mt-5 flex-row items-center'>
+        <Text>毎日</Text>
+        <View className='ml-3'>
+          <Switch
+            trackColor={{true: '#3b82f6'}}
+            thumbColor={isEveryday ? '#d1d5db' : '#f4f3f4'}
+            ios_backgroundColor="#d1d5db"
+            onValueChange={toggleSwitch}
+            value={isEveryday}
+          />
+        </View>
+      </View>
+      <View className='mt-5 flex-row items-center'>
+        <Text>通知</Text>
+        <View className='ml-3'>
+          <Switch
+            trackColor={{true: '#3b82f6'}}
+            thumbColor={isEveryday ? '#d1d5db' : '#f4f3f4'}
+            ios_backgroundColor="#d1d5db"
+            onValueChange={togglePushNotification}
+            value={pushNotification}
+          />
+        </View>
+      </View>
       
-      <View className='mt-10'>
-        {/* TODO: 動画URLの入力フォームは後回し */}
-        {/* <FormField
+      {/* TODO: 動画URLの入力フォームは後回し */}
+      {/* <View className='mt-10'>
+        <FormField
           title='動画URL'
           value={formData.video}
           placeholder='URLを入力'
           handleChangeText={(e: string) => handleChange('video', e )}
           containerStyle='mb-4'
-        /> */}
-      </View>
+        />
+      </View> */}
       <CustomButton
         title={mode === 'create' ? '登録' : '更新'}
         handlePress={() => handleSubmit(time, selectedDays)}
-        // containerStyle='mt-7'
         containerStyle='mt-7 bg-primary'
       />
       <CustomButton

@@ -1,4 +1,4 @@
-export interface Item {
+export interface Task {
   id: string
   title: string
   video: string
@@ -15,5 +15,5 @@ export interface Schedule {
 
 export interface Notification {
   id: string,
-  itemId: string
+  taskId: string
 }

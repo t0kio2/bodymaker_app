@@ -1,7 +1,7 @@
 export const applyInitialSchema = async (db: any) => {
   try {
-    // items テーブル作成
-    const itemsSchema = `
+    // tasks テーブル作成
+    const tasksSchema = `
       id INTEGER PRIMARY KEY AUTOINCREMENT,  -- 自動インクリメント ID
       title TEXT NOT NULL,
       video TEXT,
@@ -10,13 +10,13 @@ export const applyInitialSchema = async (db: any) => {
       goal TEXT,
       createdAt TEXT NOT NULL
     `
-    await createTableIfNotExists(db, 'items', itemsSchema)
+    await createTableIfNotExists(db, 'tasks', tasksSchema)
 
     // notifications テーブル作成
     const notificationsSchema = `
       id INTEGER PRIMARY KEY AUTOINCREMENT,  -- 自動インクリメント ID
-      itemId INTEGER NOT NULL,
-      FOREIGN KEY (itemId) REFERENCES items(id) ON DELETE CASCADE
+      taskId INTEGER NOT NULL,
+      FOREIGN KEY (taskId) REFERENCES tasks(id) ON DELETE CASCADE
     `
     await createTableIfNotExists(db, 'notifications', notificationsSchema)
     // db.execAsync('COMMIT;')
