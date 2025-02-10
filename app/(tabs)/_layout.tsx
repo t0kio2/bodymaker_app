@@ -67,7 +67,7 @@ const TabLayout = () => {
         <Tabs.Screen
           name='report'
           options={{
-            title: 'Calendar',
+            title: 'Report',
             headerShown: true,
             tabBarIcon: ({ color, focused }) => (
               <MaterialIcons name='insert-chart' size={25} color={color} />

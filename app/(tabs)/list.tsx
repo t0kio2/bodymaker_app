@@ -1,6 +1,6 @@
-import { Alert, FlatList, RefreshControl, Text, TouchableOpacity, View } from 'react-native'
+import { FlatList, RefreshControl, Text, TouchableOpacity } from 'react-native'
 import React, { useEffect, useState } from 'react'
-import { SafeAreaView } from 'react-native-safe-area-context'
+import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context'
 import Icon from 'react-native-vector-icons/FontAwesome5'
 import { router, useLocalSearchParams } from 'expo-router'
 import { Task } from '@/types'
@@ -31,27 +31,30 @@ export default function List() {
 
   return (
     // デバイス毎に余白をよしなにしてくれる
-    <SafeAreaView className='h-full'>
-      <FlatList
-        // className='border border-red-500'
-        data={ tasks }
-        keyExtractor={ task => task.id.toString()}
-        renderItem={({ item }) => (
-          <TaskCard
-            task={item}
-          />
-        )}
-        // ListHeaderComponent={<Text>Header</Text>}
-        ListEmptyComponent={<Text>習慣が登録されていません。登録しましょう！</Text>}
-        refreshControl={<RefreshControl refreshing={false} onRefresh={() => {}} />}
-      />
-      <TouchableOpacity
-        className='absolute bottom-8 right-8 shadow-lg w-20 h-20 bg-[#161622] rounded-full
-        flex items-center justify-center'
-        onPress={() => router.push('/create')}
-      >
-        <Icon name='plus' size={20} color='#FFF' />
-      </TouchableOpacity>
-    </SafeAreaView>
+    <SafeAreaProvider>
+      <SafeAreaView className='h-full'>
+        <Text>継続度カレンダー</Text>
+        <FlatList
+          // className='border border-red-500'
+          data={ tasks }
+          keyExtractor={ task => task.id.toString()}
+          renderItem={({ item }) => (
+            <TaskCard
+              task={item}
+            />
+          )}
+          // ListHeaderComponent={<Text>Header</Text>}
+          ListEmptyComponent={<Text>習慣が登録されていません。登録しましょう！</Text>}
+          refreshControl={<RefreshControl refreshing={false} onRefresh={() => {}} />}
+        />
+        <TouchableOpacity
+          className='absolute bottom-8 right-8 shadow-lg w-20 h-20 bg-[#161622] rounded-full
+          flex items-center justify-center'
+          onPress={() => router.push('/create')}
+        >
+          <Icon name='plus' size={20} color='#FFF' />
+        </TouchableOpacity>
+      </SafeAreaView>
+    </SafeAreaProvider>
   )
 }

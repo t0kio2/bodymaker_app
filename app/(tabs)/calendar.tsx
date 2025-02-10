@@ -3,14 +3,12 @@ import React, { useEffect, useState } from 'react'
 import Modal from 'react-native-modal'
 import {Calendar as CalendarComponent, LocaleConfig } from 'react-native-calendars'
 import { Task } from '@/types'
-import Entypo from 'react-native-vector-icons/Entypo'
-import Recurring from '@/components/Recurring'
-import { formatDate } from '@/lib/utils'
 import { router, useLocalSearchParams } from 'expo-router'
 import { deleteNotificationById } from '@/lib/pushNotification'
 import { openDatabaseAsync } from '@/database/db'
 import { deleteTask, getTasks } from '@/database/queries'
 import TaskCard from '@/components/TaskCard'
+import { SafeAreaProvider } from 'react-native-safe-area-context'
 
 LocaleConfig.locales.jp = {
   monthNames: ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月'],
@@ -53,14 +51,6 @@ const Calendar = () => {
       throw new Error('Failed to load data')
     }
   }
-
-  const showDialog = (e: any, task: Task) => {
-    const { pageX, pageY } = e.nativeEvent
-    setIconPosition({ x: pageX, y: pageY })
-    setIsModalVisible(true)
-    // モーダルで対象とするアイテムを保持
-    setTaskOnModal(task)
-  }
   const handleEdit = () => {
     setIsModalVisible(false)
     router.push(`/edit?id=${taskOnModal?.id}`)
@@ -98,50 +88,52 @@ const Calendar = () => {
     )
   }
   return (
-    <SafeAreaView className='h-full'>
-      <CalendarComponent
-        onDayPress={day => {
-          console.log('selected day', day);
-        }}
-        markedDates={markedDates}
-      />
-      <Text>今日のトレーニング</Text>
-      <FlatList
-        data={ tasks }
-        keyExtractor={ task => task.id.toString() }
-        renderItem={({ item }) => (
-          <TaskCard
-            task={item}
-          />
-        )}
-        ListEmptyComponent={<Text>習慣が登録されていません。登録しましょう！</Text>}
-        refreshControl={<RefreshControl refreshing={false} onRefresh={() => {}} />}
-      />
-      <Modal
-        isVisible={isModalVisible}
-        onBackdropPress={() => setIsModalVisible(false)}
-        backdropOpacity={0.1}
-        animationInTiming={1} // アニメーション無効
-        animationOutTiming={1} // アニメーション無効
-        style={{
-          margin: 0,
-          position: "absolute",
-          top: iconPosition.y,
-          left: iconPosition.x - 60, // ダイアログの横位置調整
-        }}
-        useNativeDriver={true} // チラつき防止
-        hideModalContentWhileAnimating={true} // チラつき防止
-      >
-        <View className="bg-white p-2 rounded shadow-lg">
-          <TouchableOpacity onPress={() => handleEdit()} className="mb-2">
-            <Text className="text-blue-500 text-lg">編集</Text>
-          </TouchableOpacity>
-          <TouchableOpacity onPress={() => handleDelete()}>
-            <Text className="text-red-500 text-lg">削除</Text>
-          </TouchableOpacity>
-        </View>
-      </Modal>
-    </SafeAreaView>
+    <SafeAreaProvider>
+      <SafeAreaView className='h-full'>
+        <CalendarComponent
+          onDayPress={day => {
+            console.log('selected day', day);
+          }}
+          markedDates={markedDates}
+        />
+        <Text>今日のトレーニング</Text>
+        <FlatList
+          data={ tasks }
+          keyExtractor={ task => task.id.toString() }
+          renderItem={({ item }) => (
+            <TaskCard
+              task={item}
+            />
+          )}
+          ListEmptyComponent={<Text>習慣が登録されていません。登録しましょう！</Text>}
+          refreshControl={<RefreshControl refreshing={false} onRefresh={() => {}} />}
+        />
+        <Modal
+          isVisible={isModalVisible}
+          onBackdropPress={() => setIsModalVisible(false)}
+          backdropOpacity={0.1}
+          animationInTiming={1} // アニメーション無効
+          animationOutTiming={1} // アニメーション無効
+          style={{
+            margin: 0,
+            position: "absolute",
+            top: iconPosition.y,
+            left: iconPosition.x - 60, // ダイアログの横位置調整
+          }}
+          useNativeDriver={true} // チラつき防止
+          hideModalContentWhileAnimating={true} // チラつき防止
+        >
+          <View className="bg-white p-2 rounded shadow-lg">
+            <TouchableOpacity onPress={() => handleEdit()} className="mb-2">
+              <Text className="text-blue-500 text-lg">編集</Text>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => handleDelete()}>
+              <Text className="text-red-500 text-lg">削除</Text>
+            </TouchableOpacity>
+          </View>
+        </Modal>
+      </SafeAreaView>
+    </SafeAreaProvider>
   )
 }
 
