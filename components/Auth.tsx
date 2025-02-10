@@ -3,7 +3,7 @@ import React from 'react'
 import { supabase } from '@/lib/supabase'
 import { Input } from '@rneui/themed'
 import CustomButton from './CustomButton'
-import { SafeAreaView } from 'react-native-safe-area-context'
+import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context'
 import { Link } from 'expo-router'
 
 AppState.addEventListener('change', (state) => {
@@ -45,38 +45,40 @@ const Auth = () => {
   }
 
   return (
-    <SafeAreaView className='h-full'>
-      <ScrollView>
-        <View className='w-full justify-center min-h-[83vh] px-4 my-6'>
-          <Input
-            label="メールアドレス"
-            leftIcon={{ type: 'font-awesome', name: 'envelope' }}
-            value={email}
-            onChangeText={(text) => setEmail(text)}
-            placeholder="email@address.com"
-            autoCapitalize={'none'}
-          />
-          <Input
-            label="パスワード"
-            leftIcon={{ type: 'font-awesome', name: 'lock' }}
-            onChangeText={(text) => setPassword(text)}
-            value={password}
-            secureTextEntry={true}
-            placeholder="Password"
-            autoCapitalize={'none'}
-          />
-          <CustomButton
-            title="ログイン"
-            handlePress={() => signInWithEmail()}
-            isLoading={loading}
-            containerStyle='mt-7'
-          />
-          <View className='justify-center pt-5 flex-row pag-2'>          
-            <Link href='/signup'>新規登録はこちら</Link>
+    <SafeAreaProvider>
+      <SafeAreaView className='h-full'>
+        <ScrollView>
+          <View className='w-full justify-center min-h-[83vh] px-4 my-6'>
+            <Input
+              label="メールアドレス"
+              leftIcon={{ type: 'font-awesome', name: 'envelope' }}
+              value={email}
+              onChangeText={(text) => setEmail(text)}
+              placeholder="email@address.com"
+              autoCapitalize={'none'}
+            />
+            <Input
+              label="パスワード"
+              leftIcon={{ type: 'font-awesome', name: 'lock' }}
+              onChangeText={(text) => setPassword(text)}
+              value={password}
+              secureTextEntry={true}
+              placeholder="Password"
+              autoCapitalize={'none'}
+            />
+            <CustomButton
+              title="ログイン"
+              handlePress={() => signInWithEmail()}
+              isLoading={loading}
+              containerStyle='mt-7'
+            />
+            <View className='justify-center pt-5 flex-row pag-2'>          
+              <Link href='/signup'>新規登録はこちら</Link>
+            </View>
           </View>
-        </View>
-      </ScrollView>
-    </SafeAreaView>
+        </ScrollView>
+      </SafeAreaView>
+    </SafeAreaProvider>
   )
 }
 
