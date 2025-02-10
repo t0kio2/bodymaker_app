@@ -1,6 +1,6 @@
-import { FlatList, RefreshControl, Text, TouchableOpacity } from 'react-native'
+import { FlatList, RefreshControl, Text, TouchableOpacity, SafeAreaView } from 'react-native'
 import React, { useEffect, useState } from 'react'
-import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context'
+import { SafeAreaProvider } from 'react-native-safe-area-context'
 import Icon from 'react-native-vector-icons/FontAwesome5'
 import { router, useLocalSearchParams } from 'expo-router'
 import { Task } from '@/types'

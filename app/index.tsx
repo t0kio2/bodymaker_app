@@ -1,7 +1,7 @@
-import { Text, View } from 'react-native'
+import { Text, View, SafeAreaView } from 'react-native'
 import React, { useEffect } from 'react'
 import "./../global.css"
-import { SafeAreaView } from 'react-native-safe-area-context'
+import { SafeAreaProvider } from 'react-native-safe-area-context'
 import { ScrollView } from 'react-native'
 import { Redirect, router } from 'expo-router'
 import CustomButton from '@/components/CustomButton'
@@ -36,17 +36,19 @@ export default function App () {
   // if (session && session?.user) return <Redirect href="/home" />
 
   return (
-    <SafeAreaView className='h-full'>
-      <ScrollView>
-        <View>
-          <Text>init画面</Text>
-        </View>
-        <CustomButton
-          title="メールアドレスでログイン"
-          handlePress={() => { router.push('/signin') }}
-          containerStyle="w-full mt-7"
-        />
-      </ScrollView>
-    </SafeAreaView>
+    <SafeAreaProvider>
+      <SafeAreaView className='h-full'>
+        <ScrollView>
+          <View>
+            <Text>init画面</Text>
+          </View>
+          <CustomButton
+            title="メールアドレスでログイン"
+            handlePress={() => { router.push('/signin') }}
+            containerStyle="w-full mt-7"
+          />
+        </ScrollView>
+      </SafeAreaView>
+    </SafeAreaProvider>
   )
 }

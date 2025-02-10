@@ -1,9 +1,9 @@
-import { View, AppState, Alert, ScrollView } from 'react-native'
+import { View, AppState, Alert, ScrollView, SafeAreaView } from 'react-native'
 import React from 'react'
 import { supabase } from '@/lib/supabase'
 import { Input } from '@rneui/themed'
 import CustomButton from './CustomButton'
-import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context'
+import { SafeAreaProvider } from 'react-native-safe-area-context'
 import { Link } from 'expo-router'
 
 AppState.addEventListener('change', (state) => {
