@@ -1,6 +1,6 @@
-import { View, Text, ScrollView } from 'react-native'
+import { View, Text, ScrollView, SafeAreaView } from 'react-native'
 import React from 'react'
-import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context'
+import { SafeAreaProvider } from 'react-native-safe-area-context'
 import Svg, { Rect } from 'react-native-svg'
 import { eachDayOfInterval, endOfYear, format, getDay, getISOWeek, startOfYear } from 'date-fns'
 
