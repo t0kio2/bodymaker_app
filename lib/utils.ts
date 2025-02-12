@@ -1,6 +1,16 @@
 import { DAY_OF_WEEK } from "@/constants/common"
 import { Linking } from "react-native"
 
+// M月D日 (ddd)
+export const formattedDate = () => {
+  const date = new Date()
+  const month = date.getMonth() + 1
+  const day = date.getDate()
+  const weekdays = ['日', '月', '火', '水', '木', '金', '土']
+  const weekday = weekdays[date.getDay()] // 曜日
+  return `${month}月${day}日 (${weekday})`
+}
+
 export const getDaysOfWeek = (dayNumber: number) => {
   if (dayNumber < 0 || dayNumber > 6) {
     throw new Error('Invalid day number. Must be between 0 and 6')

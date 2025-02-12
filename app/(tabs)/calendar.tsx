@@ -9,6 +9,7 @@ import { openDatabaseAsync } from '@/database/db'
 import { deleteTask, getTasks } from '@/database/queries'
 import TaskCard from '@/components/TaskCard'
 import { SafeAreaProvider } from 'react-native-safe-area-context'
+import { formattedDate } from '@/lib/utils'
 
 LocaleConfig.locales.jp = {
   monthNames: ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月'],
@@ -19,12 +20,11 @@ LocaleConfig.locales.jp = {
 LocaleConfig.defaultLocale = 'jp'
 
 const markedDates = {
-  '2025-01-01': { selected: true, selectedColor: '#239a3b' },
-  '2025-01-02': { selected: true, selectedColor: '#7bc96f' },
-  '2025-01-03': { selected: true, selectedColor: '#c6e48b' },
-  '2025-01-04': { selected: true, selectedColor: '#e0e0e0' },
+  '2025-02-01': { selected: true, selectedColor: '#239a3b' },
+  '2025-02-02': { selected: true, selectedColor: '#7bc96f' },
+  '2025-02-03': { selected: true, selectedColor: '#c6e48b' },
+  '2025-02-04': { selected: true, selectedColor: '#e0e0e0' },
 }
-
 
 const Calendar = () => {
   const [tasks, setTasks] = useState<Task[]>([])
@@ -89,49 +89,29 @@ const Calendar = () => {
   }
   return (
     <SafeAreaProvider>
-      <SafeAreaView className='h-full'>
+      <SafeAreaView className='h-full bg-white'>
+        <Text className='text-3xl'>{ formattedDate() }</Text>
         <CalendarComponent
           onDayPress={day => {
             console.log('selected day', day);
           }}
           markedDates={markedDates}
         />
-        <Text>今日のトレーニング</Text>
-        <FlatList
-          data={ tasks }
-          keyExtractor={ task => task.id.toString() }
-          renderItem={({ item }) => (
-            <TaskCard
-              task={item}
-            />
-          )}
-          ListEmptyComponent={<Text>習慣が登録されていません。登録しましょう！</Text>}
-          refreshControl={<RefreshControl refreshing={false} onRefresh={() => {}} />}
-        />
-        <Modal
-          isVisible={isModalVisible}
-          onBackdropPress={() => setIsModalVisible(false)}
-          backdropOpacity={0.1}
-          animationInTiming={1} // アニメーション無効
-          animationOutTiming={1} // アニメーション無効
-          style={{
-            margin: 0,
-            position: "absolute",
-            top: iconPosition.y,
-            left: iconPosition.x - 60, // ダイアログの横位置調整
-          }}
-          useNativeDriver={true} // チラつき防止
-          hideModalContentWhileAnimating={true} // チラつき防止
-        >
-          <View className="bg-white p-2 rounded shadow-lg">
-            <TouchableOpacity onPress={() => handleEdit()} className="mb-2">
-              <Text className="text-blue-500 text-lg">編集</Text>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => handleDelete()}>
-              <Text className="text-red-500 text-lg">削除</Text>
-            </TouchableOpacity>
-          </View>
-        </Modal>
+        <View className='pl-4 pt-4'>
+          <Text className='text-2xl'>今日のトレーニング</Text>
+          <FlatList
+            // contentContainerClassName='pl-4'
+            data={ tasks }
+            keyExtractor={ task => task.id.toString() }
+            renderItem={({ item }) => (
+              <TaskCard
+                task={item}
+              />
+            )}
+            ListEmptyComponent={<Text>習慣が登録されていません。登録しましょう！</Text>}
+            refreshControl={<RefreshControl refreshing={false} onRefresh={() => {}} />}
+          />
+        </View>
       </SafeAreaView>
     </SafeAreaProvider>
   )

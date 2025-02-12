@@ -32,8 +32,7 @@ export default function List() {
   return (
     // デバイス毎に余白をよしなにしてくれる
     <SafeAreaProvider>
-      <SafeAreaView className='h-full'>
-        <Text>継続度カレンダー</Text>
+      <SafeAreaView className='h-full bg-white'>
         <FlatList
           // className='border border-red-500'
           data={ tasks }
