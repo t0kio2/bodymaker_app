@@ -25,7 +25,7 @@ const Report = () => {
   
   return (
     <SafeAreaProvider>
-      <SafeAreaView className='h-full'>
+      <SafeAreaView className='h-full bg-white'>
         <Text>継続度カレンダー</Text>
         <ScrollView horizontal>
           <View style={{ padding: 10 }}>
