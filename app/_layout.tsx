@@ -37,6 +37,7 @@ export default function RootLayout() {
           options={{ 
             title: '習慣の作成',
             headerBackTitle: '戻る',
+            headerShadowVisible: false,
         }} />
         <Stack.Screen name="edit"
           options={{ 

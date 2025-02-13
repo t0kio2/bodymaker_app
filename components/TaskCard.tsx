@@ -8,15 +8,17 @@ import { formatDate } from '@/lib/utils'
 import Entypo from 'react-native-vector-icons/Entypo'
 import Modal from 'react-native-modal'
 import { deleteNotificationById } from '@/lib/pushNotification'
+import Checkbox from 'expo-checkbox'
 
-const TaskCard = ({ task }: any) => {
+const TaskCard = ({ task, editMode = false }: any) => {
   const [taskOnModal, setTaskOnModal] = useState<Task | null>(null)
   const [isModalVisible, setIsModalVisible] = useState(false)
   const [iconPosition, setIconPosition] = useState({ x: 0, y: 0 })
   const params = useLocalSearchParams()
+
+  const [isChecked, setIsChecked] = useState(false)
   
   useEffect(() => {
-
   }, [params?.updated])
 
   const showDialog = (e: any, task: Task) => {
@@ -67,13 +69,29 @@ const TaskCard = ({ task }: any) => {
   return (
     <>
       <View className='flex-row items-center m-2 pb-2 border-b-[0.5px] border-b-gray-400'>
-        {/* リオーダーアイコン */}
-        <Icon
-          name='align-justify'
-          size={20}
-          color='#161622'
-          className='mr-6'
-        />
+        {
+          editMode ? (
+            <Icon
+              name='align-justify'
+              size={20}
+              color='#161622'
+              className='mr-6'
+            />
+          ):(
+            <Checkbox
+              value={isChecked}
+              onValueChange={setIsChecked}
+              color={isChecked ? '#7bc96f' : undefined}
+              className='mr-4'
+              style={{ 
+                width: 25, // サイズ調整
+                height: 25,
+                borderRadius: 15, // 円形にする
+                borderWidth: 1, // 枠線を表示
+              }}
+            />
+          )
+        }
         {/* メイン情報 */}
         <View className='w-[160px] h-full'>
           <View className='flex-1 justify-between'>
@@ -89,16 +107,20 @@ const TaskCard = ({ task }: any) => {
           <Text className='mt-1'>開始日 {formatDate(task.createdAt)}</Text>
         </View>
         {/* 3点リーダー */}
-        <TouchableOpacity
-          className='flex-1 h-full absolute right-0 top-1'
-          onPress={(e) => showDialog(e, task)}
-        >
-          <Entypo
-            name='dots-three-vertical'
-            size={20}
-            color='#161622'
-          />
-        </TouchableOpacity>
+        {
+          editMode && (
+            <TouchableOpacity
+              className='flex-1 h-full absolute right-0 top-1'
+              onPress={(e) => showDialog(e, task)}
+            >
+              <Entypo
+                name='dots-three-vertical'
+                size={20}
+                color='#161622'
+              />
+            </TouchableOpacity>
+          )
+        }
       </View>
       <Modal
         isVisible={isModalVisible}

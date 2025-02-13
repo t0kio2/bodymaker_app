@@ -6,7 +6,7 @@ import Form from '@/components/Form'
 const Create = () => {
   return (
     <SafeAreaProvider>
-      <SafeAreaView>
+      <SafeAreaView className='h-full bg-white'>
         <ScrollView className='px-4 my-6'>
           <Form
             mode='create'
