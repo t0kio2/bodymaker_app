@@ -28,6 +28,7 @@ const TabLayout = () => {
           options={{
             title: 'Calendar',
             headerShown: true,
+            headerShadowVisible: false,
             tabBarIcon: ({ color, focused }) => (
               <Icon name='calendar' size={20} color={color} />
             ),
@@ -38,6 +39,7 @@ const TabLayout = () => {
           options={{
             title: 'トレーニング一覧',
             headerShown: true,
+            headerShadowVisible: false,
             tabBarIcon: ({ color, focused }) => (
               <MaterialCommunityIcons name='format-list-bulleted-square' size={25} color={color} />
             ),
@@ -69,6 +71,7 @@ const TabLayout = () => {
           options={{
             title: 'Report',
             headerShown: true,
+            headerShadowVisible: false,
             tabBarIcon: ({ color, focused }) => (
               <MaterialIcons name='insert-chart' size={25} color={color} />
             ),

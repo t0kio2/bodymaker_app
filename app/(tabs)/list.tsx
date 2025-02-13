@@ -40,6 +40,7 @@ export default function List() {
           renderItem={({ item }) => (
             <TaskCard
               task={item}
+              editMode={true}
             />
           )}
           // ListHeaderComponent={<Text>Header</Text>}
