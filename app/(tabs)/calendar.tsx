@@ -90,7 +90,7 @@ const Calendar = () => {
   return (
     <SafeAreaProvider>
       <SafeAreaView className='h-full bg-white'>
-        <Text className='text-3xl'>{ formattedDate() }</Text>
+        <Text className='text-3xl ml-3'>{ formattedDate() }</Text>
         <CalendarComponent
           onDayPress={day => {
             console.log('selected day', day);
