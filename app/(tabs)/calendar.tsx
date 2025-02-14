@@ -100,7 +100,6 @@ const Calendar = () => {
         <View className='pl-4 pt-4'>
           <Text className='text-2xl'>今日のトレーニング</Text>
           <FlatList
-            // contentContainerClassName='pl-4'
             data={ tasks }
             keyExtractor={ task => task.id.toString() }
             renderItem={({ item }) => (
