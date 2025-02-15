@@ -5,136 +5,43 @@ import TimePicker from './TimePicker'
 import { DAY_OF_WEEK } from '@/constants/common'
 import CustomButton from './CustomButton'
 import { router, useLocalSearchParams } from 'expo-router'
-import { Task } from '@/types'
-import { getDayNumber, getStringId, getThumbnailFromVideo, isEverydayChecked } from '@/lib/utils'
-import { registerNotification } from '@/lib/pushNotification'
-import { openDatabaseAsync } from '@/database/db'
-import { getTaskById, insertTask, updateTask } from '@/database/queries'
+import { useTask } from '@/hooks/useTask'
+import { useForm } from '@/hooks/useForm'
 
 const Form = ({ mode }: { mode: 'create' | 'edit'}) => {
   const { id } = useLocalSearchParams()
-  const [time, setTime] = useState<any>('')
-  const [selectedDays, setSelectedDays] = useState<string[]>([])
-  const [isEveryday, setIsEveryday] = useState(false)
-  const [pushNotification, setPushNotification] = useState(true)
-  const [task, setTask] = useState<Task>()
-  const [formData, setFormData] = useState({
-    title: '', 
-    video: '',
-    goal: '',
-  })
-  const [errors, setErrors] = useState<any>({
-    title: '',
-    video: '',
-  })
-
-  useEffect(() => {
-    loadData()
-  }, [id])
-
-  const loadData = async () => {
-    try {
-      const db = await openDatabaseAsync()
-      const stringId = getStringId(id)
-      if (!stringId) return
-
-      const task = await getTaskById(db, stringId)
-      if (task === null) return
-      setTask(task)
-      if (mode === 'edit') {
-        setFormData({
-          title: task.title,
-          video: task.video,
-          goal: task.goal,
-        })
-        setTime(task.schedule.time)
-        setSelectedDays(task.schedule.recurring.map((day: number) => DAY_OF_WEEK[day]))
-        isEverydayChecked(task.schedule.recurring) && setIsEveryday(true)
-      }
-    } catch (error) {
-      console.error(error)
-      throw new Error('Failed to load data')
-    }
-  }
-
-  const handleChange = (field: string, value: string) => {
-    setFormData((prev) => ({ ...prev, [field]: value }))
-  }
+  const { task, saveTask } = useTask(id as string, mode)
+  const {
+    formData,
+    time,
+    selectedDays,
+    isEveryday,
+    pushNotification,
+    errors,
+    setTime,
+    setPushNotification,
+    handleChange,
+    validateForm,
+    toggleSwitch,
+    toggleDays,
+  } = useForm(mode, task)
 
 
-  const handleSubmit = async (time: string, selectedDays: string[]) => {
+
+  const handleSubmit = async () => {
     if (!validateForm()) {
-      return Alert.alert(
-        '入力内容に不備があります',
-        errors.title
-      )
+      return Alert.alert('入力内容に不備があります', errors.title)
     }
-    const selectedDaysNumber = selectedDays.map((e: string) => getDayNumber(e))
-    const task: Omit<Task, 'id'> = {
+    const taskData = {
       title: formData.title,
       video: formData.video,
-      thumbnail: getThumbnailFromVideo(formData.video),
-      schedule: {
-        // For weekly: 0=Sunday, 1=Monday, etc.
-        recurring: selectedDaysNumber,
-        time: time,
-      },
-      goal: 'まずは2習慣継続!',
-      createdAt: new Date(),
+      schedule: { recurring: selectedDays, time },
+      goal: formData.goal,
     }
-    try {
-      // // Push通知の登録
-      // await registerNotification(data)
-
-      const db = await openDatabaseAsync()
-      if (mode === 'create') {
-        await insertTask(db, task)
-        Alert.alert('登録しました！頑張りましょう！')
-        return
-      }
-      if (mode === 'edit') {
-        const stringId = getStringId(id)
-        if (!stringId) return
-
-        const updatingTask = { ...task, id: stringId }
-        await updateTask(db, updatingTask)
-        router.replace('/calendar?updated=true')
-        return
-      }
-      Alert.alert('データの保存に失敗しました')
-      return
-    } catch (error) {
-      console.error(error)
-      throw new Error('Failed to save data')
-    }
+    const success = await saveTask(taskData)
+    Alert.alert(success ? "保存成功！" : "保存失敗")
   }
   
-  const validateForm = () => {
-    if (!formData.title) {
-      setErrors({ title: '習慣名を入力してください' })
-      return false
-    }
-    return true
-  }
-  
-  const toggleSwitch = () => {
-    const nextState = !isEveryday
-    setSelectedDays(nextState ? DAY_OF_WEEK : [])
-    setIsEveryday(nextState)
-  }
-
-  const toggleDays = (day: string) => {
-    setSelectedDays(prev => {
-      const updated = prev.includes(day) ? prev.filter(d => d !== day) : [...prev, day]
-      const isSelectedAll = isEverydayChecked(updated)
-      setIsEveryday(isSelectedAll)
-      return updated
-    })
-  }
-
-  const togglePushNotification = () => {
-    setPushNotification(prev => !prev)
-  }
 
   return (
     <>
@@ -188,7 +95,7 @@ const Form = ({ mode }: { mode: 'create' | 'edit'}) => {
             trackColor={{true: '#3b82f6'}}
             thumbColor={isEveryday ? '#d1d5db' : '#f4f3f4'}
             ios_backgroundColor="#d1d5db"
-            onValueChange={togglePushNotification}
+            onValueChange={() => setPushNotification((prev) => !prev)} 
             value={pushNotification}
           />
         </View>
@@ -206,7 +113,7 @@ const Form = ({ mode }: { mode: 'create' | 'edit'}) => {
       </View> */}
       <CustomButton
         title={mode === 'create' ? '登録' : '更新'}
-        handlePress={() => handleSubmit(time, selectedDays)}
+        handlePress={() => handleSubmit}
         containerStyle='mt-7 bg-primary'
       />
       <CustomButton
