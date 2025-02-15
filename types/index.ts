@@ -2,10 +2,10 @@ export interface Task {
   id: string
   title: string
   video: string
-  thumbnail: string
+  thumbnail?: string | null
   schedule: Schedule
   goal: string
-  createdAt: Date
+  createdAt?: Date
 }
 
 export interface Schedule {
