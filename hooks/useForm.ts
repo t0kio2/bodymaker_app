@@ -7,7 +7,6 @@ import { useEffect, useState } from "react";
 export const useForm = (mode: 'create' | 'edit', initialTask?: Task | null) => {
   const [formData, setFormData] = useState({
     title: '', 
-    video: '',
     goal: '',
   })
   const [time, setTime] = useState('')
@@ -20,12 +19,10 @@ export const useForm = (mode: 'create' | 'edit', initialTask?: Task | null) => {
     if (mode === 'edit' && initialTask) {
       setFormData({
         title: initialTask.title,
-        video: initialTask.video,
         goal: initialTask.goal,
       })
-      setTime(initialTask.schedule.time)
-      setSelectedDays(initialTask.schedule.recurring.map((day: number) => DAY_OF_WEEK[day]))
-      setIsEveryday(isEverydayChecked(initialTask.schedule.recurring))
+      // setSelectedDays(initialTask.schedule.recurring.map((day: number) => DAY_OF_WEEK[day]))
+      // setIsEveryday(isEverydayChecked(initialTask.schedule.recurring))
     }
   }, [mode, initialTask])
 

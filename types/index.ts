@@ -1,9 +1,7 @@
 export interface Task {
-  id: string
+  id: string,
+  user_id? : number | null
   title: string
-  video: string
-  thumbnail?: string | null
-  schedule: Schedule
   goal: string
   createdAt?: Date
 }

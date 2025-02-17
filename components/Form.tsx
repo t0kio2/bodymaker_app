@@ -26,15 +26,13 @@ const Form = ({ mode }: { mode: 'create' | 'edit'}) => {
     toggleDays,
   } = useForm(mode, task)
 
-
-
   const handleSubmit = async () => {
+    console.log('formData', formData)
     if (!validateForm()) {
       return Alert.alert('入力内容に不備があります', errors.title)
     }
     const taskData = {
       title: formData.title,
-      video: formData.video,
       schedule: { recurring: selectedDays, time },
       goal: formData.goal,
     }
@@ -100,20 +98,9 @@ const Form = ({ mode }: { mode: 'create' | 'edit'}) => {
           />
         </View>
       </View>
-      
-      {/* TODO: 動画URLの入力フォームは後回し */}
-      {/* <View className='mt-10'>
-        <FormField
-          title='動画URL'
-          value={formData.video}
-          placeholder='URLを入力'
-          handleChangeText={(e: string) => handleChange('video', e )}
-          containerStyle='mb-4'
-        />
-      </View> */}
       <CustomButton
         title={mode === 'create' ? '登録' : '更新'}
-        handlePress={() => handleSubmit}
+        handlePress={() => handleSubmit()}
         containerStyle='mt-7 bg-primary'
       />
       <CustomButton
