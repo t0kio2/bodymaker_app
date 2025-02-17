@@ -97,7 +97,7 @@ const TaskCard = ({ task, editMode = false }: any) => {
           <View className='flex-1 justify-between'>
             <Text className='text-xl mt-2'>{task.title}</Text>
             {/* カレンダーアイコン */}
-            <Recurring schedule={task.schedule} className='mr-1' />
+            {/* <Recurring schedule={task.schedule} className='mr-1' /> */}
           </View>
         </View>
         {/* サブ情報 */}

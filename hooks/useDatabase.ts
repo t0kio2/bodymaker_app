@@ -10,7 +10,7 @@ export const useDatabase = () => {
   useEffect(() => {
     const deleteDB = async () => {
       try {
-        // await deleteDatabaseAsync('local_database.db');
+        await deleteDatabaseAsync('local_database.db');
         console.log('Database deleted successfully');
       } catch (error) {
         console.error(error);
@@ -34,7 +34,7 @@ export const useDatabase = () => {
         throw new Error('Failed to open database')
       }
     }
-    deleteDB()
+    // deleteDB()
     initDatabase()
   }, []) // []を渡すことで初回レンダー時のみ実行される
 }

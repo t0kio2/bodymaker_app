@@ -28,14 +28,6 @@ export const getDayNumber = (day: string) => {
 
 export const isEverydayChecked = (days: string[] | number[]) => days.length === DAY_OF_WEEK.length
 
-export const getThumbnailFromVideo = (videoURL: string) => {
-  if (!videoURL) return ''
-  const videoId = videoURL.split('v=')[1]?.split('&')[0]
-  if (!videoId) return ''
-  const thumbnailURL = `https://img.youtube.com/vi/${videoId}/mqdefault.jpg`
-  return thumbnailURL
-}
-
 export const getStringId = (id: string | string[]): string | null => {
   if (typeof id === 'string') {
     return id
@@ -61,4 +53,12 @@ const openYouTube = (video: string) => {
   Linking.openURL(video).catch(err => {
     throw new Error('Failed to open YouTube', err)
   })
+}
+
+export const getThumbnailFromVideo = (videoURL: string) => {
+  if (!videoURL) return ''
+  const videoId = videoURL.split('v=')[1]?.split('&')[0]
+  if (!videoId) return ''
+  const thumbnailURL = `https://img.youtube.com/vi/${videoId}/mqdefault.jpg`
+  return thumbnailURL
 }

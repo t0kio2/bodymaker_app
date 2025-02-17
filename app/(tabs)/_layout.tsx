@@ -3,8 +3,6 @@ import { Tabs } from 'expo-router'
 import Icon from 'react-native-vector-icons/FontAwesome5'
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
-import { getAllSchedule } from '@/lib/pushNotification'
-import * as Notifications from 'expo-notifications'
 
 const TabLayout = () => {
   return (
@@ -46,8 +44,7 @@ const TabLayout = () => {
             headerRight: () => (
               <TouchableOpacity
                 onPress={async () => {
-                  const schedule = await getAllSchedule()
-                  Alert.alert('Schedule', JSON.stringify(schedule))
+                  
                 }}
                 className="mr-4"
               >
@@ -56,12 +53,12 @@ const TabLayout = () => {
             ),
             headerLeft: () => (
               <TouchableOpacity
-                onPress={() => {
-                  Notifications.cancelAllScheduledNotificationsAsync()
+                onPress={async () => {
+                  // TODO
                 }}
                 className="ml-4"
               >
-                <Text>delete push</Text>
+                <Text>delete tables</Text>
               </TouchableOpacity>
             ),
           }}
