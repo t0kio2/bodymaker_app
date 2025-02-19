@@ -28,16 +28,16 @@ const Form = ({ mode }: { mode: 'create' | 'edit'}) => {
 
   const handleSubmit = async () => {
     console.log('formData', formData)
-    if (!validateForm()) {
-      return Alert.alert('入力内容に不備があります', errors.title)
-    }
-    const taskData = {
-      title: formData.title,
-      schedule: { recurring: selectedDays, time },
-      goal: formData.goal,
-    }
-    const success = await saveTask(taskData)
-    Alert.alert(success ? "保存成功！" : "保存失敗")
+    // if (!validateForm()) {
+    //   return Alert.alert('入力内容に不備があります', errors.title)
+    // }
+    // const taskData = {
+    //   title: formData.title,
+    //   schedule: { recurring: selectedDays, time },
+    //   goal: formData.goal,
+    // }
+    // const success = await saveTask(taskData)
+    // Alert.alert(success ? "保存成功！" : "保存失敗")
   }
   
 

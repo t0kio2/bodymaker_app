@@ -10,7 +10,7 @@ export const useForm = (mode: 'create' | 'edit', initialTask?: Task | null) => {
     goal: '',
   })
   const [time, setTime] = useState('')
-  const [selectedDays, setSelectedDays] = useState<string[]>([])
+  const [selectedDays, setSelectedDays] = useState(0)
   const [isEveryday, setIsEveryday] = useState(false)
   const [pushNotification, setPushNotification] = useState(true)
   const [errors, setErrors] = useState<any>({ title: '', vide: '' })
@@ -52,6 +52,10 @@ export const useForm = (mode: 'create' | 'edit', initialTask?: Task | null) => {
       return updated
     })
   }
+
+  // const toggleDays = (day: number) => {
+  //   setSelectedDays(prev => prev ^ day)
+  // }
 
   return {
     formData,
