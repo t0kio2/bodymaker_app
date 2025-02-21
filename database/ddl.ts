@@ -2,6 +2,8 @@ export const tasksSchema = `
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   title TEXT NOT NULL,
   goal TEXT,
+  start_date TEXT NOT NULL,
+  is_push_notification BOOLEAN NOT NULL DEFAULT 1,
   created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
 `
 
