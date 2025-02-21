@@ -29,6 +29,54 @@ export const getTaskById = async (db: any, id: string): Promise<Task | null> => 
   }
 }
 
+// TODO
+export const addTask = async (db: any, task: any, schedule: any) => {
+  try {
+    const result = await db.runAsync(
+      `INSERT INTO tasks (title, goal, start_date, is_push_notification)
+        VALUES (?, ?, ?, ?);`,
+        [
+          task.title,
+          task.goal,
+          task.startDate,
+          task.isPushNotification,
+        ]
+    )
+    const taskId = result.lastInsertRowId
+
+    const scheduleResult = await db.runAsync(
+      `INSERT INTO task_schedules (taskId, bitmask_days, time)
+        VALUES (?, ?, ?);`,
+        [
+          taskId,
+          schedule.bitmaskDays,
+          schedule.time,
+        ]
+    )
+    const taskScheduleId = scheduleResult.lastInsertRowId
+
+    await db.runAsync(
+      `INSERT INTO task_logs (task_schedule_id, date, is_completed)
+        VALUES (?, ?, ?);`,
+        [
+          taskScheduleId,
+          task.startDate,
+          0
+        ]
+    )
+
+    await db.runAsync(
+      `INSERT INTO notifications (taskId)
+        VALUES (?);`,
+        [taskId]
+    )
+    
+  } catch (error) {
+    console.error('タスク追加に失敗', error)
+  }
+
+}
+
 export const insertTask = async (db: any, task: Omit<Task, 'id'>) => {
   try {
     await db.runAsync(
