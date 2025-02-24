@@ -33,7 +33,7 @@ export const insertTask = async (db: any, task: Omit<Task, 'id'>) => {
   try {
     await db.runAsync(
       `INSERT INTO tasks (title, goal)
-      VALUES (?, ?);`,
+        VALUES (?, ?);`,
       [
         task.title,
         task.goal,
@@ -48,8 +48,8 @@ export const updateTask = async (db: any, task: Task) => {
   try {
     await db.runAsync(
       `UPDATE tasks
-      SET title = ?, goal = ?
-      WHERE id = ?;`,
+        SET title = ?, goal = ?
+        WHERE id = ?;`,
       [
         task.title,
         task.goal,
