@@ -5,18 +5,18 @@ export const getTasks = async (db: any): Promise<Task[]> => {
   try {
     const tasks = await db.getAllAsync(
       `SELECT
-        tasks.id AS id,
-        tasks.title,
-        tasks.goal,
-        tasks.start_date,
-        tasks.is_push_notification,
-        tasks.created_at,
+        t.id AS id,
+        t.title,
+        t.goal,
+        t.start_date,
+        t.is_push_notification,
+        t.created_at,
 
-        task_schedules.bitmask_days,
-        task_schedules.time
+        ts.bitmask_days,
+        ts.time
 
-        FROM tasks
-        LEFT JOIN task_schedules ON tasks.id = task_schedules.task_id
+        FROM tasks AS t
+        LEFT JOIN task_schedules AS ts ON t.id = ts.task_id
         ;`
     )
     // tasks.forEach((task: any) => {

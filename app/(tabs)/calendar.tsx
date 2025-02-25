@@ -42,6 +42,7 @@ const Calendar = () => {
     try {
       const db = await openDatabaseAsync()
       const tasks = await getTasks(db)
+      // const tasks = null
       if (tasks !== null) {
         setTasks(tasks)
       }
