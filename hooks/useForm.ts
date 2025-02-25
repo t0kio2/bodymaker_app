@@ -1,5 +1,5 @@
-import { DAY_OF_WEEK, DAY_OF_WEEK_BIT } from "@/constants/common";
-import { isEverydayChecked, toggleDays } from "@/lib/utils";
+import { DAY_OF_WEEK_BIT } from "@/constants/common";
+import { toggleDays } from "@/lib/utils";
 import { Task } from "@/types";
 import { useEffect, useState } from "react";
 
@@ -50,8 +50,14 @@ export const useForm = (mode: 'create' | 'edit', initialTask?: Task | null) => {
   }
 
   const handleToggleDays = (day: number) => {
-    setSelectedDays(prev => toggleDays(prev, day))
+    setSelectedDays(prev => {
+      const updateDays = toggleDays(prev, day)
+      setIsEveryday(updateDays === allDaysMask)
+      return updateDays
+    })
   }
+
+  const allDaysMask = Object.values(DAY_OF_WEEK_BIT).reduce((acc, bit) => acc | bit, 0)
 
   return {
     formData,

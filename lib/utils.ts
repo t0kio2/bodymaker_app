@@ -34,8 +34,6 @@ export const getDayNumber = (day: string) => {
   return dayNumber
 }
 
-export const isEverydayChecked = (days: string[] | number[]) => days.length === DAY_OF_WEEK.length
-
 export const getStringId = (id: string | string[]): string | null => {
   if (typeof id === 'string') {
     return id
