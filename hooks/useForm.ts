@@ -8,18 +8,20 @@ export const useForm = (mode: 'create' | 'edit', initialTask?: Task | null) => {
   const [formData, setFormData] = useState({
     title: '', 
     goal: '',
+    start_date: new Date(),
   })
   const [time, setTime] = useState('')
   const [selectedDays, setSelectedDays] = useState(0)
   const [isEveryday, setIsEveryday] = useState(false)
   const [pushNotification, setPushNotification] = useState(true)
-  const [errors, setErrors] = useState<any>({ title: '', vide: '' })
+  const [errors, setErrors] = useState<any>({})
 
   useEffect(() => {
     if (mode === 'edit' && initialTask) {
       setFormData({
         title: initialTask.title,
         goal: initialTask.goal,
+        start_date: new Date(initialTask.start_date),
       })
       // setSelectedDays(initialTask.schedule.recurring.map((day: number) => DAY_OF_WEEK[day]))
       // setIsEveryday(isEverydayChecked(initialTask.schedule.recurring))
@@ -32,7 +34,19 @@ export const useForm = (mode: 'create' | 'edit', initialTask?: Task | null) => {
 
   const validateForm = () => {
     if (!formData.title) {
-      setErrors({ title: 'タイトルを入力してください'})
+      setErrors({ message: 'タイトルを入力してください'})
+      return false
+    }
+    // if (!formData.goal) {
+    //   setErrors({ message: '目標を入力してください'})
+    //   return false
+    // }
+    if (!time) {
+      setErrors({ message: '時間を入力してください'})
+      return false
+    }
+    if (!selectedDays) {
+      setErrors({ message: '曜日を選択してください'})
       return false
     }
     return true

@@ -19,9 +19,6 @@ export const getTasks = async (db: any): Promise<Task[]> => {
         LEFT JOIN task_schedules AS ts ON t.id = ts.task_id
         ;`
     )
-    // tasks.forEach((task: any) => {
-    //   task.schedule = parseSchedule(task.schedule)
-    // })
     return tasks
   } catch (error) {
     throw error
@@ -42,8 +39,7 @@ export const getTaskById = async (db: any, id: string): Promise<Task | null> => 
   }
 }
 
-// TODO
-export const addTask = async (db: any, task: any, schedule: any) => {
+export const insertTask = async (db: any, task: Omit<Task, 'id'>, schedule: any) => {
   try {
     const result = await db.runAsync(
       `INSERT INTO tasks (title, goal, start_date, is_push_notification)
@@ -51,8 +47,8 @@ export const addTask = async (db: any, task: any, schedule: any) => {
         [
           task.title,
           task.goal,
-          task.startDate,
-          task.isPushNotification,
+          task.start_date,
+          task.is_push_notification,
         ]
     )
     const taskId = result.lastInsertRowId
@@ -73,7 +69,7 @@ export const addTask = async (db: any, task: any, schedule: any) => {
         VALUES (?, ?, ?);`,
         [
           taskScheduleId,
-          task.startDate,
+          task.start_date,
           0
         ]
     )
@@ -88,21 +84,6 @@ export const addTask = async (db: any, task: any, schedule: any) => {
     console.error('タスク追加に失敗', error)
   }
 
-}
-
-export const insertTask = async (db: any, task: Omit<Task, 'id'>) => {
-  try {
-    await db.runAsync(
-      `INSERT INTO tasks (title, goal)
-        VALUES (?, ?);`,
-      [
-        task.title,
-        task.goal,
-      ]
-    )
-  } catch (error) {
-    throw error
-  }
 }
 
 export const updateTask = async (db: any, task: Task) => {
