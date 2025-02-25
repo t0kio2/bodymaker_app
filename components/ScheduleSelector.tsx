@@ -10,7 +10,7 @@ type Props = {
 const ScheduleSelector: React.FC<Props> = ({ selectedDays, onToggle }) => {
   return (
     <View className='mt-3 flex-row flex-wrap justify-center gap-1'>
-      {Object.entries(DAY_OF_WEEK_BIT).map(([day, bit]) => (
+      {Object.entries(DAY_OF_WEEK_BIT.ja).map(([day, bit]) => (
         <TouchableOpacity
           key={day}
           className={`px-4 bg-[#D9D9D9] rounded-full w-14 h-14

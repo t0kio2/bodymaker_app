@@ -42,7 +42,7 @@ export const useForm = (mode: 'create' | 'edit', initialTask?: Task | null) => {
     setIsEveryday(prev => {
       const nextState = !prev
       setSelectedDays(nextState ?
-        Object.values(DAY_OF_WEEK_BIT).reduce((acc, bit) => acc | bit, 0) :
+        Object.values(DAY_OF_WEEK_BIT.ja).reduce((acc, bit) => acc | bit, 0) :
         0
       )
       return nextState
@@ -57,7 +57,7 @@ export const useForm = (mode: 'create' | 'edit', initialTask?: Task | null) => {
     })
   }
 
-  const allDaysMask = Object.values(DAY_OF_WEEK_BIT).reduce((acc, bit) => acc | bit, 0)
+  const allDaysMask = Object.values(DAY_OF_WEEK_BIT.ja).reduce((acc, bit) => acc | bit, 0)
 
   return {
     formData,
