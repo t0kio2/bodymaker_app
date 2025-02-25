@@ -1,5 +1,5 @@
 import { DAY_OF_WEEK_BIT } from "@/constants/common";
-import { toggleDays } from "@/lib/utils";
+import { allDaysMask, toggleDays } from "@/lib/utils";
 import { Task } from "@/types";
 import { useEffect, useState } from "react";
 
@@ -56,8 +56,6 @@ export const useForm = (mode: 'create' | 'edit', initialTask?: Task | null) => {
       return updateDays
     })
   }
-
-  const allDaysMask = Object.values(DAY_OF_WEEK_BIT.ja).reduce((acc, bit) => acc | bit, 0)
 
   return {
     formData,

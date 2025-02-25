@@ -14,11 +14,13 @@ import { useDatabase } from '@/hooks/useDatabase'
 
 export default function App () {
   // データベース初期化
-  useDatabase()
+  const isDbReady = useDatabase()
   
   useEffect(() => {
     requestPermissionAsync()
   })
+  if (!isDbReady) return <Text>データベースの初期化中...</Text>
+  
   return <Redirect href="/calendar" />
 
   // WIP: 認証機能
