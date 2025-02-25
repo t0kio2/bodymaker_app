@@ -1,6 +1,14 @@
 import { DAY_OF_WEEK } from "@/constants/common"
 import { Linking } from "react-native"
 
+export const isDaySelected = (bitmask: number, day: number) => {
+  return (bitmask & day) !== 0 // ANDで判定
+}
+
+export const toggleDays = (selectedDays: number, day: number) => {
+  return selectedDays ^ day // XORでトグル
+}
+
 // M月D日 (ddd)
 export const formattedDate = () => {
   const date = new Date()

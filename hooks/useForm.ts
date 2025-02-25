@@ -1,5 +1,5 @@
-import { DAY_OF_WEEK } from "@/constants/common";
-import { isEverydayChecked } from "@/lib/utils";
+import { DAY_OF_WEEK, DAY_OF_WEEK_BIT } from "@/constants/common";
+import { isEverydayChecked, toggleDays } from "@/lib/utils";
 import { Task } from "@/types";
 import { useEffect, useState } from "react";
 
@@ -38,24 +38,20 @@ export const useForm = (mode: 'create' | 'edit', initialTask?: Task | null) => {
     return true
   }
 
-  const toggleSwitch = () => {
-    const nextState = !isEveryday
-    setSelectedDays(nextState ? DAY_OF_WEEK : [])
-    setIsEveryday(nextState)
-  }
-
-  const toggleDays = (day: string) => {
-    setSelectedDays(prev => {
-      const updated = prev.includes(day) ? prev.filter(d => d !== day) : [...prev, day]
-      const isSelectedAll = isEverydayChecked(updated)
-      setIsEveryday(isSelectedAll)
-      return updated
+  const selectAllDays = () => {
+    setIsEveryday(prev => {
+      const nextState = !prev
+      setSelectedDays(nextState ?
+        Object.values(DAY_OF_WEEK_BIT).reduce((acc, bit) => acc | bit, 0) :
+        0
+      )
+      return nextState
     })
   }
 
-  // const toggleDays = (day: number) => {
-  //   setSelectedDays(prev => prev ^ day)
-  // }
+  const handleToggleDays = (day: number) => {
+    setSelectedDays(prev => toggleDays(prev, day))
+  }
 
   return {
     formData,
@@ -68,7 +64,7 @@ export const useForm = (mode: 'create' | 'edit', initialTask?: Task | null) => {
     setPushNotification,
     handleChange,
     validateForm,
-    toggleSwitch,
-    toggleDays,
+    selectAllDays,
+    handleToggleDays
   }
 }
