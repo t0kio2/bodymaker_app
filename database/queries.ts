@@ -4,7 +4,20 @@ import { deleteDatabaseAsync } from "expo-sqlite"
 export const getTasks = async (db: any): Promise<Task[]> => {
   try {
     const tasks = await db.getAllAsync(
-      `SELECT * FROM tasks;`
+      `SELECT
+        tasks.id AS id,
+        tasks.title,
+        tasks.goal,
+        tasks.start_date,
+        tasks.is_push_notification,
+        tasks.created_at,
+
+        task_schedules.bitmask_days,
+        task_schedules.time
+
+        FROM tasks
+        LEFT JOIN task_schedules ON tasks.id = task_schedules.task_id
+        ;`
     )
     // tasks.forEach((task: any) => {
     //   task.schedule = parseSchedule(task.schedule)

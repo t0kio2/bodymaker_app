@@ -1,6 +1,5 @@
-import { View, Text, SafeAreaView, FlatList, TouchableOpacity, RefreshControl, Alert, ScrollView } from 'react-native'
+import { View, Text, SafeAreaView, FlatList, RefreshControl, Alert } from 'react-native'
 import React, { useEffect, useState } from 'react'
-import Modal from 'react-native-modal'
 import {Calendar as CalendarComponent, LocaleConfig } from 'react-native-calendars'
 import { Task } from '@/types'
 import { router, useLocalSearchParams } from 'expo-router'

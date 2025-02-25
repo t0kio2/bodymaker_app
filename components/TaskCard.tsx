@@ -104,7 +104,7 @@ const TaskCard = ({ task, editMode = false }: any) => {
         <View className='ml-4'>
           <Text className='mt-1'>継続率 60%</Text>
           <Text className='mt-1'>クリアした回数 108回</Text>
-          <Text className='mt-1'>開始日 {formatDate(task.createdAt)}</Text>
+          <Text className='mt-1'>開始日 {formatDate(task.created_at)}</Text>
         </View>
         {/* 3点リーダー */}
         {
