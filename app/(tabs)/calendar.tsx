@@ -1,11 +1,14 @@
+// TODO: list.tsxに合わせてDatabaseProviderを使うよう修正
+// '@/database/db' は消す
+
+
 import { View, Text, SafeAreaView, FlatList, RefreshControl, Alert } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import {Calendar as CalendarComponent, LocaleConfig } from 'react-native-calendars'
-import { Task } from '@/types'
-import { router, useLocalSearchParams } from 'expo-router'
-import { deleteNotificationById } from '@/lib/pushNotification'
+import { TaskWithSchedule } from '@/types'
+import { useLocalSearchParams } from 'expo-router'
 import { openDatabaseAsync } from '@/database/db'
-import { deleteTask, getTasks } from '@/database/queries'
+import { getTasks } from '@/database/queries'
 import TaskCard from '@/components/TaskCard'
 import { SafeAreaProvider } from 'react-native-safe-area-context'
 import { formattedDate } from '@/lib/utils'
@@ -26,8 +29,8 @@ const markedDates = {
 }
 
 const Calendar = () => {
-  const [tasks, setTasks] = useState<Task[]>([])
-  const [taskOnModal, setTaskOnModal] = useState<Task | null>(null)
+  const [tasks, setTasks] = useState<TaskWithSchedule[]>([])
+  const [taskOnModal, setTaskOnModal] = useState<TaskWithSchedule | null>(null)
 
   const [isModalVisible, setIsModalVisible] = useState(false)
   const [iconPosition, setIconPosition] = useState({ x: 0, y: 0 })
@@ -51,42 +54,7 @@ const Calendar = () => {
       throw new Error('Failed to load data')
     }
   }
-  const handleEdit = () => {
-    setIsModalVisible(false)
-    router.push(`/edit?id=${taskOnModal?.id}`)
-  }
-  const handleDelete = async () => {
-    if (!taskOnModal) return
-    Alert.alert(
-      taskOnModal.title, // タイトル
-      '削除してもよろしいですか？', // メッセージ
-      [ // ボタン
-        {
-          text: 'キャンセル',
-          style: 'cancel',
-          onPress: () => setIsModalVisible(false)
-        },
-        {
-          text: 'OK',
-          onPress: async () => {
-            setIsModalVisible(false)
-            deleteNotificationById(taskOnModal.id)
-            const updatedTasks = tasks.filter((task: any) => task.id !== taskOnModal.id)
-            try {
-              const db = await openDatabaseAsync()
-              await deleteTask(db, taskOnModal.id)
-              setTasks(updatedTasks)
-              Alert.alert('削除しました')
-            } catch (error) {
-              throw new Error('Failed to delete task')
-            } finally {
-              setIsModalVisible(false)
-            }
-          }
-        }
-      ]
-    )
-  }
+
   return (
     <SafeAreaProvider>
       <SafeAreaView className='h-full bg-white'>

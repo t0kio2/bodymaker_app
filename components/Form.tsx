@@ -9,8 +9,11 @@ import { useForm } from '@/hooks/useForm'
 import ScheduleSelector from './ScheduleSelector'
 import { Schedule } from '@/types'
 
-const Form = ({ mode }: { mode: 'create' | 'edit'}) => {
-  const { id } = useLocalSearchParams()
+const Form = ({ mode, id, onTaskAdded }: { 
+  mode: 'create' | 'edit'
+  id?: string
+  onTaskAdded: () => void
+}) => {
   const { task, saveTask } = useTask(id as string, mode)
   const {
     formData,
@@ -43,7 +46,12 @@ const Form = ({ mode }: { mode: 'create' | 'edit'}) => {
     } as Schedule
 
     const success = await saveTask(taskData, schedule)
-    Alert.alert(success ? "保存成功！" : "保存失敗")
+    if (success) {
+      Alert.alert("保存しました！")
+      onTaskAdded()
+    } else {
+      Alert.alert("保存に失敗しました")
+    }
   }
   
 
@@ -94,7 +102,7 @@ const Form = ({ mode }: { mode: 'create' | 'edit'}) => {
       />
       <CustomButton
         title='とじる'
-        handlePress={() => router.replace('/calendar')}
+        handlePress={() => router.replace('/list')}
         containerStyle='mt-2 bg-gray-500'
       />
     </>
