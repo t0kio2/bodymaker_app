@@ -7,9 +7,13 @@ import { router, useLocalSearchParams } from 'expo-router'
 import { useTask } from '@/hooks/useTask'
 import { useForm } from '@/hooks/useForm'
 import ScheduleSelector from './ScheduleSelector'
+import { Schedule } from '@/types'
 
-const Form = ({ mode }: { mode: 'create' | 'edit'}) => {
-  const { id } = useLocalSearchParams()
+const Form = ({ mode, id, onTaskAdded }: { 
+  mode: 'create' | 'edit'
+  id?: string
+  onTaskAdded: () => void
+}) => {
   const { task, saveTask } = useTask(id as string, mode)
   const {
     formData,
@@ -27,17 +31,27 @@ const Form = ({ mode }: { mode: 'create' | 'edit'}) => {
   } = useForm(mode, task)
 
   const handleSubmit = async () => {
-    console.log('formData', formData)
-    // if (!validateForm()) {
-    //   return Alert.alert('入力内容に不備があります', errors.title)
-    // }
-    // const taskData = {
-    //   title: formData.title,
-    //   schedule: { recurring: selectedDays, time },
-    //   goal: formData.goal,
-    // }
-    // const success = await saveTask(taskData)
-    // Alert.alert(success ? "保存成功！" : "保存失敗")
+    if (!validateForm()) {
+      return Alert.alert('入力内容に不備があります', errors.message)
+    }
+
+    const taskData = {
+      ...formData,
+      is_push_notification: pushNotification
+    }
+    
+    const schedule = {
+      bitmask_days: selectedDays,
+      time: time
+    } as Schedule
+
+    const success = await saveTask(taskData, schedule)
+    if (success) {
+      Alert.alert("保存しました！")
+      onTaskAdded()
+    } else {
+      Alert.alert("保存に失敗しました")
+    }
   }
   
 
@@ -88,7 +102,7 @@ const Form = ({ mode }: { mode: 'create' | 'edit'}) => {
       />
       <CustomButton
         title='とじる'
-        handlePress={() => router.replace('/calendar')}
+        handlePress={() => router.replace('/list')}
         containerStyle='mt-2 bg-gray-500'
       />
     </>

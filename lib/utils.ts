@@ -44,7 +44,8 @@ export const getStringId = (id: string | string[]): string | null => {
   return null
 }
 
-export const formatDate = (dateStr: string | Date) => {
+export const formatDate = (dateStr: undefined | Date) => {
+  if (!dateStr) return ''
   // ISO形式の日付文字列をDateオブジェクトに変換
   const date = new Date(dateStr);
   // 年、月、日を取得

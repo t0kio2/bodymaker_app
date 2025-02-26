@@ -2,32 +2,27 @@ import { FlatList, RefreshControl, Text, TouchableOpacity, SafeAreaView } from '
 import React, { useEffect, useState } from 'react'
 import { SafeAreaProvider } from 'react-native-safe-area-context'
 import Icon from 'react-native-vector-icons/FontAwesome5'
-import { router, useLocalSearchParams } from 'expo-router'
-import { Task } from '@/types'
+import { router } from 'expo-router'
+import { TaskWithSchedule } from '@/types'
 import { getTasks } from '@/database/queries'
-import { openDatabaseAsync } from '@/database/db'
 import TaskCard from '@/components/TaskCard'
+import { useDatabase } from '@/hooks/useDatabase'
 
 export default function List() {
-  const [tasks, setTasks] = useState<Task[]>([])
-  const params = useLocalSearchParams()
+  const { db } = useDatabase()
+  const [tasks, setTasks] = useState<TaskWithSchedule[]>([])
+
+  const loadTasks = async () => {
+    if (!db) return
+    const taskData = await getTasks(db)
+    setTasks(taskData)
+  }
 
   useEffect(() => {
-    loadData()
-  }, [params?.updated])
+    loadTasks()
+  }, [db])
 
-  const loadData = async () => {
-    try {
-      const db = await openDatabaseAsync()
-      const tasks = await getTasks(db)
-      if (tasks !== null) {
-        setTasks(tasks)
-      }
-    } catch (error) {
-      console.error(error)
-      throw new Error('Failed to load data')
-    }
-  }
+  if (!db) return null
 
   return (
     // デバイス毎に余白をよしなにしてくれる
@@ -50,7 +45,7 @@ export default function List() {
         <TouchableOpacity
           className='absolute bottom-8 right-8 shadow-lg w-20 h-20 bg-[#161622] rounded-full
           flex items-center justify-center'
-          onPress={() => router.push('/create')}
+          onPress={() => router.push('/taskForm?mode=create')}
         >
           <Icon name='plus' size={20} color='#FFF' />
         </TouchableOpacity>
