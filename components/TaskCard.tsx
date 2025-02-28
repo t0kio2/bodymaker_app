@@ -2,7 +2,7 @@ import { View, Text, TouchableOpacity, Image, Alert } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import Icon from 'react-native-vector-icons/FontAwesome5'
 import Recurring from './Recurring'
-import { Task } from '@/types'
+import { Task, TaskWithSchedule } from '@/types'
 import { router, useLocalSearchParams } from 'expo-router'
 import { formatDate } from '@/lib/utils'
 import Entypo from 'react-native-vector-icons/Entypo'
@@ -10,7 +10,10 @@ import Modal from 'react-native-modal'
 import { deleteNotificationById } from '@/lib/pushNotification'
 import Checkbox from 'expo-checkbox'
 
-const TaskCard = ({ task, editMode = false }: any) => {
+const TaskCard = ({ task, editMode = false }:{
+  task: TaskWithSchedule
+  editMode?: boolean
+}) => {
   const [taskOnModal, setTaskOnModal] = useState<Task | null>(null)
   const [isModalVisible, setIsModalVisible] = useState(false)
   const [iconPosition, setIconPosition] = useState({ x: 0, y: 0 })
@@ -31,7 +34,8 @@ const TaskCard = ({ task, editMode = false }: any) => {
 
   const handleEdit = () => {
     setIsModalVisible(false)
-    router.push(`/edit?id=${taskOnModal?.id}`)
+    if (!taskOnModal) return
+    router.push(`/taskForm?mode=edit&id=${taskOnModal.id}`)
   }
   const handleDelete = async () => {
     if (!taskOnModal) return
@@ -97,14 +101,14 @@ const TaskCard = ({ task, editMode = false }: any) => {
           <View className='flex-1 justify-between'>
             <Text className='text-xl mt-2'>{task.title}</Text>
             {/* カレンダーアイコン */}
-            {/* <Recurring schedule={task.schedule} className='mr-1' /> */}
+            <Recurring schedule={task.schedule} />
           </View>
         </View>
         {/* サブ情報 */}
         <View className='ml-4'>
           <Text className='mt-1'>継続率 60%</Text>
           <Text className='mt-1'>クリアした回数 108回</Text>
-          <Text className='mt-1'>開始日 {formatDate(task.createdAt)}</Text>
+          <Text className='mt-1'>開始日 {formatDate(task.created_at)}</Text>
         </View>
         {/* 3点リーダー */}
         {

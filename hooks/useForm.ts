@@ -1,5 +1,5 @@
-import { DAY_OF_WEEK } from "@/constants/common";
-import { isEverydayChecked } from "@/lib/utils";
+import { DAY_OF_WEEK_BIT } from "@/constants/common";
+import { allDaysMask, toggleDays } from "@/lib/utils";
 import { Task } from "@/types";
 import { useEffect, useState } from "react";
 
@@ -8,18 +8,20 @@ export const useForm = (mode: 'create' | 'edit', initialTask?: Task | null) => {
   const [formData, setFormData] = useState({
     title: '', 
     goal: '',
+    start_date: new Date(),
   })
   const [time, setTime] = useState('')
-  const [selectedDays, setSelectedDays] = useState<string[]>([])
+  const [selectedDays, setSelectedDays] = useState(0)
   const [isEveryday, setIsEveryday] = useState(false)
   const [pushNotification, setPushNotification] = useState(true)
-  const [errors, setErrors] = useState<any>({ title: '', vide: '' })
+  const [errors, setErrors] = useState<any>({})
 
   useEffect(() => {
     if (mode === 'edit' && initialTask) {
       setFormData({
         title: initialTask.title,
         goal: initialTask.goal,
+        start_date: new Date(initialTask.start_date),
       })
       // setSelectedDays(initialTask.schedule.recurring.map((day: number) => DAY_OF_WEEK[day]))
       // setIsEveryday(isEverydayChecked(initialTask.schedule.recurring))
@@ -32,24 +34,40 @@ export const useForm = (mode: 'create' | 'edit', initialTask?: Task | null) => {
 
   const validateForm = () => {
     if (!formData.title) {
-      setErrors({ title: 'タイトルを入力してください'})
+      setErrors({ message: 'タイトルを入力してください'})
+      return false
+    }
+    // if (!formData.goal) {
+    //   setErrors({ message: '目標を入力してください'})
+    //   return false
+    // }
+    if (!time) {
+      setErrors({ message: '時間を入力してください'})
+      return false
+    }
+    if (!selectedDays) {
+      setErrors({ message: '曜日を選択してください'})
       return false
     }
     return true
   }
 
-  const toggleSwitch = () => {
-    const nextState = !isEveryday
-    setSelectedDays(nextState ? DAY_OF_WEEK : [])
-    setIsEveryday(nextState)
+  const selectAllDays = () => {
+    setIsEveryday(prev => {
+      const nextState = !prev
+      setSelectedDays(nextState ?
+        Object.values(DAY_OF_WEEK_BIT.ja).reduce((acc, bit) => acc | bit, 0) :
+        0
+      )
+      return nextState
+    })
   }
 
-  const toggleDays = (day: string) => {
+  const handleToggleDays = (day: number) => {
     setSelectedDays(prev => {
-      const updated = prev.includes(day) ? prev.filter(d => d !== day) : [...prev, day]
-      const isSelectedAll = isEverydayChecked(updated)
-      setIsEveryday(isSelectedAll)
-      return updated
+      const updateDays = toggleDays(prev, day)
+      setIsEveryday(updateDays === allDaysMask)
+      return updateDays
     })
   }
 
@@ -64,7 +82,7 @@ export const useForm = (mode: 'create' | 'edit', initialTask?: Task | null) => {
     setPushNotification,
     handleChange,
     validateForm,
-    toggleSwitch,
-    toggleDays,
+    selectAllDays,
+    handleToggleDays
   }
 }

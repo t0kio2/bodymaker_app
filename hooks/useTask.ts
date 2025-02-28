@@ -1,6 +1,6 @@
 import { openDatabaseAsync } from "@/database/db"
 import { getTaskById, insertTask, updateTask } from "@/database/queries"
-import { Task } from "@/types"
+import { Schedule, Task } from "@/types"
 import { useEffect, useState } from "react"
 
 // タスクデータの取得・更新・保存を行うカスタムフック
@@ -24,11 +24,11 @@ export const useTask = (id: string | undefined, mode: 'create' | 'edit') => {
     }
   }
   
-  const saveTask = async (task: Omit<Task, 'id'>) => {
+  const saveTask = async (task: Omit<Task, 'id'>, schedule: Schedule) => {
     try {
       const db = await openDatabaseAsync()
       if (mode === 'create') {
-        await insertTask(db, task)
+        await insertTask(db, task, schedule)
         return true
       }
       if (mode === 'edit') {

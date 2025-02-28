@@ -2,14 +2,18 @@ import { View, Text, Switch, TouchableOpacity, Alert } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import FormField from './FormField'
 import TimePicker from './TimePicker'
-import { DAY_OF_WEEK } from '@/constants/common'
 import CustomButton from './CustomButton'
 import { router, useLocalSearchParams } from 'expo-router'
 import { useTask } from '@/hooks/useTask'
 import { useForm } from '@/hooks/useForm'
+import ScheduleSelector from './ScheduleSelector'
+import { Schedule } from '@/types'
 
-const Form = ({ mode }: { mode: 'create' | 'edit'}) => {
-  const { id } = useLocalSearchParams()
+const Form = ({ mode, id, onTaskAdded }: { 
+  mode: 'create' | 'edit'
+  id?: string
+  onTaskAdded: () => void
+}) => {
   const { task, saveTask } = useTask(id as string, mode)
   const {
     formData,
@@ -22,22 +26,32 @@ const Form = ({ mode }: { mode: 'create' | 'edit'}) => {
     setPushNotification,
     handleChange,
     validateForm,
-    toggleSwitch,
-    toggleDays,
+    selectAllDays,
+    handleToggleDays,
   } = useForm(mode, task)
 
   const handleSubmit = async () => {
-    console.log('formData', formData)
     if (!validateForm()) {
-      return Alert.alert('入力内容に不備があります', errors.title)
+      return Alert.alert('入力内容に不備があります', errors.message)
     }
+
     const taskData = {
-      title: formData.title,
-      schedule: { recurring: selectedDays, time },
-      goal: formData.goal,
+      ...formData,
+      is_push_notification: pushNotification
     }
-    const success = await saveTask(taskData)
-    Alert.alert(success ? "保存成功！" : "保存失敗")
+    
+    const schedule = {
+      bitmask_days: selectedDays,
+      time: time
+    } as Schedule
+
+    const success = await saveTask(taskData, schedule)
+    if (success) {
+      Alert.alert("保存しました！")
+      onTaskAdded()
+    } else {
+      Alert.alert("保存に失敗しました")
+    }
   }
   
 
@@ -56,24 +70,7 @@ const Form = ({ mode }: { mode: 'create' | 'edit'}) => {
           handleTimeChange={(e) => setTime(e)}
         />
       </View>
-      <View className='mt-3 flex-row flex-wrap justify-center gap-1'>
-        {DAY_OF_WEEK.map((day, i) => (
-          <TouchableOpacity
-            key={i}
-            className={`px-4 bg-[#D9D9D9] rounded-full w-14 h-14
-            justify-center items-center
-            ${selectedDays.includes(day) ? 'bg-blue-500' : 'bg-gray-300'}
-            `}
-            onPress={() => toggleDays(day)}
-          >
-            <Text
-              className={`text-xl font-bold ${
-                selectedDays.includes(day) ? "text-white" : "text-black"
-              }`}
-            >{day}</Text>
-          </TouchableOpacity>
-        ))}
-      </View>
+      <ScheduleSelector selectedDays={selectedDays} onToggle={handleToggleDays} />
       <View className='mt-5 flex-row items-center'>
         <Text>毎日</Text>
         <View className='ml-3'>
@@ -81,7 +78,7 @@ const Form = ({ mode }: { mode: 'create' | 'edit'}) => {
             trackColor={{true: '#3b82f6'}}
             thumbColor={isEveryday ? '#d1d5db' : '#f4f3f4'}
             ios_backgroundColor="#d1d5db"
-            onValueChange={toggleSwitch}
+            onValueChange={selectAllDays}
             value={isEveryday}
           />
         </View>
@@ -105,7 +102,7 @@ const Form = ({ mode }: { mode: 'create' | 'edit'}) => {
       />
       <CustomButton
         title='とじる'
-        handlePress={() => router.replace('/calendar')}
+        handlePress={() => router.replace('/list')}
         containerStyle='mt-2 bg-gray-500'
       />
     </>

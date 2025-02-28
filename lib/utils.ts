@@ -1,5 +1,13 @@
-import { DAY_OF_WEEK } from "@/constants/common"
+import { DAY_OF_WEEK_BIT } from "@/constants/common"
 import { Linking } from "react-native"
+
+export const isDaySelected = (bitmask: number, day: number) => {
+  return (bitmask & day) !== 0 // ANDで判定
+}
+
+export const toggleDays = (selectedDays: number, day: number) => {
+  return selectedDays ^ day // XORでトグル
+}
 
 // M月D日 (ddd)
 export const formattedDate = () => {
@@ -11,22 +19,20 @@ export const formattedDate = () => {
   return `${month}月${day}日 (${weekday})`
 }
 
-export const getDaysOfWeek = (dayNumber: number) => {
-  if (dayNumber < 0 || dayNumber > 6) {
-    throw new Error('Invalid day number. Must be between 0 and 6')
-  }
-  return DAY_OF_WEEK[dayNumber]
+// ビットマスクから曜日を取得
+export const getSelectedDays = (bitmask: number) => {
+  return Object.entries(DAY_OF_WEEK_BIT.ja)
+    .filter(([_, day]) => bitmask & day)
+    .map(([label]) => label)
 }
 
-export const getDayNumber = (day: string) => {
-  const dayNumber = DAY_OF_WEEK.indexOf(day)
-  if (dayNumber === -1) {
-    throw new Error('Invalid day name')
-  }
-  return dayNumber
+// すべての曜日が選択されているか
+export const isEverydayChecked = (bitmask: number) => {
+  return bitmask === allDaysMask
 }
 
-export const isEverydayChecked = (days: string[] | number[]) => days.length === DAY_OF_WEEK.length
+export const allDaysMask = Object.values(DAY_OF_WEEK_BIT.ja).reduce((acc, bit) => acc | bit, 0)
+
 
 export const getStringId = (id: string | string[]): string | null => {
   if (typeof id === 'string') {
@@ -38,7 +44,8 @@ export const getStringId = (id: string | string[]): string | null => {
   return null
 }
 
-export const formatDate = (dateStr: string | Date) => {
+export const formatDate = (dateStr: undefined | Date) => {
+  if (!dateStr) return ''
   // ISO形式の日付文字列をDateオブジェクトに変換
   const date = new Date(dateStr);
   // 年、月、日を取得
@@ -55,7 +62,7 @@ const openYouTube = (video: string) => {
   })
 }
 
-export const getThumbnailFromVideo = (videoURL: string) => {
+const getThumbnailFromVideo = (videoURL: string) => {
   if (!videoURL) return ''
   const videoId = videoURL.split('v=')[1]?.split('&')[0]
   if (!videoId) return ''

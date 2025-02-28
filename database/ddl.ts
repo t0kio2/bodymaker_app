@@ -2,15 +2,17 @@ export const tasksSchema = `
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   title TEXT NOT NULL,
   goal TEXT,
+  start_date TEXT NOT NULL,
+  is_push_notification BOOLEAN NOT NULL DEFAULT 1,
   created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
 `
 
 export const taskSchedulesSchema = `
   id INTEGER PRIMARY KEY AUTOINCREMENT,
-  taskId INTEGER NOT NULL,
+  task_id INTEGER NOT NULL,
   bitmask_days INTErGER NOT NULL,
   time TEXT NOT NULL,
-  FOREIGN KEY (taskId) REFERENCES tasks(id) ON DELETE CASCADE
+  FOREIGN KEY (task_id) REFERENCES tasks(id) ON DELETE CASCADE
 `
 
 export const taskLogsSchema = `
@@ -23,6 +25,6 @@ export const taskLogsSchema = `
 
 export const notificationsSchema = `
   id INTEGER PRIMARY KEY AUTOINCREMENT,
-  taskId INTEGER NOT NULL,
-  FOREIGN KEY (taskId) REFERENCES tasks(id) ON DELETE CASCADE
+  task_id INTEGER NOT NULL,
+  FOREIGN KEY (task_id) REFERENCES tasks(id) ON DELETE CASCADE
 `
