@@ -23,6 +23,8 @@ export const useTask = (id: string | undefined, mode: 'create' | 'edit') => {
   }, [id, db])
 
   const saveTask = async (task: Omit<Task, 'id'>, schedule: Schedule) => {
+    // console.log('saveTask', task, schedule)
+    // return
     if (!db) return false
     try {
       if (mode === 'create') {

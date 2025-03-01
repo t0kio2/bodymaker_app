@@ -1,9 +1,9 @@
 import { View, Text, TouchableOpacity, Image, Alert } from 'react-native'
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import Icon from 'react-native-vector-icons/FontAwesome5'
 import Recurring from './Recurring'
 import { Task, TaskWithSchedule } from '@/types'
-import { router, useLocalSearchParams } from 'expo-router'
+import { router } from 'expo-router'
 import { formatDate } from '@/lib/utils'
 import Entypo from 'react-native-vector-icons/Entypo'
 import Modal from 'react-native-modal'
@@ -17,12 +17,8 @@ const TaskCard = ({ task, editMode = false }:{
   const [taskOnModal, setTaskOnModal] = useState<Task | null>(null)
   const [isModalVisible, setIsModalVisible] = useState(false)
   const [iconPosition, setIconPosition] = useState({ x: 0, y: 0 })
-  const params = useLocalSearchParams()
-
   const [isChecked, setIsChecked] = useState(false)
   
-  useEffect(() => {
-  }, [params?.updated])
 
   const showDialog = (e: any, task: Task) => {
     const { pageX, pageY } = e.nativeEvent
@@ -101,7 +97,7 @@ const TaskCard = ({ task, editMode = false }:{
           <View className='flex-1 justify-between'>
             <Text className='text-xl mt-2'>{task.title}</Text>
             {/* カレンダーアイコン */}
-            <Recurring schedule={task.schedule} />
+            <Recurring schedule={task} />
           </View>
         </View>
         {/* サブ情報 */}

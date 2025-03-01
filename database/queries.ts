@@ -1,7 +1,6 @@
 import { Task, Schedule, TaskWithSchedule } from "@/types"
-import { deleteDatabaseAsync } from "expo-sqlite"
 
-export const getTasks = async (db: any): Promise<TaskWithSchedule[]> => {
+export const getTaskList = async (db: any): Promise<TaskWithSchedule[]> => {
   try {
     const tasks = await db.getAllAsync(
       `SELECT
@@ -19,6 +18,7 @@ export const getTasks = async (db: any): Promise<TaskWithSchedule[]> => {
         LEFT JOIN task_schedules AS ts ON t.id = ts.task_id
         ;`
     )
+    console.log('getTaskList ** tasks', tasks)
     return tasks
   } catch (error) {
     throw error
