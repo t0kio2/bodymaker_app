@@ -65,5 +65,4 @@ const TimePicker: React.FC<TimePickerProps> = ({ value, handleTimeChange }) => {
   )
 }
 
-
 export default TimePicker

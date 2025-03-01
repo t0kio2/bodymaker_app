@@ -9,8 +9,6 @@ import { useTaskList } from '@/hooks/useTaskList'
 export default function List() {
   const { taskList, refreshing, loadTaskList } = useTaskList()
 
-  console.log('taskList', taskList)
-
   return (
     // デバイス毎に余白をよしなにしてくれる
     <SafeAreaProvider>

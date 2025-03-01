@@ -1,6 +1,5 @@
 export interface Task {
   id: string,
-  user_id? : number | null
   title: string
   goal: string
   start_date: Date

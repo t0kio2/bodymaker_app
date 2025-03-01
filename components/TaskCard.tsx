@@ -36,9 +36,9 @@ const TaskCard = ({ task, editMode = false }:{
   const handleDelete = async () => {
     if (!taskOnModal) return
     Alert.alert(
-      taskOnModal.title, // タイトル
-      '削除してもよろしいですか？', // メッセージ
-      [ // ボタン
+      taskOnModal.title,
+      '削除してもよろしいですか？',
+      [
         {
           text: 'キャンセル',
           style: 'cancel',
