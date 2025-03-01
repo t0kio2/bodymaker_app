@@ -1,32 +1,30 @@
-import { openDatabaseAsync } from "@/database/db"
 import { getTaskById, insertTask, updateTask } from "@/database/queries"
 import { Schedule, Task } from "@/types"
 import { useEffect, useState } from "react"
+import { useDatabase } from "./useDatabase"
 
 // タスクデータの取得・更新・保存を行うカスタムフック
 export const useTask = (id: string | undefined, mode: 'create' | 'edit') => {
+  const { db } = useDatabase()
   const [task, setTask] = useState<Task | null>(null)
 
   useEffect(() => {
-    if (id) {
-      loadData(id)
-    }
-  }, [id])
+    if (id && db) {
+      (async () => {
+        try {
+          const fetchedTask = await getTaskById(db, id)
+          if (fetchedTask) setTask(fetchedTask)
 
-  const loadData = async (taskId: string) => {
-    try {
-      const db = await openDatabaseAsync()
-      const task = await getTaskById(db, taskId)
-      if (task) setTask(task)
-    } catch (error) {
-      console.error(error)
-      throw new Error('Failed to load data')
+        } catch (error) {
+          console.error(error)
+        }
+      })()
     }
-  }
-  
+  }, [id, db])
+
   const saveTask = async (task: Omit<Task, 'id'>, schedule: Schedule) => {
+    if (!db) return false
     try {
-      const db = await openDatabaseAsync()
       if (mode === 'create') {
         await insertTask(db, task, schedule)
         return true

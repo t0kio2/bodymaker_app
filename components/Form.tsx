@@ -1,9 +1,9 @@
-import { View, Text, Switch, TouchableOpacity, Alert } from 'react-native'
-import React, { useEffect, useState } from 'react'
+import { View, Text, Switch, Alert } from 'react-native'
+import React from 'react'
 import FormField from './FormField'
 import TimePicker from './TimePicker'
 import CustomButton from './CustomButton'
-import { router, useLocalSearchParams } from 'expo-router'
+import { router } from 'expo-router'
 import { useTask } from '@/hooks/useTask'
 import { useForm } from '@/hooks/useForm'
 import ScheduleSelector from './ScheduleSelector'
@@ -53,7 +53,6 @@ const Form = ({ mode, id, onTaskAdded }: {
       Alert.alert("保存に失敗しました")
     }
   }
-  
 
   return (
     <>
