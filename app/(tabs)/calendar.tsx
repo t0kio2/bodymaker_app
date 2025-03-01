@@ -1,17 +1,10 @@
-// TODO: list.tsxに合わせてDatabaseProviderを使うよう修正
-// '@/database/db' は消す
-
-
 import { View, Text, SafeAreaView, FlatList, RefreshControl, Alert } from 'react-native'
-import React, { useEffect, useState } from 'react'
+import React from 'react'
 import {Calendar as CalendarComponent, LocaleConfig } from 'react-native-calendars'
-import { TaskWithSchedule } from '@/types'
-import { useLocalSearchParams } from 'expo-router'
-import { openDatabaseAsync } from '@/database/db'
-import { getTasks } from '@/database/queries'
 import TaskCard from '@/components/TaskCard'
 import { SafeAreaProvider } from 'react-native-safe-area-context'
 import { formattedDate } from '@/lib/utils'
+import { useTaskList } from '@/hooks/useTaskList'
 
 LocaleConfig.locales.jp = {
   monthNames: ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月'],
@@ -29,32 +22,8 @@ const markedDates = {
 }
 
 const Calendar = () => {
-  const [tasks, setTasks] = useState<TaskWithSchedule[]>([])
-  const [taskOnModal, setTaskOnModal] = useState<TaskWithSchedule | null>(null)
-
-  const [isModalVisible, setIsModalVisible] = useState(false)
-  const [iconPosition, setIconPosition] = useState({ x: 0, y: 0 })
-
-  const params = useLocalSearchParams()
+  const { taskList, refreshing, loadTaskList} = useTaskList()
   
-  useEffect(() => {
-    loadData()
-  }, [params?.updated])
-
-  const loadData = async () => {
-    try {
-      const db = await openDatabaseAsync()
-      const tasks = await getTasks(db)
-      // const tasks = null
-      if (tasks !== null) {
-        setTasks(tasks)
-      }
-    } catch (error) {
-      console.error(error)
-      throw new Error('Failed to load data')
-    }
-  }
-
   return (
     <SafeAreaProvider>
       <SafeAreaView className='h-full bg-white'>
@@ -68,7 +37,7 @@ const Calendar = () => {
         <View className='pl-4 pt-4'>
           <Text className='text-2xl'>今日のトレーニング</Text>
           <FlatList
-            data={ tasks }
+            data={ taskList }
             keyExtractor={ task => task.id.toString() }
             renderItem={({ item }) => (
               <TaskCard
@@ -76,7 +45,7 @@ const Calendar = () => {
               />
             )}
             ListEmptyComponent={<Text>習慣が登録されていません。登録しましょう！</Text>}
-            refreshControl={<RefreshControl refreshing={false} onRefresh={() => {}} />}
+            refreshControl={<RefreshControl refreshing={refreshing} onRefresh={loadTaskList} />}
           />
         </View>
       </SafeAreaView>

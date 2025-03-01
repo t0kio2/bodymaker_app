@@ -10,7 +10,6 @@ interface DatabaseContextType {
 
 export const DatabaseContext = createContext<DatabaseContextType | null>(null)
 
-
 // コンテキストを提供するカスタムフック
 export const DatabaseProvider = ({ children }: { children: ReactNode }) => {
   const [db, setDb] = useState(null)
