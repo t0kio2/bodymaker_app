@@ -1,5 +1,5 @@
 import { DAY_OF_WEEK_BIT } from "@/constants/common";
-import { allDaysMask, toggleDays } from "@/lib/utils";
+import { allDaysMask, getCurrentTimeStr, toggleDays } from "@/lib/utils";
 import { TaskWithSchedule } from "@/types";
 import { useEffect, useState } from "react";
 
@@ -14,7 +14,7 @@ export const useForm = (mode: 'create' | 'edit', initialTask?: TaskWithSchedule 
     time: '',
     is_push_notification: false,
   })
-  const [time, setTime] = useState('')
+  const [timeStr, setTimeStr] = useState(getCurrentTimeStr())
   const [selectedDays, setSelectedDays] = useState(0)
   const [isEveryday, setIsEveryday] = useState(false)
   const [pushNotification, setPushNotification] = useState(true)
@@ -32,7 +32,7 @@ export const useForm = (mode: 'create' | 'edit', initialTask?: TaskWithSchedule 
         is_push_notification: initialTask.is_push_notification
       })
       setSelectedDays(initialTask.bitmask_days)
-      setTime(initialTask.time)
+      setTimeStr(initialTask.time)
       setPushNotification(initialTask.is_push_notification)
     }
   }, [mode, initialTask])
@@ -50,7 +50,7 @@ export const useForm = (mode: 'create' | 'edit', initialTask?: TaskWithSchedule 
     //   setErrors({ message: '目標を入力してください'})
     //   return false
     // }
-    if (!time) {
+    if (!timeStr) {
       setErrors({ message: '時間を入力してください'})
       return false
     }
@@ -82,12 +82,12 @@ export const useForm = (mode: 'create' | 'edit', initialTask?: TaskWithSchedule 
 
   return {
     formData,
-    time,
+    timeStr,
     selectedDays,
     isEveryday,
     pushNotification,
     errors,
-    setTime,
+    setTimeStr,
     setPushNotification,
     handleChange,
     validateForm,

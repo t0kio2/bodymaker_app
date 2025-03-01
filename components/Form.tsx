@@ -17,12 +17,12 @@ const Form = ({ mode, id, onTaskAdded }: {
   const { task, saveTask } = useTask(id as string, mode)
   const {
     formData,
-    time,
+    timeStr,
     selectedDays,
     isEveryday,
     pushNotification,
     errors,
-    setTime,
+    setTimeStr,
     setPushNotification,
     handleChange,
     validateForm,
@@ -42,7 +42,7 @@ const Form = ({ mode, id, onTaskAdded }: {
     
     const schedule = {
       bitmask_days: selectedDays,
-      time: time
+      time: timeStr
     } as Schedule
 
     const success = await saveTask(taskData, schedule)
@@ -65,8 +65,8 @@ const Form = ({ mode, id, onTaskAdded }: {
       />
       <View className='mt-5'>
         <TimePicker
-          value={time}
-          handleTimeChange={(e) => setTime(e)}
+          timeStr={timeStr}
+          handleTimeChange={(e) => setTimeStr(e)}
         />
       </View>
       <ScheduleSelector selectedDays={selectedDays} onToggle={handleToggleDays} />

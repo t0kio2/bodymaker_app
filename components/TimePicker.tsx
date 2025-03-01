@@ -1,33 +1,27 @@
 import { View, Text, Platform, TouchableOpacity } from 'react-native'
-import React, { useState } from 'react'
+import React from 'react'
 import DateTimePicker from '@react-native-community/datetimepicker'
 import Icon from 'react-native-vector-icons/FontAwesome5'
+import { useTimePicker } from '@/hooks/useTimePicker'
+import { getCurrentTimeStr } from '@/lib/utils'
 
 interface TimePickerProps {
-  value: string
+  timeStr: string
   handleTimeChange: (date: string) => void
 }
 
-const TimePicker: React.FC<TimePickerProps> = ({ value, handleTimeChange }) => {
-  const [timePickerVisible, setTimePickerVisible] = useState<boolean>(Platform.OS === 'ios')
-  const [selectedTime, setSelectedTime] = useState<Date>(new Date())
-
-  const onTimeChange = (event: any, selectedDate: Date | undefined) => {
-    if (!selectedDate) return
-    const hours = selectedDate.getHours().toString().padStart(2, '0')
-    const minutes = selectedDate.getMinutes().toString().padStart(2, '0')
-    const formattedTime = `${hours}:${minutes}`
-    handleTimeChange(formattedTime)
-    setTimePickerVisible(Platform.OS === 'ios')
+const TimePicker: React.FC<TimePickerProps> = ({ timeStr, handleTimeChange }) => {
+  const { timePickerVisible, selectedTime, onTimeChange, showTimePicker } = useTimePicker(timeStr || getCurrentTimeStr())
+  
+  const handleChange = (event: any, date: Date | undefined) => {
+    onTimeChange(event, date, handleTimeChange)
   }
+
   return (
-    
     <View>
       {
         Platform.OS === 'android' && 
-          <TouchableOpacity
-            onPress={() => setTimePickerVisible(true)}
-          >
+          <TouchableOpacity onPress={showTimePicker}>
             <View className='flex-row items-center'>
               <Icon
                 name='clock'
@@ -36,7 +30,7 @@ const TimePicker: React.FC<TimePickerProps> = ({ value, handleTimeChange }) => {
                 style={{ width: 24, textAlign: "center" }}
                 className='flex mr-1'
               />
-              <Text className='text-4xl'>{value || '00:00'}</Text>
+              <Text className='text-4xl'>{timeStr}</Text>
             </View>
           </TouchableOpacity>
       }
@@ -56,7 +50,7 @@ const TimePicker: React.FC<TimePickerProps> = ({ value, handleTimeChange }) => {
             mode='time'
             is24Hour={true}
             display='default'
-            onChange={onTimeChange}
+            onChange={handleChange}
             locale="ja-JP"
           />
         </View>
