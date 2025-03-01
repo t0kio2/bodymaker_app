@@ -1,7 +1,7 @@
 import { TaskWithSchedule } from "@/types"
 import { useDatabase } from "./useDatabase"
 import { useEffect, useState } from "react"
-import { getTasks } from "@/database/queries"
+import { getTaskList } from "@/database/queries"
 
 export const useTaskList = () => {
   const { db } = useDatabase()
@@ -12,7 +12,7 @@ export const useTaskList = () => {
     if (!db) return
     setRefreshing(true)
     try {
-      const taskData = await getTasks(db)
+      const taskData = await getTaskList(db)
       setTaskList(taskData)
     } catch (error) {
       console.error(error)

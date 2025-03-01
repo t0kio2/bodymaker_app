@@ -1,12 +1,12 @@
 import { getTaskById, insertTask, updateTask } from "@/database/queries"
-import { Schedule, Task } from "@/types"
+import { Schedule, Task, TaskWithSchedule } from "@/types"
 import { useEffect, useState } from "react"
 import { useDatabase } from "./useDatabase"
 
 // タスクデータの取得・更新・保存を行うカスタムフック
 export const useTask = (id: string | undefined, mode: 'create' | 'edit') => {
   const { db } = useDatabase()
-  const [task, setTask] = useState<Task | null>(null)
+  const [task, setTask] = useState<TaskWithSchedule | null>(null)
 
   useEffect(() => {
     if (id && db) {
@@ -22,7 +22,7 @@ export const useTask = (id: string | undefined, mode: 'create' | 'edit') => {
     }
   }, [id, db])
 
-  const saveTask = async (task: Omit<Task, 'id'>, schedule: Schedule) => {
+  const saveTask = async (task: Task, schedule: Schedule) => {
     if (!db) return false
     try {
       if (mode === 'create') {
@@ -31,7 +31,7 @@ export const useTask = (id: string | undefined, mode: 'create' | 'edit') => {
       }
       if (mode === 'edit') {
         if (!id) return false
-        await updateTask(db, { ...task, id })
+        await updateTask(db, task, schedule)
         return true
       }
       return false

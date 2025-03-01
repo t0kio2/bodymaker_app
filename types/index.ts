@@ -1,6 +1,5 @@
 export interface Task {
   id: string,
-  user_id? : number | null
   title: string
   goal: string
   start_date: Date
@@ -13,10 +12,7 @@ export interface Schedule {
   time: string
 }
 
-export interface TaskWithSchedule extends Task {
-  schedule: Schedule
-}
-
+export interface TaskWithSchedule extends Task, Schedule {}
 export interface Notification {
   id: string,
   taskId: string
