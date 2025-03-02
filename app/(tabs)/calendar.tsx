@@ -1,4 +1,4 @@
-import { View, Text, SafeAreaView, FlatList, RefreshControl, Alert } from 'react-native'
+import { View, Text, SafeAreaView, FlatList, RefreshControl, Alert, SectionList } from 'react-native'
 import React from 'react'
 import {Calendar as CalendarComponent, LocaleConfig } from 'react-native-calendars'
 import TaskCard from '@/components/TaskCard'
@@ -23,31 +23,39 @@ const markedDates = {
 
 const Calendar = () => {
   const { taskList, refreshing, loadTaskList} = useTaskList()
+
+  const sections = [
+    {
+      title: '今日のトレーニング',
+      data: taskList
+    }
+  ]
   
   return (
     <SafeAreaProvider>
-      <SafeAreaView className='h-full bg-white'>
-        <Text className='text-3xl ml-3'>{ formattedDate() }</Text>
-        <CalendarComponent
-          onDayPress={day => {
-            console.log('selected day', day);
-          }}
-          markedDates={markedDates}
-        />
-        <View className='pl-4 pt-4'>
-          <Text className='text-2xl'>今日のトレーニング</Text>
-          <FlatList
-            data={ taskList }
-            keyExtractor={ task => task.id.toString() }
-            renderItem={({ item }) => (
-              <TaskCard
-                task={item}
+      <SafeAreaView className="h-full bg-white">
+        <SectionList
+          sections={sections}
+          keyExtractor={(item) => item.id.toString()}
+          renderItem={({ item }) => (
+            <TaskCard task={item} editMode={false} />
+          )}
+          renderSectionHeader={({ section: { title } }) => (
+            <Text className="text-2xl pl-4 pt-4">{title}</Text>
+          )}
+          ListHeaderComponent={
+            <>
+              <Text className="text-3xl ml-3">{formattedDate()}</Text>
+              <CalendarComponent
+                onDayPress={(day) => {
+                  console.log("selected day", day)
+                }}
+                markedDates={markedDates}
               />
-            )}
-            ListEmptyComponent={<Text>習慣が登録されていません。登録しましょう！</Text>}
-            refreshControl={<RefreshControl refreshing={refreshing} onRefresh={loadTaskList} />}
-          />
-        </View>
+            </>
+          }
+          refreshControl={<RefreshControl refreshing={refreshing} onRefresh={loadTaskList} />}
+        />
       </SafeAreaView>
     </SafeAreaProvider>
   )
