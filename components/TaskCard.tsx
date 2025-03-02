@@ -1,48 +1,41 @@
 import { View, Text, TouchableOpacity, Image, Alert } from 'react-native'
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import Icon from 'react-native-vector-icons/FontAwesome5'
 import Recurring from './Recurring'
 import { Task, TaskWithSchedule } from '@/types'
-import { router, useLocalSearchParams } from 'expo-router'
+import { router } from 'expo-router'
 import { formatDate } from '@/lib/utils'
 import Entypo from 'react-native-vector-icons/Entypo'
 import Modal from 'react-native-modal'
-import { deleteNotificationById } from '@/lib/pushNotification'
 import Checkbox from 'expo-checkbox'
+import { useTask } from '@/hooks/useTask'
 
-const TaskCard = ({ task, editMode = false }:{
+const TaskCard = ({ task, editMode = false, onTaskDeleted }:{
   task: TaskWithSchedule
   editMode?: boolean
+  onTaskDeleted: () => void
 }) => {
-  const [taskOnModal, setTaskOnModal] = useState<Task | null>(null)
   const [isModalVisible, setIsModalVisible] = useState(false)
   const [iconPosition, setIconPosition] = useState({ x: 0, y: 0 })
-  const params = useLocalSearchParams()
-
   const [isChecked, setIsChecked] = useState(false)
+  const { removeTask } = useTask(task.id as string)
   
-  useEffect(() => {
-  }, [params?.updated])
 
   const showDialog = (e: any, task: Task) => {
     const { pageX, pageY } = e.nativeEvent
     setIconPosition({ x: pageX, y: pageY })
     setIsModalVisible(true)
-    // モーダルで対象とするアイテムを保持
-    setTaskOnModal(task)
   }
 
   const handleEdit = () => {
     setIsModalVisible(false)
-    if (!taskOnModal) return
-    router.push(`/taskForm?mode=edit&id=${taskOnModal.id}`)
+    router.push(`/taskForm?mode=edit&id=${task.id}`)
   }
   const handleDelete = async () => {
-    if (!taskOnModal) return
     Alert.alert(
-      taskOnModal.title, // タイトル
-      '削除してもよろしいですか？', // メッセージ
-      [ // ボタン
+      task.title,
+      '削除してもよろしいですか？',
+      [
         {
           text: 'キャンセル',
           style: 'cancel',
@@ -52,18 +45,8 @@ const TaskCard = ({ task, editMode = false }:{
           text: 'OK',
           onPress: async () => {
             setIsModalVisible(false)
-            deleteNotificationById(taskOnModal.id)
-            // const updatedTasks = tasks.filter((task: any) => task.id !== taskOnModal.id)
-            // try {
-            //   const db = await openDatabaseAsync()
-            //   await deleteTask(db, taskOnModal.id)
-            //   setTasks(updatedTasks)
-            //   Alert.alert('削除しました')
-            // } catch (error) {
-            //   throw new Error('Failed to delete task')
-            // } finally {
-            //   setIsModalVisible(false)
-            // }
+            await removeTask(task.id)
+            onTaskDeleted()
           }
         }
       ]
@@ -101,7 +84,7 @@ const TaskCard = ({ task, editMode = false }:{
           <View className='flex-1 justify-between'>
             <Text className='text-xl mt-2'>{task.title}</Text>
             {/* カレンダーアイコン */}
-            <Recurring schedule={task.schedule} />
+            <Recurring schedule={task} />
           </View>
         </View>
         {/* サブ情報 */}

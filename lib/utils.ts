@@ -9,6 +9,23 @@ export const toggleDays = (selectedDays: number, day: number) => {
   return selectedDays ^ day // XORでトグル
 }
 
+// 'HH:mm'形式をDateオブジェクトに変換
+export const timeToDate = (time: string) => {
+  const [hours, minutes] = time.split(':').map(Number)
+  const date = new Date()
+  date.setHours(hours)
+  date.setMinutes(minutes)
+  return date
+}
+
+// 現在時刻を'HH:mm'形式で取得
+export const getCurrentTimeStr = () => {
+  const date = new Date()
+  const hours = date.getHours().toString().padStart(2, '0')
+  const minutes = date.getMinutes().toString().padStart(2, '0')
+  return `${hours}:${minutes}`
+}
+
 // M月D日 (ddd)
 export const formattedDate = () => {
   const date = new Date()

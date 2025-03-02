@@ -1,9 +1,9 @@
-import { View, Text, Switch, TouchableOpacity, Alert } from 'react-native'
-import React, { useEffect, useState } from 'react'
+import { View, Text, Switch, Alert } from 'react-native'
+import React from 'react'
 import FormField from './FormField'
 import TimePicker from './TimePicker'
 import CustomButton from './CustomButton'
-import { router, useLocalSearchParams } from 'expo-router'
+import { router } from 'expo-router'
 import { useTask } from '@/hooks/useTask'
 import { useForm } from '@/hooks/useForm'
 import ScheduleSelector from './ScheduleSelector'
@@ -17,12 +17,11 @@ const Form = ({ mode, id, onTaskAdded }: {
   const { task, saveTask } = useTask(id as string, mode)
   const {
     formData,
-    time,
+    timeStr,
     selectedDays,
     isEveryday,
     pushNotification,
-    errors,
-    setTime,
+    setTimeStr,
     setPushNotification,
     handleChange,
     validateForm,
@@ -31,8 +30,9 @@ const Form = ({ mode, id, onTaskAdded }: {
   } = useForm(mode, task)
 
   const handleSubmit = async () => {
-    if (!validateForm()) {
-      return Alert.alert('入力内容に不備があります', errors.message)
+    const errorMessage = validateForm() 
+    if (errorMessage) {
+      return Alert.alert('入力内容に不備があります', errorMessage)
     }
 
     const taskData = {
@@ -42,7 +42,7 @@ const Form = ({ mode, id, onTaskAdded }: {
     
     const schedule = {
       bitmask_days: selectedDays,
-      time: time
+      time: timeStr
     } as Schedule
 
     const success = await saveTask(taskData, schedule)
@@ -53,7 +53,6 @@ const Form = ({ mode, id, onTaskAdded }: {
       Alert.alert("保存に失敗しました")
     }
   }
-  
 
   return (
     <>
@@ -66,8 +65,8 @@ const Form = ({ mode, id, onTaskAdded }: {
       />
       <View className='mt-5'>
         <TimePicker
-          value={time}
-          handleTimeChange={(e) => setTime(e)}
+          timeStr={timeStr}
+          handleTimeChange={(e) => setTimeStr(e)}
         />
       </View>
       <ScheduleSelector selectedDays={selectedDays} onToggle={handleToggleDays} />
