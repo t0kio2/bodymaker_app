@@ -21,7 +21,6 @@ const Form = ({ mode, id, onTaskAdded }: {
     selectedDays,
     isEveryday,
     pushNotification,
-    errors,
     setTimeStr,
     setPushNotification,
     handleChange,
@@ -31,8 +30,9 @@ const Form = ({ mode, id, onTaskAdded }: {
   } = useForm(mode, task)
 
   const handleSubmit = async () => {
-    if (!validateForm()) {
-      return Alert.alert('入力内容に不備があります', errors.message)
+    const errorMessage = validateForm() 
+    if (errorMessage) {
+      return Alert.alert('入力内容に不備があります', errorMessage)
     }
 
     const taskData = {

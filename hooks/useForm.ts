@@ -18,7 +18,6 @@ export const useForm = (mode: 'create' | 'edit', initialTask?: TaskWithSchedule 
   const [selectedDays, setSelectedDays] = useState(0)
   const [isEveryday, setIsEveryday] = useState(false)
   const [pushNotification, setPushNotification] = useState(true)
-  const [errors, setErrors] = useState<any>({})
 
   useEffect(() => {
     if (mode === 'edit' && initialTask) {
@@ -41,24 +40,17 @@ export const useForm = (mode: 'create' | 'edit', initialTask?: TaskWithSchedule 
     setFormData((prev) => ({ ...prev, [field]: value }))
   }
 
-  const validateForm = () => {
+  const validateForm = (): string => {
     if (!formData.title) {
-      setErrors({ message: 'タイトルを入力してください'})
-      return false
+      return 'タイトルを入力してください'
     }
-    // if (!formData.goal) {
-    //   setErrors({ message: '目標を入力してください'})
-    //   return false
-    // }
     if (!timeStr) {
-      setErrors({ message: '時間を入力してください'})
-      return false
+      return '時間を入力してください'
     }
     if (!selectedDays) {
-      setErrors({ message: '曜日を選択してください'})
-      return false
+      return '曜日を選択してください'
     }
-    return true
+    return ''
   }
 
   const selectAllDays = () => {
@@ -86,7 +78,6 @@ export const useForm = (mode: 'create' | 'edit', initialTask?: TaskWithSchedule 
     selectedDays,
     isEveryday,
     pushNotification,
-    errors,
     setTimeStr,
     setPushNotification,
     handleChange,
