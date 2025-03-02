@@ -1,10 +1,10 @@
-import { getTaskById, insertTask, updateTask } from "@/database/queries"
+import { deleteTask, getTaskById, insertTask, updateTask } from "@/database/queries"
 import { Schedule, Task, TaskWithSchedule } from "@/types"
 import { useEffect, useState } from "react"
 import { useDatabase } from "./useDatabase"
 
 // タスクデータの取得・更新・保存を行うカスタムフック
-export const useTask = (id: string | undefined, mode: 'create' | 'edit') => {
+export const useTask = (id: string | undefined, mode?: 'create' | 'edit') => {
   const { db } = useDatabase()
   const [task, setTask] = useState<TaskWithSchedule | null>(null)
 
@@ -40,5 +40,17 @@ export const useTask = (id: string | undefined, mode: 'create' | 'edit') => {
       return false
     }
   }
-  return { task, saveTask }
+
+  const removeTask = async (id: string) => {
+    if (!db) return false
+    try {
+      await deleteTask(db, id)
+      return true
+    } catch (error) {
+      console.error(error)
+      return false
+    }
+  }
+
+  return { task, saveTask, removeTask }
 }

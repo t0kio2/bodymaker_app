@@ -21,11 +21,16 @@ export default function List() {
             <TaskCard
               task={item}
               editMode={true}
+              onTaskDeleted={loadTaskList}
             />
           )}
           // ListHeaderComponent={<Text>Header</Text>}
-          ListEmptyComponent={<Text>習慣が登録されていません。登録しましょう！</Text>}
-          refreshControl={<RefreshControl refreshing={refreshing} onRefresh={loadTaskList} />}
+          ListEmptyComponent={
+            <Text>習慣が登録されていません。登録しましょう！</Text>
+          }
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={loadTaskList} />
+          }
         />
         <TouchableOpacity
           className='absolute bottom-8 right-8 shadow-lg w-20 h-20 bg-[#161622] rounded-full
