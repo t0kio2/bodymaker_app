@@ -9,6 +9,22 @@ export const toggleDays = (selectedDays: number, day: number) => {
   return selectedDays ^ day // XORでトグル
 }
 
+/**
+ * 指定した日付から、曜日に対応するビットマスクを算出する関数
+ * 例:
+ *   日曜日 → 1 (1 << 0)
+ *   月曜日 → 2 (1 << 1)
+ *   ...
+ *   金曜日 → 32 (1 << 5)
+ *   土曜日 → 64 (1 << 6)
+ *
+ * @param date 対象の日付
+ * @returns 曜日を表すビットマスク
+ */
+export const getDayBit = (date: Date): number => {
+  return 1 << date.getDay()
+}
+
 // 'HH:mm'形式をDateオブジェクトに変換
 export const timeToDate = (time: string) => {
   const [hours, minutes] = time.split(':').map(Number)
@@ -49,7 +65,6 @@ export const isEverydayChecked = (bitmask: number) => {
 }
 
 export const allDaysMask = Object.values(DAY_OF_WEEK_BIT.ja).reduce((acc, bit) => acc | bit, 0)
-
 
 export const getStringId = (id: string | string[]): string | null => {
   if (typeof id === 'string') {

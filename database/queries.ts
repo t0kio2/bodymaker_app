@@ -16,7 +16,33 @@ export const getTaskList = async (db: any): Promise<TaskWithSchedule[]> => {
         LEFT JOIN task_schedules ts ON t.id = ts.task_id
         ;`
     )
+    console.log("tasks: ", tasks)
     return tasks
+  } catch (error) {
+    throw error
+  }
+}
+
+export const getTaskListByDay = async (db: any, dayBit: number): Promise<TaskWithSchedule[]> => {
+  console.log('dayBit: ', dayBit)
+  try {
+    const query = `SELECT
+      t.id AS id,
+      t.title,
+      t.goal,
+      t.start_date,
+      t.is_push_notification,
+      t.created_at,
+      ts.bitmask_days,
+      ts.time
+    FROM tasks t
+    LEFT JOIN task_schedules ts ON t.id = ts.task_id
+    WHERE ts.bitmask_days = ?
+    ;`
+    const tasks = await db.getAllAsync(query, [dayBit])
+    console.log("tasks: ", tasks)
+    return tasks
+
   } catch (error) {
     throw error
   }
