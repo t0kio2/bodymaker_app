@@ -10,10 +10,10 @@ import Modal from 'react-native-modal'
 import Checkbox from 'expo-checkbox'
 import { useTask } from '@/hooks/useTask'
 
-const TaskCard = ({ task, editMode = false, onTaskDeleted }:{
+const TaskCard = ({ task, editMode = false, onTaskDeleted = () => {} }:{
   task: TaskWithSchedule
   editMode?: boolean
-  onTaskDeleted: () => void
+  onTaskDeleted?: () => void
 }) => {
   const [isModalVisible, setIsModalVisible] = useState(false)
   const [iconPosition, setIconPosition] = useState({ x: 0, y: 0 })
