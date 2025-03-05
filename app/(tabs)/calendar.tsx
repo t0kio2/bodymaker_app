@@ -1,9 +1,9 @@
-import { View, Text, SafeAreaView, FlatList, RefreshControl, Alert, SectionList } from 'react-native'
-import React from 'react'
+import { Text, SafeAreaView, RefreshControl, SectionList } from 'react-native'
+import React, { useEffect, useState } from 'react'
 import {Calendar as CalendarComponent, LocaleConfig } from 'react-native-calendars'
 import TaskCard from '@/components/TaskCard'
 import { SafeAreaProvider } from 'react-native-safe-area-context'
-import { getDayBit } from '@/lib/utils'
+import { generateMarkedDatesForMonth } from '@/lib/utils'
 import { useTaskList } from '@/hooks/useTaskList'
 
 LocaleConfig.locales.jp = {
@@ -14,15 +14,21 @@ LocaleConfig.locales.jp = {
 }
 LocaleConfig.defaultLocale = 'jp'
 
-const markedDates = {
-  '2025-02-01': { selected: true, selectedColor: '#239a3b' },
-  '2025-02-02': { selected: true, selectedColor: '#7bc96f' },
-  '2025-02-03': { selected: true, selectedColor: '#c6e48b' },
-  '2025-02-04': { selected: true, selectedColor: '#e0e0e0' },
-}
-
 const Calendar = () => {
-  const { taskList, refreshing, loadTaskList} = useTaskList(getDayBit(new Date()))
+  const { taskList, refreshing, loadTaskList} = useTaskList()
+  const [currentYear, setCurrentYear] = useState(new Date().getFullYear())
+  const [currentMonth, setCurrentMonth] = useState(new Date().getMonth())
+  const [markedDates, setMarkedDates] = useState<Record<string, any>>({})
+
+  const updateMarkedDates = () => {
+    const newMarkedDates = generateMarkedDatesForMonth(taskList, currentYear, currentMonth)
+    setMarkedDates(newMarkedDates)
+  }
+
+  useEffect(() => {
+    updateMarkedDates()
+  }, [currentYear, currentMonth, taskList])
+
 
   const sections = [
     {
@@ -47,15 +53,17 @@ const Calendar = () => {
             <Text className="text-2xl pl-4 pt-4">{title}</Text>
           )}
           ListHeaderComponent={
-            <>
-              {/* <Text className="text-3xl ml-3">{formattedDate()}</Text> */}
-              <CalendarComponent
-                onDayPress={(day) => {
-                  console.log("selected day", day)
-                }}
-                markedDates={markedDates}
-              />
-            </>
+            <CalendarComponent
+              onMonthChange={(month) => {
+                setCurrentYear(month.year)
+                setCurrentMonth(month.month - 1)
+              }}
+              onDayPress={(day) => {
+                console.log("selected day", day)
+              }}
+              markedDates={markedDates}
+              enableSwipeMonths
+            />
           }
           refreshControl={<RefreshControl refreshing={refreshing} onRefresh={loadTaskList} />}
         />
