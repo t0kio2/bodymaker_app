@@ -39,6 +39,7 @@ export const generateMarkedDatesForMonth = (
   year: number,
   month: number
 ): Record<string, { selected: boolean, selectedColor?: string }> => {
+
   const marked: Record<string, { marked: boolean, selected: boolean, selectedColor?: string }> = {}
   const today = new Date().toISOString().split("T")[0]
 
