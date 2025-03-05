@@ -3,7 +3,7 @@ import React from 'react'
 import {Calendar as CalendarComponent, LocaleConfig } from 'react-native-calendars'
 import TaskCard from '@/components/TaskCard'
 import { SafeAreaProvider } from 'react-native-safe-area-context'
-import { formattedDate } from '@/lib/utils'
+import { getDayBit } from '@/lib/utils'
 import { useTaskList } from '@/hooks/useTaskList'
 
 LocaleConfig.locales.jp = {
@@ -22,7 +22,7 @@ const markedDates = {
 }
 
 const Calendar = () => {
-  const { taskList, refreshing, loadTaskList} = useTaskList()
+  const { taskList, refreshing, loadTaskList} = useTaskList(getDayBit(new Date()))
 
   const sections = [
     {
@@ -40,12 +40,15 @@ const Calendar = () => {
           renderItem={({ item }) => (
             <TaskCard task={item} editMode={false} />
           )}
+          ListEmptyComponent={
+            <Text>習慣が登録されていません。登録しましょう！</Text>
+          }
           renderSectionHeader={({ section: { title } }) => (
             <Text className="text-2xl pl-4 pt-4">{title}</Text>
           )}
           ListHeaderComponent={
             <>
-              <Text className="text-3xl ml-3">{formattedDate()}</Text>
+              {/* <Text className="text-3xl ml-3">{formattedDate()}</Text> */}
               <CalendarComponent
                 onDayPress={(day) => {
                   console.log("selected day", day)
