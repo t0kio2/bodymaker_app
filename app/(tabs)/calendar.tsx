@@ -1,10 +1,11 @@
-import { View, Text, SafeAreaView, FlatList, RefreshControl, Alert, SectionList } from 'react-native'
+import { Text, SafeAreaView, RefreshControl, SectionList } from 'react-native'
 import React from 'react'
 import {Calendar as CalendarComponent, LocaleConfig } from 'react-native-calendars'
 import TaskCard from '@/components/TaskCard'
 import { SafeAreaProvider } from 'react-native-safe-area-context'
-import { getDayBit } from '@/lib/utils'
+import { generateMarkedDatesForMonth, getDayBit } from '@/lib/utils'
 import { useTaskList } from '@/hooks/useTaskList'
+import { DAY_OF_WEEK_BIT } from '@/constants/common'
 
 LocaleConfig.locales.jp = {
   monthNames: ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月'],
@@ -14,15 +15,14 @@ LocaleConfig.locales.jp = {
 }
 LocaleConfig.defaultLocale = 'jp'
 
-const markedDates = {
-  '2025-02-01': { selected: true, selectedColor: '#239a3b' },
-  '2025-02-02': { selected: true, selectedColor: '#7bc96f' },
-  '2025-02-03': { selected: true, selectedColor: '#c6e48b' },
-  '2025-02-04': { selected: true, selectedColor: '#e0e0e0' },
-}
 
 const Calendar = () => {
-  const { taskList, refreshing, loadTaskList} = useTaskList(getDayBit(new Date()))
+  const { taskList, refreshing, loadTaskList} = useTaskList()
+
+  // 例: 月、水、金がスケジュールされた場合
+  const scheduleBitmask = DAY_OF_WEEK_BIT.en.Monday
+  const markedDates = generateMarkedDatesForMonth(taskList, 2025, 2); // 2025年3月（monthは0始まり）
+  console.log('markedDates: ', markedDates)
 
   const sections = [
     {
@@ -50,10 +50,14 @@ const Calendar = () => {
             <>
               {/* <Text className="text-3xl ml-3">{formattedDate()}</Text> */}
               <CalendarComponent
+                onMonthChange={(month) => {
+
+                }}
                 onDayPress={(day) => {
                   console.log("selected day", day)
                 }}
                 markedDates={markedDates}
+                enableSwipeMonths
               />
             </>
           }
