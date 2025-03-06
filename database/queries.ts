@@ -37,7 +37,7 @@ export const getTaskListByDay = async (db: any, dayBit: number): Promise<TaskWit
       ts.time
     FROM tasks t
     LEFT JOIN task_schedules ts ON t.id = ts.task_id
-    WHERE ts.bitmask_days = ?
+    WHERE ts.bitmask_days & ? != 0
     ;`
     const tasks = await db.getAllAsync(query, [dayBit])
     console.log("tasks: ", tasks)

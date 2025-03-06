@@ -1,4 +1,5 @@
 import { DAY_OF_WEEK_BIT } from "@/constants/common"
+import { TaskWithSchedule } from "@/types"
 import { Linking } from "react-native"
 
 export const isDaySelected = (bitmask: number, day: number) => {
@@ -24,6 +25,48 @@ export const toggleDays = (selectedDays: number, day: number) => {
 export const getDayBit = (date: Date): number => {
   return 1 << date.getDay()
 }
+
+/**
+ * 指定された年月で、スケジュールされた曜日のタスクをマークするためのオブジェクトを生成する
+ *
+ * @param scheduleBitmask 例: 月・水・金が選択されているなら (DAY_OF_WEEK.Monday | DAY_OF_WEEK.Wednesday | DAY_OF_WEEK.Friday)
+ * @param year 対象の年（例: 2025）
+ * @param month 対象の月（0～11、例: 1=2月）
+ * @returns markedDates オブジェクト。キーは "YYYY-MM-DD" の形式で、値は { selected: true, selectedColor: string } のオブジェクト。
+ */
+export const generateMarkedDatesForMonth = (
+  taskList: TaskWithSchedule[],
+  year: number,
+  month: number
+): Record<string, { selected: boolean, selectedColor?: string }> => {
+
+  const marked: Record<string, { marked: boolean, selected: boolean, selectedColor?: string }> = {}
+  const today = new Date().toISOString().split("T")[0]
+
+  // 対象月の初日と最終日を取得
+  const start = new Date(year, month, 1)
+  const end = new Date(year, month + 1, 0)
+
+  // 月初から月末までの日付をループ
+  for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
+    // Date.getDay() は 0 (Sunday) ～ 6 (Saturday) を返す
+    const dayBit = 1 << d.getDay()
+
+    const dateStr = d.toISOString().split("T")[0]
+
+    const isMarked = taskList.some(task => (task.bitmask_days & dayBit) !== 0)
+
+    for (let task of taskList) {
+      marked[dateStr] = { 
+        marked: isMarked,
+        selected: dateStr == today,
+        selectedColor: "#239a3b"
+      }
+    }
+  }
+  return marked
+}
+
 
 // 'HH:mm'形式をDateオブジェクトに変換
 export const timeToDate = (time: string) => {
