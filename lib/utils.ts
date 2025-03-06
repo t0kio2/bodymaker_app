@@ -40,6 +40,13 @@ export const generateMarkedDatesForMonth = (
   month: number
 ): Record<string, { selected: boolean, selectedColor?: string }> => {
 
+  const getLocalDateString = (date: Date): string => {
+    const year = date.getFullYear();
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    const day = date.getDate().toString().padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  }
+
   const marked: Record<string, { marked: boolean, selected: boolean, selectedColor?: string }> = {}
   const today = new Date().toISOString().split("T")[0]
 
@@ -47,21 +54,18 @@ export const generateMarkedDatesForMonth = (
   const start = new Date(year, month, 1)
   const end = new Date(year, month + 1, 0)
 
+
   // 月初から月末までの日付をループ
   for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
     // Date.getDay() は 0 (Sunday) ～ 6 (Saturday) を返す
     const dayBit = 1 << d.getDay()
-
-    const dateStr = d.toISOString().split("T")[0]
-
+    const dateStr = getLocalDateString(d)
     const isMarked = taskList.some(task => (task.bitmask_days & dayBit) !== 0)
 
-    for (let task of taskList) {
-      marked[dateStr] = { 
-        marked: isMarked,
-        selected: dateStr == today,
-        selectedColor: "#239a3b"
-      }
+    marked[dateStr] = { 
+      marked: isMarked,
+      selected: dateStr == today,
+      selectedColor: "#239a3b"
     }
   }
   return marked
