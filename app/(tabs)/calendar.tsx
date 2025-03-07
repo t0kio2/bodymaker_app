@@ -3,8 +3,9 @@ import React, { useEffect, useState } from 'react'
 import {Calendar as CalendarComponent, LocaleConfig } from 'react-native-calendars'
 import TaskCard from '@/components/TaskCard'
 import { SafeAreaProvider } from 'react-native-safe-area-context'
-import { generateMarkedDatesForMonth } from '@/lib/utils'
+import { generateMarkedDatesForMonth, getDayBit, getLocalDateString } from '@/lib/utils'
 import { useTaskList } from '@/hooks/useTaskList'
+import { TaskWithSchedule } from '@/types'
 
 LocaleConfig.locales.jp = {
   monthNames: ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月'],
@@ -20,9 +21,18 @@ const Calendar = () => {
   const [currentMonth, setCurrentMonth] = useState(new Date().getMonth())
   const [markedDates, setMarkedDates] = useState<Record<string, any>>({})
 
+  const [selectedDate, setSelectedDate] = useState(getLocalDateString(new Date()))
+
   const updateMarkedDates = () => {
-    const newMarkedDates = generateMarkedDatesForMonth(taskList, currentYear, currentMonth)
+    const today = getLocalDateString(new Date())
+    const newMarkedDates = generateMarkedDatesForMonth(taskList, currentYear, currentMonth, today)
     setMarkedDates(newMarkedDates)
+  }
+
+  const filterTasksByDate = (taskList: TaskWithSchedule[], date: Date) => {
+    const dayBit = getDayBit(date)
+    const tasksOnDay = taskList.filter(task => (task.bitmask_days & dayBit) !== 0)
+    console.log(tasksOnDay)
   }
 
   useEffect(() => {
@@ -59,7 +69,7 @@ const Calendar = () => {
                 setCurrentMonth(month.month - 1)
               }}
               onDayPress={(day) => {
-                console.log("selected day", day)
+                filterTasksByDate(taskList, new Date(day.dateString))
               }}
               markedDates={markedDates}
               enableSwipeMonths

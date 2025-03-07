@@ -26,29 +26,21 @@ export const getDayBit = (date: Date): number => {
   return 1 << date.getDay()
 }
 
-/**
- * 指定された年月で、スケジュールされた曜日のタスクをマークするためのオブジェクトを生成する
- *
- * @param scheduleBitmask 例: 月・水・金が選択されているなら (DAY_OF_WEEK.Monday | DAY_OF_WEEK.Wednesday | DAY_OF_WEEK.Friday)
- * @param year 対象の年（例: 2025）
- * @param month 対象の月（0～11、例: 1=2月）
- * @returns markedDates オブジェクト。キーは "YYYY-MM-DD" の形式で、値は { selected: true, selectedColor: string } のオブジェクト。
- */
+// ローカル日付文字列を取得
+export const getLocalDateString = (date: Date): string => {
+  const y = date.getFullYear();
+  const m = (date.getMonth() + 1).toString().padStart(2, '0');
+  const d = date.getDate().toString().padStart(2, '0');
+  return `${y}-${m}-${d}`;
+}
+
 export const generateMarkedDatesForMonth = (
   taskList: TaskWithSchedule[],
   year: number,
-  month: number
+  month: number,
+  selectedDay: string
 ): Record<string, { selected: boolean, selectedColor?: string }> => {
-
-  const getLocalDateString = (date: Date): string => {
-    const year = date.getFullYear();
-    const month = (date.getMonth() + 1).toString().padStart(2, '0');
-    const day = date.getDate().toString().padStart(2, '0');
-    return `${year}-${month}-${day}`;
-  }
-
   const marked: Record<string, { marked: boolean, selected: boolean, selectedColor?: string }> = {}
-  const today = new Date().toISOString().split("T")[0]
 
   // 対象月の初日と最終日を取得
   const start = new Date(year, month, 1)
@@ -60,11 +52,11 @@ export const generateMarkedDatesForMonth = (
     // Date.getDay() は 0 (Sunday) ～ 6 (Saturday) を返す
     const dayBit = 1 << d.getDay()
     const dateStr = getLocalDateString(d)
-    const isMarked = taskList.some(task => (task.bitmask_days & dayBit) !== 0)
+    const hasTask = taskList.some(task => (task.bitmask_days & dayBit) !== 0)
 
     marked[dateStr] = { 
-      marked: isMarked,
-      selected: dateStr == today,
+      marked: hasTask,
+      selected: dateStr === selectedDay,
       selectedColor: "#239a3b"
     }
   }
