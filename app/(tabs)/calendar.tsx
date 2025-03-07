@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react'
 import {Calendar as CalendarComponent, LocaleConfig } from 'react-native-calendars'
 import TaskCard from '@/components/TaskCard'
 import { SafeAreaProvider } from 'react-native-safe-area-context'
-import { generateMarkedDatesForMonth, getDayBit } from '@/lib/utils'
+import { generateMarkedDatesForMonth, getDayBit, getLocalDateString } from '@/lib/utils'
 import { useTaskList } from '@/hooks/useTaskList'
 import { TaskWithSchedule } from '@/types'
 
@@ -21,8 +21,11 @@ const Calendar = () => {
   const [currentMonth, setCurrentMonth] = useState(new Date().getMonth())
   const [markedDates, setMarkedDates] = useState<Record<string, any>>({})
 
+  const [selectedDate, setSelectedDate] = useState(getLocalDateString(new Date()))
+
   const updateMarkedDates = () => {
-    const newMarkedDates = generateMarkedDatesForMonth(taskList, currentYear, currentMonth)
+    const today = getLocalDateString(new Date())
+    const newMarkedDates = generateMarkedDatesForMonth(taskList, currentYear, currentMonth, today)
     setMarkedDates(newMarkedDates)
   }
 
