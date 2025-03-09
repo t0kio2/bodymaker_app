@@ -22,6 +22,7 @@ const Calendar = () => {
   const [markedDates, setMarkedDates] = useState<Record<string, any>>({})
 
   const [selectedDate, setSelectedDate] = useState(getLocalDateString(new Date()))
+  const [filterTasks, setFilterTasks] = useState<TaskWithSchedule[]>([])
 
   const updateMarkedDates = () => {
     const today = getLocalDateString(new Date())
@@ -31,19 +32,35 @@ const Calendar = () => {
 
   const filterTasksByDate = (taskList: TaskWithSchedule[], date: Date) => {
     const dayBit = getDayBit(date)
-    const tasksOnDay = taskList.filter(task => (task.bitmask_days & dayBit) !== 0)
-    console.log(tasksOnDay)
+    const tasksForDay = taskList.filter(task => (task.bitmask_days & dayBit) !== 0)
+    return tasksForDay
   }
 
   useEffect(() => {
+    const tasksForDay = taskList.filter(task => {
+      // 各タスクのスケジュールビットマスクと、タップされた日のビットマスクを比較
+      const dayBit = getDayBit(new Date(selectedDate))
+      return (task.bitmask_days & dayBit) !== 0;
+    })
+    setFilterTasks(tasksForDay)
+  }, [taskList, selectedDate])
+
+  useEffect(() => {
     updateMarkedDates()
-  }, [currentYear, currentMonth, taskList])
+  }, [currentYear, currentMonth, taskList, selectedDate])
+
+  const handleDayPress = (dateStr: string ) => {
+    setSelectedDate(dateStr)
+    const tasksForDay = filterTasksByDate(taskList, new Date(dateStr))
+    setFilterTasks(tasksForDay)
+  }
 
 
   const sections = [
     {
-      title: '今日のトレーニング',
-      data: taskList
+      title: selectedDate ===  getLocalDateString(new Date()) ? 
+        '今日のトレーニング' : `${selectedDate}のトレーニング`,
+      data: filterTasks
     }
   ]
   
@@ -69,7 +86,7 @@ const Calendar = () => {
                 setCurrentMonth(month.month - 1)
               }}
               onDayPress={(day) => {
-                filterTasksByDate(taskList, new Date(day.dateString))
+                handleDayPress(day.dateString)
               }}
               markedDates={markedDates}
               enableSwipeMonths
