@@ -1,10 +1,10 @@
-import { View, Text, SafeAreaView, FlatList, RefreshControl, Alert, SectionList } from 'react-native'
+import { Text, SafeAreaView, RefreshControl, SectionList } from 'react-native'
 import React from 'react'
 import {Calendar as CalendarComponent, LocaleConfig } from 'react-native-calendars'
 import TaskCard from '@/components/TaskCard'
 import { SafeAreaProvider } from 'react-native-safe-area-context'
-import { formattedDate } from '@/lib/utils'
-import { useTaskList } from '@/hooks/useTaskList'
+import { getLocalDateString } from '@/lib/utils'
+import { useCalendarData } from '@/hooks/useCalendarData'
 
 LocaleConfig.locales.jp = {
   monthNames: ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月'],
@@ -14,20 +14,24 @@ LocaleConfig.locales.jp = {
 }
 LocaleConfig.defaultLocale = 'jp'
 
-const markedDates = {
-  '2025-02-01': { selected: true, selectedColor: '#239a3b' },
-  '2025-02-02': { selected: true, selectedColor: '#7bc96f' },
-  '2025-02-03': { selected: true, selectedColor: '#c6e48b' },
-  '2025-02-04': { selected: true, selectedColor: '#e0e0e0' },
-}
-
 const Calendar = () => {
-  const { taskList, refreshing, loadTaskList} = useTaskList()
+  const {
+    refreshing,
+    loadTaskList,
+    setCurrentYear,
+    setCurrentMonth,
+    markedDates,
+    selectedDate,
+    handleDayPress,
+    filterTasks
+  } = useCalendarData()
+  
 
   const sections = [
     {
-      title: '今日のトレーニング',
-      data: taskList
+      title: selectedDate ===  getLocalDateString(new Date()) ? 
+        '今日のトレーニング' : `${selectedDate}のトレーニング`,
+      data: filterTasks
     }
   ]
   
@@ -40,19 +44,24 @@ const Calendar = () => {
           renderItem={({ item }) => (
             <TaskCard task={item} editMode={false} />
           )}
+          ListEmptyComponent={
+            <Text>習慣が登録されていません。登録しましょう！</Text>
+          }
           renderSectionHeader={({ section: { title } }) => (
             <Text className="text-2xl pl-4 pt-4">{title}</Text>
           )}
           ListHeaderComponent={
-            <>
-              <Text className="text-3xl ml-3">{formattedDate()}</Text>
-              <CalendarComponent
-                onDayPress={(day) => {
-                  console.log("selected day", day)
-                }}
-                markedDates={markedDates}
-              />
-            </>
+            <CalendarComponent
+              onMonthChange={(month) => {
+                setCurrentYear(month.year)
+                setCurrentMonth(month.month - 1)
+              }}
+              onDayPress={(day) => {
+                handleDayPress(day.dateString)
+              }}
+              markedDates={markedDates}
+              enableSwipeMonths
+            />
           }
           refreshControl={<RefreshControl refreshing={refreshing} onRefresh={loadTaskList} />}
         />

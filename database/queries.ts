@@ -22,6 +22,30 @@ export const getTaskList = async (db: any): Promise<TaskWithSchedule[]> => {
   }
 }
 
+export const getTaskListByDay = async (db: any, dayBit: number): Promise<TaskWithSchedule[]> => {
+  console.log('dayBit: ', dayBit)
+  try {
+    const query = `SELECT
+      t.id AS id,
+      t.title,
+      t.goal,
+      t.start_date,
+      t.is_push_notification,
+      t.created_at,
+      ts.bitmask_days,
+      ts.time
+    FROM tasks t
+    LEFT JOIN task_schedules ts ON t.id = ts.task_id
+    WHERE ts.bitmask_days & ? != 0
+    ;`
+    const tasks = await db.getAllAsync(query, [dayBit])
+    return tasks
+
+  } catch (error) {
+    throw error
+  }
+}
+
 export const getTaskById = async (db: any, id: string): Promise<TaskWithSchedule | null> => { 
   try {
     const task = await db.getFirstAsync(

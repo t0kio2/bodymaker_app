@@ -1,4 +1,5 @@
 import { DAY_OF_WEEK_BIT } from "@/constants/common"
+import { TaskWithSchedule } from "@/types"
 import { Linking } from "react-native"
 
 export const isDaySelected = (bitmask: number, day: number) => {
@@ -8,6 +9,60 @@ export const isDaySelected = (bitmask: number, day: number) => {
 export const toggleDays = (selectedDays: number, day: number) => {
   return selectedDays ^ day // XORでトグル
 }
+
+/**
+ * 指定した日付から、曜日に対応するビットマスクを算出する関数
+ * 例:
+ *   日曜日 → 1 (1 << 0)
+ *   月曜日 → 2 (1 << 1)
+ *   ...
+ *   金曜日 → 32 (1 << 5)
+ *   土曜日 → 64 (1 << 6)
+ *
+ * @param date 対象の日付
+ * @returns 曜日を表すビットマスク
+ */
+export const getDayBit = (date: Date): number => {
+  return 1 << date.getDay()
+}
+
+// ローカル日付文字列を取得
+export const getLocalDateString = (date: Date): string => {
+  const y = date.getFullYear();
+  const m = (date.getMonth() + 1).toString().padStart(2, '0');
+  const d = date.getDate().toString().padStart(2, '0');
+  return `${y}-${m}-${d}`;
+}
+
+export const generateMarkedDatesForMonth = (
+  taskList: TaskWithSchedule[],
+  year: number,
+  month: number,
+  selectedDay: string
+): Record<string, { selected: boolean, selectedColor?: string }> => {
+  const marked: Record<string, { marked: boolean, selected: boolean, selectedColor?: string }> = {}
+
+  // 対象月の初日と最終日を取得
+  const start = new Date(year, month, 1)
+  const end = new Date(year, month + 1, 0)
+
+
+  // 月初から月末までの日付をループ
+  for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
+    // Date.getDay() は 0 (Sunday) ～ 6 (Saturday) を返す
+    const dayBit = 1 << d.getDay()
+    const dateStr = getLocalDateString(d)
+    const hasTask = taskList.some(task => (task.bitmask_days & dayBit) !== 0)
+
+    marked[dateStr] = { 
+      marked: hasTask,
+      selected: dateStr === selectedDay,
+      selectedColor: "#239a3b"
+    }
+  }
+  return marked
+}
+
 
 // 'HH:mm'形式をDateオブジェクトに変換
 export const timeToDate = (time: string) => {
@@ -49,7 +104,6 @@ export const isEverydayChecked = (bitmask: number) => {
 }
 
 export const allDaysMask = Object.values(DAY_OF_WEEK_BIT.ja).reduce((acc, bit) => acc | bit, 0)
-
 
 export const getStringId = (id: string | string[]): string | null => {
   if (typeof id === 'string') {
