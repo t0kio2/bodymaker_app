@@ -1,28 +1,38 @@
-import { DAY_OF_WEEK } from "@/constants/common";
-import { isEverydayChecked } from "@/lib/utils";
-import { Task } from "@/types";
+import { DAY_OF_WEEK_BIT } from "@/constants/common";
+import { allDaysMask, getCurrentTimeStr, toggleDays } from "@/lib/utils";
+import { TaskWithSchedule } from "@/types";
 import { useEffect, useState } from "react";
 
 // フォームの状態・バリデーション・入力変更ロジックを管理するカスタムフック
-export const useForm = (mode: 'create' | 'edit', initialTask?: Task | null) => {
-  const [formData, setFormData] = useState({
+export const useForm = (mode: 'create' | 'edit', initialTask?: TaskWithSchedule | null) => {
+  const [formData, setFormData] = useState<TaskWithSchedule>({
+    id: '',
     title: '', 
     goal: '',
+    start_date: new Date(),
+    bitmask_days: 0,
+    time: '',
+    is_push_notification: false,
   })
-  const [time, setTime] = useState('')
+  const [timeStr, setTimeStr] = useState(getCurrentTimeStr())
   const [selectedDays, setSelectedDays] = useState(0)
   const [isEveryday, setIsEveryday] = useState(false)
   const [pushNotification, setPushNotification] = useState(true)
-  const [errors, setErrors] = useState<any>({ title: '', vide: '' })
 
   useEffect(() => {
     if (mode === 'edit' && initialTask) {
       setFormData({
+        id: initialTask.id,
         title: initialTask.title,
         goal: initialTask.goal,
+        start_date: new Date(initialTask.start_date),
+        bitmask_days: initialTask.bitmask_days,
+        time: initialTask.time,
+        is_push_notification: initialTask.is_push_notification
       })
-      // setSelectedDays(initialTask.schedule.recurring.map((day: number) => DAY_OF_WEEK[day]))
-      // setIsEveryday(isEverydayChecked(initialTask.schedule.recurring))
+      setSelectedDays(initialTask.bitmask_days)
+      setTimeStr(initialTask.time)
+      setPushNotification(initialTask.is_push_notification)
     }
   }, [mode, initialTask])
 
@@ -30,45 +40,49 @@ export const useForm = (mode: 'create' | 'edit', initialTask?: Task | null) => {
     setFormData((prev) => ({ ...prev, [field]: value }))
   }
 
-  const validateForm = () => {
+  const validateForm = (): string => {
     if (!formData.title) {
-      setErrors({ title: 'タイトルを入力してください'})
-      return false
+      return 'タイトルを入力してください'
     }
-    return true
+    if (!timeStr) {
+      return '時間を入力してください'
+    }
+    if (!selectedDays) {
+      return '曜日を選択してください'
+    }
+    return ''
   }
 
-  const toggleSwitch = () => {
-    const nextState = !isEveryday
-    setSelectedDays(nextState ? DAY_OF_WEEK : [])
-    setIsEveryday(nextState)
-  }
-
-  const toggleDays = (day: string) => {
-    setSelectedDays(prev => {
-      const updated = prev.includes(day) ? prev.filter(d => d !== day) : [...prev, day]
-      const isSelectedAll = isEverydayChecked(updated)
-      setIsEveryday(isSelectedAll)
-      return updated
+  const selectAllDays = () => {
+    setIsEveryday(prev => {
+      const nextState = !prev
+      setSelectedDays(nextState ?
+        Object.values(DAY_OF_WEEK_BIT.ja).reduce((acc, bit) => acc | bit, 0) :
+        0
+      )
+      return nextState
     })
   }
 
-  // const toggleDays = (day: number) => {
-  //   setSelectedDays(prev => prev ^ day)
-  // }
+  const handleToggleDays = (day: number) => {
+    setSelectedDays(prev => {
+      const updateDays = toggleDays(prev, day)
+      setIsEveryday(updateDays === allDaysMask)
+      return updateDays
+    })
+  }
 
   return {
     formData,
-    time,
+    timeStr,
     selectedDays,
     isEveryday,
     pushNotification,
-    errors,
-    setTime,
+    setTimeStr,
     setPushNotification,
     handleChange,
     validateForm,
-    toggleSwitch,
-    toggleDays,
+    selectAllDays,
+    handleToggleDays
   }
 }

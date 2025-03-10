@@ -1,15 +1,10 @@
-import { View, Text, SafeAreaView, FlatList, TouchableOpacity, RefreshControl, Alert, ScrollView } from 'react-native'
-import React, { useEffect, useState } from 'react'
-import Modal from 'react-native-modal'
+import { Text, SafeAreaView, RefreshControl, SectionList } from 'react-native'
+import React from 'react'
 import {Calendar as CalendarComponent, LocaleConfig } from 'react-native-calendars'
-import { Task } from '@/types'
-import { router, useLocalSearchParams } from 'expo-router'
-import { deleteNotificationById } from '@/lib/pushNotification'
-import { openDatabaseAsync } from '@/database/db'
-import { deleteTask, getTasks } from '@/database/queries'
 import TaskCard from '@/components/TaskCard'
 import { SafeAreaProvider } from 'react-native-safe-area-context'
-import { formattedDate } from '@/lib/utils'
+import { getLocalDateString } from '@/lib/utils'
+import { useCalendarData } from '@/hooks/useCalendarData'
 
 LocaleConfig.locales.jp = {
   monthNames: ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月'],
@@ -19,98 +14,57 @@ LocaleConfig.locales.jp = {
 }
 LocaleConfig.defaultLocale = 'jp'
 
-const markedDates = {
-  '2025-02-01': { selected: true, selectedColor: '#239a3b' },
-  '2025-02-02': { selected: true, selectedColor: '#7bc96f' },
-  '2025-02-03': { selected: true, selectedColor: '#c6e48b' },
-  '2025-02-04': { selected: true, selectedColor: '#e0e0e0' },
-}
-
 const Calendar = () => {
-  const [tasks, setTasks] = useState<Task[]>([])
-  const [taskOnModal, setTaskOnModal] = useState<Task | null>(null)
-
-  const [isModalVisible, setIsModalVisible] = useState(false)
-  const [iconPosition, setIconPosition] = useState({ x: 0, y: 0 })
-
-  const params = useLocalSearchParams()
+  const {
+    refreshing,
+    loadTaskList,
+    setCurrentYear,
+    setCurrentMonth,
+    markedDates,
+    selectedDate,
+    handleDayPress,
+    filterTasks
+  } = useCalendarData()
   
-  useEffect(() => {
-    loadData()
-  }, [params?.updated])
 
-  const loadData = async () => {
-    try {
-      const db = await openDatabaseAsync()
-      const tasks = await getTasks(db)
-      if (tasks !== null) {
-        setTasks(tasks)
-      }
-    } catch (error) {
-      console.error(error)
-      throw new Error('Failed to load data')
+  const sections = [
+    {
+      title: selectedDate ===  getLocalDateString(new Date()) ? 
+        '今日のトレーニング' : `${selectedDate}のトレーニング`,
+      data: filterTasks
     }
-  }
-  const handleEdit = () => {
-    setIsModalVisible(false)
-    router.push(`/edit?id=${taskOnModal?.id}`)
-  }
-  const handleDelete = async () => {
-    if (!taskOnModal) return
-    Alert.alert(
-      taskOnModal.title, // タイトル
-      '削除してもよろしいですか？', // メッセージ
-      [ // ボタン
-        {
-          text: 'キャンセル',
-          style: 'cancel',
-          onPress: () => setIsModalVisible(false)
-        },
-        {
-          text: 'OK',
-          onPress: async () => {
-            setIsModalVisible(false)
-            deleteNotificationById(taskOnModal.id)
-            const updatedTasks = tasks.filter((task: any) => task.id !== taskOnModal.id)
-            try {
-              const db = await openDatabaseAsync()
-              await deleteTask(db, taskOnModal.id)
-              setTasks(updatedTasks)
-              Alert.alert('削除しました')
-            } catch (error) {
-              throw new Error('Failed to delete task')
-            } finally {
-              setIsModalVisible(false)
-            }
-          }
-        }
-      ]
-    )
-  }
+  ]
+  
   return (
     <SafeAreaProvider>
-      <SafeAreaView className='h-full bg-white'>
-        <Text className='text-3xl ml-3'>{ formattedDate() }</Text>
-        <CalendarComponent
-          onDayPress={day => {
-            console.log('selected day', day);
-          }}
-          markedDates={markedDates}
+      <SafeAreaView className="h-full bg-white">
+        <SectionList
+          sections={sections}
+          keyExtractor={(item) => item.id.toString()}
+          renderItem={({ item }) => (
+            <TaskCard task={item} editMode={false} />
+          )}
+          ListEmptyComponent={
+            <Text>習慣が登録されていません。登録しましょう！</Text>
+          }
+          renderSectionHeader={({ section: { title } }) => (
+            <Text className="text-2xl pl-4 pt-4">{title}</Text>
+          )}
+          ListHeaderComponent={
+            <CalendarComponent
+              onMonthChange={(month) => {
+                setCurrentYear(month.year)
+                setCurrentMonth(month.month - 1)
+              }}
+              onDayPress={(day) => {
+                handleDayPress(day.dateString)
+              }}
+              markedDates={markedDates}
+              enableSwipeMonths
+            />
+          }
+          refreshControl={<RefreshControl refreshing={refreshing} onRefresh={loadTaskList} />}
         />
-        <View className='pl-4 pt-4'>
-          <Text className='text-2xl'>今日のトレーニング</Text>
-          <FlatList
-            data={ tasks }
-            keyExtractor={ task => task.id.toString() }
-            renderItem={({ item }) => (
-              <TaskCard
-                task={item}
-              />
-            )}
-            ListEmptyComponent={<Text>習慣が登録されていません。登録しましょう！</Text>}
-            refreshControl={<RefreshControl refreshing={false} onRefresh={() => {}} />}
-          />
-        </View>
       </SafeAreaView>
     </SafeAreaProvider>
   )

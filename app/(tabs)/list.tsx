@@ -1,33 +1,13 @@
 import { FlatList, RefreshControl, Text, TouchableOpacity, SafeAreaView } from 'react-native'
-import React, { useEffect, useState } from 'react'
+import React from 'react'
 import { SafeAreaProvider } from 'react-native-safe-area-context'
 import Icon from 'react-native-vector-icons/FontAwesome5'
-import { router, useLocalSearchParams } from 'expo-router'
-import { Task } from '@/types'
-import { getTasks } from '@/database/queries'
-import { openDatabaseAsync } from '@/database/db'
+import { router } from 'expo-router'
 import TaskCard from '@/components/TaskCard'
+import { useTaskList } from '@/hooks/useTaskList'
 
 export default function List() {
-  const [tasks, setTasks] = useState<Task[]>([])
-  const params = useLocalSearchParams()
-
-  useEffect(() => {
-    loadData()
-  }, [params?.updated])
-
-  const loadData = async () => {
-    try {
-      const db = await openDatabaseAsync()
-      const tasks = await getTasks(db)
-      if (tasks !== null) {
-        setTasks(tasks)
-      }
-    } catch (error) {
-      console.error(error)
-      throw new Error('Failed to load data')
-    }
-  }
+  const { taskList, refreshing, loadTaskList } = useTaskList()
 
   return (
     // デバイス毎に余白をよしなにしてくれる
@@ -35,22 +15,27 @@ export default function List() {
       <SafeAreaView className='h-full bg-white'>
         <FlatList
           // className='border border-red-500'
-          data={ tasks }
+          data={ taskList }
           keyExtractor={ task => task.id.toString()}
           renderItem={({ item }) => (
             <TaskCard
               task={item}
               editMode={true}
+              onTaskDeleted={loadTaskList}
             />
           )}
           // ListHeaderComponent={<Text>Header</Text>}
-          ListEmptyComponent={<Text>習慣が登録されていません。登録しましょう！</Text>}
-          refreshControl={<RefreshControl refreshing={false} onRefresh={() => {}} />}
+          ListEmptyComponent={
+            <Text>習慣が登録されていません。登録しましょう！</Text>
+          }
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={loadTaskList} />
+          }
         />
         <TouchableOpacity
           className='absolute bottom-8 right-8 shadow-lg w-20 h-20 bg-[#161622] rounded-full
           flex items-center justify-center'
-          onPress={() => router.push('/create')}
+          onPress={() => router.push('/taskForm?mode=create')}
         >
           <Icon name='plus' size={20} color='#FFF' />
         </TouchableOpacity>
