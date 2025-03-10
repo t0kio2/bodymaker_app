@@ -1,11 +1,10 @@
 import { Text, SafeAreaView, RefreshControl, SectionList } from 'react-native'
-import React, { useEffect, useState } from 'react'
+import React from 'react'
 import {Calendar as CalendarComponent, LocaleConfig } from 'react-native-calendars'
 import TaskCard from '@/components/TaskCard'
 import { SafeAreaProvider } from 'react-native-safe-area-context'
-import { generateMarkedDatesForMonth, getDayBit, getLocalDateString } from '@/lib/utils'
-import { useTaskList } from '@/hooks/useTaskList'
-import { TaskWithSchedule } from '@/types'
+import { getLocalDateString } from '@/lib/utils'
+import { useCalendarData } from '@/hooks/useCalendarData'
 
 LocaleConfig.locales.jp = {
   monthNames: ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月'],
@@ -16,45 +15,17 @@ LocaleConfig.locales.jp = {
 LocaleConfig.defaultLocale = 'jp'
 
 const Calendar = () => {
-  const { taskList, refreshing, loadTaskList} = useTaskList()
-  const [currentYear, setCurrentYear] = useState(new Date().getFullYear())
-  const [currentMonth, setCurrentMonth] = useState(new Date().getMonth())
-  const [markedDates, setMarkedDates] = useState<Record<string, any>>({})
-
-  const [selectedDate, setSelectedDate] = useState(getLocalDateString(new Date()))
-  const [filterTasks, setFilterTasks] = useState<TaskWithSchedule[]>([])
-
-  const updateMarkedDates = () => {
-    const today = getLocalDateString(new Date())
-    const newMarkedDates = generateMarkedDatesForMonth(taskList, currentYear, currentMonth, today)
-    setMarkedDates(newMarkedDates)
-  }
-
-  const filterTasksByDate = (taskList: TaskWithSchedule[], date: Date) => {
-    const dayBit = getDayBit(date)
-    const tasksForDay = taskList.filter(task => (task.bitmask_days & dayBit) !== 0)
-    return tasksForDay
-  }
-
-  useEffect(() => {
-    const tasksForDay = taskList.filter(task => {
-      // 各タスクのスケジュールビットマスクと、タップされた日のビットマスクを比較
-      const dayBit = getDayBit(new Date(selectedDate))
-      return (task.bitmask_days & dayBit) !== 0;
-    })
-    setFilterTasks(tasksForDay)
-  }, [taskList, selectedDate])
-
-  useEffect(() => {
-    updateMarkedDates()
-  }, [currentYear, currentMonth, taskList, selectedDate])
-
-  const handleDayPress = (dateStr: string ) => {
-    setSelectedDate(dateStr)
-    const tasksForDay = filterTasksByDate(taskList, new Date(dateStr))
-    setFilterTasks(tasksForDay)
-  }
-
+  const {
+    refreshing,
+    loadTaskList,
+    setCurrentYear,
+    setCurrentMonth,
+    markedDates,
+    selectedDate,
+    handleDayPress,
+    filterTasks
+  } = useCalendarData()
+  
 
   const sections = [
     {
