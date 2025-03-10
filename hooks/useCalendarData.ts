@@ -12,9 +12,8 @@ export const useCalendarData = () => {
   const [selectedDate, setSelectedDate] = useState(getLocalDateString(new Date()))
   const [filterTasks, setFilterTasks] = useState<TaskWithSchedule[]>([])
 
-  const updateMarkedDates = () => {
-    const today = getLocalDateString(new Date())
-    const newMarkedDates = generateMarkedDatesForMonth(taskList, currentYear, currentMonth, today)
+  const updateMarkedDates = (selectedDate: string) => {
+    const newMarkedDates = generateMarkedDatesForMonth(taskList, currentYear, currentMonth, selectedDate)
     setMarkedDates(newMarkedDates)
   }
 
@@ -34,7 +33,7 @@ export const useCalendarData = () => {
   }, [taskList, selectedDate])
 
   useEffect(() => {
-    updateMarkedDates()
+    updateMarkedDates(selectedDate)
   }, [currentYear, currentMonth, taskList, selectedDate])
 
   const handleDayPress = (dateStr: string ) => {
