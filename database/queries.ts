@@ -1,47 +1,68 @@
 import { Task, Schedule, TaskWithSchedule } from "@/types"
 
-export const getTaskList = async (db: any): Promise<TaskWithSchedule[]> => {
+export const getTaskList = async (
+    db: any,
+    dateStr: string
+  ): Promise<TaskWithSchedule[]> => {
   try {
-    const tasks = await db.getAllAsync(
-      `SELECT
-          t.id AS id,
-          t.title,
-          t.goal,
-          t.start_date,
-          t.is_push_notification,
-          t.created_at,
-          ts.bitmask_days,
-          ts.time
-        FROM tasks t
-        LEFT JOIN task_schedules ts ON t.id = ts.task_id
-        ;`
-    )
-    return tasks
-  } catch (error) {
-    throw error
-  }
-}
-
-export const getTaskListByDay = async (db: any, dayBit: number): Promise<TaskWithSchedule[]> => {
-  console.log('dayBit: ', dayBit)
-  try {
+    console.log('dateStr', dateStr)
     const query = `SELECT
       t.id AS id,
+      ts.id AS task_schedule_id,
+      tl.id AS log_id,
       t.title,
       t.goal,
       t.start_date,
       t.is_push_notification,
       t.created_at,
       ts.bitmask_days,
-      ts.time
+      ts.time,
+      COALESCE(tl.is_completed, 0) AS is_completed
     FROM tasks t
-    LEFT JOIN task_schedules ts ON t.id = ts.task_id
-    WHERE ts.bitmask_days & ? != 0
+    LEFT JOIN task_schedules ts
+      ON t.id = ts.task_id
+    LEFT JOIN task_logs tl
+      ON ts.id = tl.task_schedule_id AND tl.date = ?
     ;`
-    const tasks = await db.getAllAsync(query, [dayBit])
+    const tasks = await db.getAllAsync(query, [dateStr])
+    console.log('tasks', tasks)
     return tasks
-
   } catch (error) {
+    throw error
+  }
+}
+
+export const completeTask = async (
+  db: any,
+  taskScheduleId: string,
+  date: string
+): Promise<boolean> => {
+  try {
+    const existingLog = await db.getFirstAsync(
+      `SELECT id FROM task_logs WHERE task_schedule_id = ? AND date = ?;`,
+      [taskScheduleId, date]
+    )
+    
+    if (existingLog) {
+      await db.runAsync(
+        `UPDATE task_logs SET is_completed = 1 WHERE id = ?;`,
+        [existingLog.id]
+      )
+      await db.runAsync(
+        `INSERT INTO task_logs (task_schedule_id, date, is_completed) VALUES (?, ?, 1);`,
+        [taskScheduleId, date]
+      )
+    } else {
+      console.log('existingLog', existingLog)
+      console.log('taskScheduleId', taskScheduleId)
+      await db.runAsync(
+        `INSERT INTO task_logs (task_schedule_id, date, is_completed) VALUES (?, ?, 1);`,
+        [taskScheduleId, date]
+      )
+    }
+    return true
+  } catch (error) {
+    console.error("completeTaskForDate error:", error);
     throw error
   }
 }

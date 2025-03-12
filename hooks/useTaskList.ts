@@ -1,18 +1,20 @@
 import { TaskWithSchedule } from "@/types"
 import { useDatabase } from "./useDatabase"
 import { useEffect, useState } from "react"
-import { getTaskList, getTaskListByDay } from "@/database/queries"
+import { completeTask, getTaskList } from "@/database/queries"
+import { getLocalDateString } from "@/lib/utils"
 
-export const useTaskList = (dayBit?: number) => {
+export const useTaskList = () => {
   const { db } = useDatabase()
   const [taskList, setTaskList] = useState<TaskWithSchedule[]>([])
   const [refreshing, setRefreshing] = useState(false)
 
-  const loadTaskList = async () => {
+  const loadTaskList = async (dateStr?: string) => {
     if (!db) return
     setRefreshing(true)
     try {
-      const taskData = dayBit ? await getTaskListByDay(db, dayBit) : await getTaskList(db)
+      const effectiveDate = dateStr || getLocalDateString(new Date())
+      const taskData = await getTaskList(db, effectiveDate)
       setTaskList(taskData)
     } catch (error) {
       console.error(error)
@@ -21,9 +23,19 @@ export const useTaskList = (dayBit?: number) => {
     }
   }
 
+  const handleTaskCompleted = async (taskScheduleId: string, date: string) => {
+    if (!db) return
+    try {
+      const result = await completeTask(db, taskScheduleId, date)
+      return result
+    } catch (error) {
+      console.error("completeTaskForDate error:", error)
+    }
+  }
+
   useEffect(() => {
     if (db) loadTaskList()
-  }, [db, dayBit])
+  }, [db])
 
-  return { taskList, refreshing, loadTaskList }
+  return { taskList, refreshing, loadTaskList, handleTaskCompleted }
 }

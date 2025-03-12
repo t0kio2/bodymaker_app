@@ -9,17 +9,22 @@ import Entypo from 'react-native-vector-icons/Entypo'
 import Modal from 'react-native-modal'
 import Checkbox from 'expo-checkbox'
 import { useTask } from '@/hooks/useTask'
+import { useTaskList } from '@/hooks/useTaskList'
 
-const TaskCard = ({ task, editMode = false, onTaskDeleted = () => {} }:{
+interface TaskCardProps {
   task: TaskWithSchedule
   editMode?: boolean
   onTaskDeleted?: () => void
-}) => {
+  onTaskCompleted?: () => void
+  date: string
+}
+
+const TaskCard = ({ task, editMode = false, onTaskDeleted = () => {}, onTaskCompleted, date }: TaskCardProps) => {
+  const { handleTaskCompleted } = useTaskList()
   const [isModalVisible, setIsModalVisible] = useState(false)
   const [iconPosition, setIconPosition] = useState({ x: 0, y: 0 })
   const [isChecked, setIsChecked] = useState(false)
   const { removeTask } = useTask(task.id as string)
-  
 
   const showDialog = (e: any, task: Task) => {
     const { pageX, pageY } = e.nativeEvent
@@ -53,6 +58,23 @@ const TaskCard = ({ task, editMode = false, onTaskDeleted = () => {} }:{
     )
   }
 
+  const handleCheckboxChange = async (newValue: boolean) => {
+    setIsChecked(newValue)
+    if (newValue) {
+      const taskScheduleId = task.task_schedule_id
+      if (!taskScheduleId) {
+        console.error('taskScheduleId is not found')
+        return
+      }
+      const success = await handleTaskCompleted(taskScheduleId, date)
+      if (success) {
+        Alert.alert("タスク完了", "タスクを完了しました")
+        if (onTaskCompleted) onTaskCompleted()
+      } else {
+        Alert.alert("エラー", "タスクの完了に失敗しました")}
+    }
+  }
+
   return (
     <>
       <View className='flex-row items-center m-2 pb-2 border-b-[0.5px] border-b-gray-400'>
@@ -67,7 +89,7 @@ const TaskCard = ({ task, editMode = false, onTaskDeleted = () => {} }:{
           ):(
             <Checkbox
               value={isChecked}
-              onValueChange={setIsChecked}
+              onValueChange={handleCheckboxChange}
               color={isChecked ? '#7bc96f' : undefined}
               className='mr-4'
               style={{ 
@@ -82,7 +104,7 @@ const TaskCard = ({ task, editMode = false, onTaskDeleted = () => {} }:{
         {/* メイン情報 */}
         <View className='w-[160px] h-full'>
           <View className='flex-1 justify-between'>
-            <Text className='text-xl mt-2'>{task.title}</Text>
+            <Text className='text-xl mt-2'>{task.title} - {task.task_log_id}</Text>
             {/* カレンダーアイコン */}
             <Recurring schedule={task} />
           </View>

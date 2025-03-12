@@ -12,7 +12,14 @@ export interface Schedule {
   time: string
 }
 
-export interface TaskWithSchedule extends Task, Schedule {}
+export interface TaskLog {
+  task_log_id: string,
+  task_schedule_id: string
+  date: Date
+  is_completed: boolean
+}
+
+export interface TaskWithSchedule extends Task, Schedule, TaskLog {}
 export interface Notification {
   id: string,
   taskId: string
