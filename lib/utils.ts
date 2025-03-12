@@ -63,7 +63,6 @@ export const generateMarkedDatesForMonth = (
   return marked
 }
 
-
 // 'HH:mm'形式をDateオブジェクトに変換
 export const timeToDate = (time: string) => {
   const [hours, minutes] = time.split(':').map(Number)
