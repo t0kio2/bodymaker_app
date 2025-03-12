@@ -4,13 +4,12 @@ import { generateMarkedDatesForMonth, getDayBit, getLocalDateString } from "@/li
 import { TaskWithSchedule } from "@/types"
 
 export const useCalendarData = () => {
-  const { taskList, refreshing, loadTaskList} = useTaskList()
   const [currentYear, setCurrentYear] = useState(new Date().getFullYear())
   const [currentMonth, setCurrentMonth] = useState(new Date().getMonth())
   const [markedDates, setMarkedDates] = useState<Record<string, any>>({})
-
   const [selectedDate, setSelectedDate] = useState(getLocalDateString(new Date()))
   const [filterTasks, setFilterTasks] = useState<TaskWithSchedule[]>([])
+  const { taskList, refreshing, loadTaskList} = useTaskList()
 
   const updateMarkedDates = (selectedDate: string) => {
     const newMarkedDates = generateMarkedDatesForMonth(taskList, currentYear, currentMonth, selectedDate)
@@ -38,6 +37,7 @@ export const useCalendarData = () => {
 
   const handleDayPress = (dateStr: string ) => {
     setSelectedDate(dateStr)
+    loadTaskList(dateStr)
     const tasksForDay = filterTasksByDate(taskList, new Date(dateStr))
     setFilterTasks(tasksForDay)
   }

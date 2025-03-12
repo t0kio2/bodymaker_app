@@ -42,7 +42,7 @@ const Calendar = () => {
           sections={sections}
           keyExtractor={(item) => item.id.toString()}
           renderItem={({ item }) => (
-            <TaskCard task={item} editMode={false} />
+            <TaskCard task={item} editMode={false} date={selectedDate} />
           )}
           ListEmptyComponent={
             <Text>習慣が登録されていません。登録しましょう！</Text>
