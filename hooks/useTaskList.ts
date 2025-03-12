@@ -1,20 +1,37 @@
 import { TaskWithSchedule } from "@/types"
 import { useDatabase } from "./useDatabase"
 import { useEffect, useState } from "react"
-import { completeTask, getTaskList } from "@/database/queries"
+import { completeTask, getAllTask, getTaskListByDay } from "@/database/queries"
 import { getLocalDateString } from "@/lib/utils"
 
 export const useTaskList = () => {
   const { db } = useDatabase()
   const [taskList, setTaskList] = useState<TaskWithSchedule[]>([])
+  const [allTask, setAllTask] = useState<TaskWithSchedule[]>([])
   const [refreshing, setRefreshing] = useState(false)
 
-  const loadTaskList = async (dateStr?: string) => {
+  const loadAllTask = async () => {
+    if (!db) return
+    setRefreshing(true)
+    try {
+      const taskData = await getAllTask(db)
+      console.log('allTask', taskData)
+      setAllTask(taskData)
+    } catch (error) {
+      console.error(error)
+    } finally {
+      setRefreshing(false)
+    }
+  }
+
+  const loadTaskListByDay = async (dateStr?: string) => {
     if (!db) return
     setRefreshing(true)
     try {
       const effectiveDate = dateStr || getLocalDateString(new Date())
-      const taskData = await getTaskList(db, effectiveDate)
+      console.log('effectiveDate', effectiveDate)
+      const taskData = await getTaskListByDay(db, effectiveDate)
+      console.log('taskData', taskData[0])
       setTaskList(taskData)
     } catch (error) {
       console.error(error)
@@ -34,8 +51,15 @@ export const useTaskList = () => {
   }
 
   useEffect(() => {
-    if (db) loadTaskList()
+    if (db) loadTaskListByDay()
   }, [db])
 
-  return { taskList, refreshing, loadTaskList, handleTaskCompleted }
+  return { 
+    taskList,
+    refreshing,
+    loadTaskListByDay,
+    handleTaskCompleted,
+    allTask,
+    loadAllTask
+  }
 }

@@ -7,7 +7,7 @@ import TaskCard from '@/components/TaskCard'
 import { useTaskList } from '@/hooks/useTaskList'
 
 export default function List() {
-  const { taskList, refreshing, loadTaskList } = useTaskList()
+  const { allTask, refreshing, loadAllTask } = useTaskList()
 
   return (
     // デバイス毎に余白をよしなにしてくれる
@@ -15,13 +15,14 @@ export default function List() {
       <SafeAreaView className='h-full bg-white'>
         <FlatList
           // className='border border-red-500'
-          data={ taskList }
+          data={ allTask }
           keyExtractor={ task => task.id.toString()}
           renderItem={({ item }) => (
             <TaskCard
               task={item}
               editMode={true}
-              onTaskDeleted={loadTaskList}
+              onTaskDeleted={loadAllTask}
+              date=''
             />
           )}
           // ListHeaderComponent={<Text>Header</Text>}
@@ -29,7 +30,7 @@ export default function List() {
             <Text>習慣が登録されていません。登録しましょう！</Text>
           }
           refreshControl={
-            <RefreshControl refreshing={refreshing} onRefresh={loadTaskList} />
+            <RefreshControl refreshing={refreshing} onRefresh={loadAllTask} />
           }
         />
         <TouchableOpacity

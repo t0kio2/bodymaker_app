@@ -5,6 +5,7 @@ import TaskCard from '@/components/TaskCard'
 import { SafeAreaProvider } from 'react-native-safe-area-context'
 import { getLocalDateString } from '@/lib/utils'
 import { useCalendarData } from '@/hooks/useCalendarData'
+import { useTaskList } from '@/hooks/useTaskList'
 
 LocaleConfig.locales.jp = {
   monthNames: ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月'],
@@ -17,21 +18,20 @@ LocaleConfig.defaultLocale = 'jp'
 const Calendar = () => {
   const {
     refreshing,
-    loadTaskList,
     setCurrentYear,
     setCurrentMonth,
     markedDates,
     selectedDate,
     handleDayPress,
-    filterTasks
+    taskList,
+    loadTaskListByDay
   } = useCalendarData()
-  
 
   const sections = [
     {
       title: selectedDate ===  getLocalDateString(new Date()) ? 
         '今日のトレーニング' : `${selectedDate}のトレーニング`,
-      data: filterTasks
+      data: taskList
     }
   ]
   
@@ -63,7 +63,7 @@ const Calendar = () => {
               enableSwipeMonths
             />
           }
-          refreshControl={<RefreshControl refreshing={refreshing} onRefresh={loadTaskList} />}
+          refreshControl={<RefreshControl refreshing={refreshing} onRefresh={loadTaskListByDay} />}
         />
       </SafeAreaView>
     </SafeAreaProvider>

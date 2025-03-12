@@ -1,11 +1,12 @@
+import { getDayBit } from "@/lib/utils"
 import { Task, Schedule, TaskWithSchedule } from "@/types"
 
-export const getTaskList = async (
+export const getTaskListByDay = async (
     db: any,
     dateStr: string
   ): Promise<TaskWithSchedule[]> => {
+    const dayBit = getDayBit(new Date(dateStr))
   try {
-    console.log('dateStr', dateStr)
     const query = `SELECT
       t.id AS id,
       ts.id AS task_schedule_id,
@@ -23,9 +24,32 @@ export const getTaskList = async (
       ON t.id = ts.task_id
     LEFT JOIN task_logs tl
       ON ts.id = tl.task_schedule_id AND tl.date = ?
+    WHERE ts.bitmask_days & ? != 0
     ;`
-    const tasks = await db.getAllAsync(query, [dateStr])
-    console.log('tasks', tasks)
+    const tasks = await db.getAllAsync(query, [dateStr, dayBit])
+    return tasks
+  } catch (error) {
+    throw error
+  }
+}
+
+export const getAllTask = async (
+    db: any,
+  ): Promise<TaskWithSchedule[]> => {
+  try {
+    const query = `SELECT
+      t.id AS id,
+      ts.id AS task_schedule_id,
+      t.title,
+      t.goal,
+      t.start_date,
+      t.is_push_notification,
+      t.created_at,
+      ts.bitmask_days,
+      ts.time
+    FROM tasks t
+    LEFT JOIN task_schedules ts ON t.id = ts.task_id;`
+    const tasks = await db.getAllAsync(query)
     return tasks
   } catch (error) {
     throw error
