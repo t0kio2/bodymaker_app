@@ -1,5 +1,5 @@
 import { DAY_OF_WEEK_BIT } from "@/constants/common";
-import { allDaysMask, getCurrentTimeStr, toggleDays } from "@/lib/utils";
+import { allDaysMask, getCurrentTimeStr, toggleDays, formatDateToYYYYMMDD } from "@/lib/utils";
 import { TaskWithSchedule } from "@/types";
 import { useEffect, useState } from "react";
 
@@ -9,7 +9,7 @@ export const useForm = (mode: 'create' | 'edit', initialTask?: TaskWithSchedule 
     id: '',
     title: '', 
     goal: '',
-    start_date: new Date(),
+    start_date: formatDateToYYYYMMDD(new Date()),
     bitmask_days: 0,
     time: '',
     is_push_notification: false,
@@ -25,7 +25,7 @@ export const useForm = (mode: 'create' | 'edit', initialTask?: TaskWithSchedule 
         id: initialTask.id,
         title: initialTask.title,
         goal: initialTask.goal,
-        start_date: new Date(initialTask.start_date),
+        start_date: formatDateToYYYYMMDD(new Date(initialTask.start_date)),
         bitmask_days: initialTask.bitmask_days,
         time: initialTask.time,
         is_push_notification: initialTask.is_push_notification

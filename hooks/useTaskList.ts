@@ -15,7 +15,7 @@ export const useTaskList = () => {
     setRefreshing(true)
     try {
       const taskData = await getAllTask(db)
-      console.log('allTask', taskData)
+      console.log('taskData:', taskData)
       setAllTask(taskData)
     } catch (error) {
       console.error(error)
@@ -29,9 +29,7 @@ export const useTaskList = () => {
     setRefreshing(true)
     try {
       const effectiveDate = dateStr || getLocalDateString(new Date())
-      console.log('effectiveDate', effectiveDate)
       const taskData = await getTaskListByDay(db, effectiveDate)
-      console.log('taskData', taskData[0])
       setTaskList(taskData)
     } catch (error) {
       console.error(error)
@@ -51,7 +49,10 @@ export const useTaskList = () => {
   }
 
   useEffect(() => {
-    if (db) loadTaskListByDay()
+    if (db) {
+      loadTaskListByDay()
+      loadAllTask()
+    }
   }, [db])
 
   return { 

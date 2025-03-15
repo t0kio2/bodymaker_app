@@ -10,7 +10,7 @@ export const getTaskListByDay = async (
     const query = `SELECT
       t.id AS id,
       ts.id AS task_schedule_id,
-      tl.id AS log_id,
+      MIN(tl.id) AS log_id,
       t.title,
       t.goal,
       t.start_date,
@@ -25,8 +25,11 @@ export const getTaskListByDay = async (
     LEFT JOIN task_logs tl
       ON ts.id = tl.task_schedule_id AND tl.date = ?
     WHERE ts.bitmask_days & ? != 0
+    GROUP BY t.id, ts.id
     ;`
     const tasks = await db.getAllAsync(query, [dateStr, dayBit])
+    console.log('tasks', tasks)
+    
     return tasks
   } catch (error) {
     throw error
