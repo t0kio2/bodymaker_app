@@ -44,7 +44,7 @@ const Form = ({ mode, id, onTaskAdded }: {
       bitmask_days: selectedDays,
       time: timeStr
     } as Schedule
-
+    
     const success = await saveTask(taskData, schedule)
     if (success) {
       Alert.alert("保存しました！")

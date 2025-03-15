@@ -1,5 +1,5 @@
 import { DAY_OF_WEEK_BIT } from "@/constants/common"
-import { TaskWithSchedule } from "@/types"
+import { TaskWithSchedule, YYYYMMDD } from "@/types"
 import { Linking } from "react-native"
 
 export const isDaySelected = (bitmask: number, day: number) => {
@@ -123,6 +123,18 @@ export const formatDate = (dateStr: undefined | Date) => {
   const month = String(date.getMonth() + 1).padStart(2, "0") // 月は0始まりなので+1
   const day = String(date.getDate()).padStart(2, "0")
   return `${year}/${month}/${day}`
+}
+
+export const formatDateToYYYYMMDD = (dateStr: undefined | Date): YYYYMMDD => {
+  if (!dateStr) return '' as YYYYMMDD
+  // ISO形式の日付文字列をDateオブジェクトに変換
+  const date = new Date(dateStr)
+  console.log('date', date)
+  // 年、月、日を取得
+  const year = date.getFullYear()
+  const month = String(date.getMonth() + 1).padStart(2, "0") // 月は0始まりなので+1
+  const day = String(date.getDate()).padStart(2, "0")
+  return `${year}-${month}-${day}` as YYYYMMDD
 }
 
 const openYouTube = (video: string) => {

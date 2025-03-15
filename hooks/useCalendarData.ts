@@ -1,25 +1,17 @@
 import { useEffect, useState } from "react"
 import { useTaskList } from "./useTaskList"
 import { generateMarkedDatesForMonth, getDayBit, getLocalDateString } from "@/lib/utils"
-import { TaskWithSchedule } from "@/types"
 
 export const useCalendarData = () => {
   const [currentYear, setCurrentYear] = useState(new Date().getFullYear())
   const [currentMonth, setCurrentMonth] = useState(new Date().getMonth())
   const [markedDates, setMarkedDates] = useState<Record<string, any>>({})
   const [selectedDate, setSelectedDate] = useState(getLocalDateString(new Date()))
-  const [filterTasks, setFilterTasks] = useState<TaskWithSchedule[]>([])
-  const { taskList, refreshing, loadTaskList} = useTaskList()
+  const { taskList, refreshing, loadTaskListByDay} = useTaskList()
 
   const updateMarkedDates = (selectedDate: string) => {
     const newMarkedDates = generateMarkedDatesForMonth(taskList, currentYear, currentMonth, selectedDate)
     setMarkedDates(newMarkedDates)
-  }
-
-  const filterTasksByDate = (taskList: TaskWithSchedule[], date: Date) => {
-    const dayBit = getDayBit(date)
-    const tasksForDay = taskList.filter(task => (task.bitmask_days & dayBit) !== 0)
-    return tasksForDay
   }
 
   useEffect(() => {
@@ -28,7 +20,6 @@ export const useCalendarData = () => {
       const dayBit = getDayBit(new Date(selectedDate))
       return (task.bitmask_days & dayBit) !== 0;
     })
-    setFilterTasks(tasksForDay)
   }, [taskList, selectedDate])
 
   useEffect(() => {
@@ -36,10 +27,9 @@ export const useCalendarData = () => {
   }, [currentYear, currentMonth, taskList, selectedDate])
 
   const handleDayPress = (dateStr: string ) => {
+    console.log('handleDayPress', dateStr)
     setSelectedDate(dateStr)
-    loadTaskList(dateStr)
-    const tasksForDay = filterTasksByDate(taskList, new Date(dateStr))
-    setFilterTasks(tasksForDay)
+    loadTaskListByDay(dateStr)
   }
 
   return {
@@ -47,9 +37,9 @@ export const useCalendarData = () => {
     setCurrentMonth,
     markedDates,
     refreshing,
-    loadTaskList,
     handleDayPress,
-    filterTasks,
-    selectedDate
+    selectedDate,
+    loadTaskListByDay,
+    taskList
   }
 }

@@ -17,21 +17,20 @@ LocaleConfig.defaultLocale = 'jp'
 const Calendar = () => {
   const {
     refreshing,
-    loadTaskList,
     setCurrentYear,
     setCurrentMonth,
     markedDates,
     selectedDate,
     handleDayPress,
-    filterTasks
+    taskList,
+    loadTaskListByDay
   } = useCalendarData()
-  
 
   const sections = [
     {
       title: selectedDate ===  getLocalDateString(new Date()) ? 
         '今日のトレーニング' : `${selectedDate}のトレーニング`,
-      data: filterTasks
+      data: taskList
     }
   ]
   
@@ -63,7 +62,7 @@ const Calendar = () => {
               enableSwipeMonths
             />
           }
-          refreshControl={<RefreshControl refreshing={refreshing} onRefresh={loadTaskList} />}
+          refreshControl={<RefreshControl refreshing={refreshing} onRefresh={loadTaskListByDay} />}
         />
       </SafeAreaView>
     </SafeAreaProvider>
