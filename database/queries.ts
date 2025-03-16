@@ -27,9 +27,13 @@ export const getTaskListByDay = async (
     WHERE ts.bitmask_days & ? != 0
     GROUP BY t.id, ts.id
     ;`
+    const taskLogsQuery = `SELECT * FROM task_logs;`
+    const taskLogs = await db.getAllAsync(taskLogsQuery)
+    console.log('taskLogs', taskLogs)
+
     const tasks = await db.getAllAsync(query, [dateStr, dayBit])
     console.log('tasks', tasks)
-    
+
     return tasks
   } catch (error) {
     throw error
@@ -61,6 +65,7 @@ export const getAllTask = async (
 
 export const completeTask = async (
   db: any,
+  taskId: string,
   taskScheduleId: string,
   date: string
 ): Promise<boolean> => {
@@ -76,11 +81,10 @@ export const completeTask = async (
         [existingLog.id]
       )
       await db.runAsync(
-        `INSERT INTO task_logs (task_schedule_id, date, is_completed) VALUES (?, ?, 1);`,
-        [taskScheduleId, date]
+        `INSERT INTO task_logs (task_id, task_schedule_id, date, is_completed) VALUES (?, ?, ?, 1);`,
+        [taskId, taskScheduleId, date]
       )
     } else {
-      console.log('existingLog', existingLog)
       console.log('taskScheduleId', taskScheduleId)
       await db.runAsync(
         `INSERT INTO task_logs (task_schedule_id, date, is_completed) VALUES (?, ?, 1);`,
@@ -142,14 +146,6 @@ export const insertTask = async (db: any, task: Omit<Task, 'id'>, schedule: Sche
     const scheduleId = scheduleIdResult?.id
 
     if (!scheduleId) throw new Error('スケジュールID取得に失敗しました')
-
-    // TODO : task_logsのスキーマをどうするか
-    await db.execAsync(`
-      INSERT INTO task_logs (
-        task_schedule_id, date, is_completed
-      )
-      VALUES (${scheduleId}, '${task.start_date}', 0);
-    `)
 
     // notificationsのスキーマをどうするか
     await db.execAsync(`

@@ -15,7 +15,7 @@ interface TaskCardProps {
   task: TaskWithSchedule
   editMode?: boolean
   onTaskDeleted?: () => void
-  onTaskCompleted?: () => void
+  onTaskCompleted?: () => void // TODO: 未実装
   date: string
 }
 
@@ -66,7 +66,7 @@ const TaskCard = ({ task, editMode = false, onTaskDeleted = () => {}, onTaskComp
         console.error('taskScheduleId is not found')
         return
       }
-      const success = await handleTaskCompleted(taskScheduleId, date)
+      const success = await handleTaskCompleted(task.id, taskScheduleId, date)
       if (success) {
         Alert.alert("タスク完了", "タスクを完了しました")
         if (onTaskCompleted) onTaskCompleted()
@@ -104,7 +104,7 @@ const TaskCard = ({ task, editMode = false, onTaskDeleted = () => {}, onTaskComp
         {/* メイン情報 */}
         <View className='w-[160px] h-full'>
           <View className='flex-1 justify-between'>
-            <Text className='text-xl mt-2'>{task.title} - {task.task_log_id}</Text>
+            <Text className='text-xl mt-2'>{task.title} - {task.is_completed ? '完了':'未完了'}</Text>
             {/* カレンダーアイコン */}
             <Recurring schedule={task} />
           </View>
