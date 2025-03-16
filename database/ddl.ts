@@ -17,6 +17,7 @@ export const taskSchedulesSchema = `
 
 export const taskLogsSchema = `
   id INTEGER PRIMARY KEY AUTOINCREMENT,
+  task_id INTEGER NOT NULL,
   task_schedule_id INTEGER NOT NULL,
   date TEXT NOT NULL,
   is_completed BOOLean NOT NULL DEFAULT 0,

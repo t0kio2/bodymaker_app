@@ -38,10 +38,10 @@ export const useTaskList = () => {
     }
   }
 
-  const handleTaskCompleted = async (taskScheduleId: string, date: string) => {
+  const handleTaskCompleted = async (taskId: string, taskScheduleId: string, date: string) => {
     if (!db) return
     try {
-      const result = await completeTask(db, taskScheduleId, date)
+      const result = await completeTask(db, taskId, taskScheduleId, date)
       return result
     } catch (error) {
       console.error("completeTaskForDate error:", error)
