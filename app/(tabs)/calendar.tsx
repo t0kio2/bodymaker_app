@@ -41,7 +41,12 @@ const Calendar = () => {
           sections={sections}
           keyExtractor={(item) => item.id.toString()}
           renderItem={({ item }) => (
-            <TaskCard task={item} editMode={false} date={selectedDate} />
+            <TaskCard
+              task={item}
+              editMode={false}
+              date={selectedDate}
+              onTaskCompleted={() => loadTaskListByDay(selectedDate)}
+            />
           )}
           ListEmptyComponent={
             <Text>習慣が登録されていません。登録しましょう！</Text>
