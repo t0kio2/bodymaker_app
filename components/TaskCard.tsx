@@ -1,4 +1,4 @@
-import { View, Text, TouchableOpacity, Image, Alert } from 'react-native'
+import { View, Text, TouchableOpacity, Image, Alert, Platform, UIManager, LayoutAnimation } from 'react-native'
 import React, { useState } from 'react'
 import Icon from 'react-native-vector-icons/FontAwesome5'
 import Recurring from './Recurring'
@@ -10,6 +10,12 @@ import Modal from 'react-native-modal'
 import Checkbox from 'expo-checkbox'
 import { useTask } from '@/hooks/useTask'
 import { useTaskList } from '@/hooks/useTaskList'
+
+
+// LayoutAnimationの有効化 TODO: APP起点で有効化する
+if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
+  UIManager.setLayoutAnimationEnabledExperimental(true)
+}
 
 interface TaskCardProps {
   task: TaskWithSchedule
@@ -68,6 +74,8 @@ const TaskCard = ({ task, editMode = false, onTaskDeleted = () => {}, onTaskComp
       }
       const success = await handleTaskCompleted(task.id, taskScheduleId, date)
       if (success) {
+        LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut)
+        
         Alert.alert("タスク完了", "タスクを完了しました")
         if (onTaskCompleted) onTaskCompleted()
       } else {
