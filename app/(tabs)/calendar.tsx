@@ -1,6 +1,6 @@
 import { Text, SafeAreaView, RefreshControl, SectionList } from 'react-native'
 import React from 'react'
-import {Calendar as CalendarComponent, LocaleConfig } from 'react-native-calendars'
+import { Calendar as CalendarComponent, LocaleConfig } from 'react-native-calendars'
 import TaskCard from '@/components/TaskCard'
 import { SafeAreaProvider } from 'react-native-safe-area-context'
 import { getLocalDateString } from '@/lib/utils'
@@ -41,7 +41,12 @@ const Calendar = () => {
           sections={sections}
           keyExtractor={(item) => item.id.toString()}
           renderItem={({ item }) => (
-            <TaskCard task={item} editMode={false} date={selectedDate} />
+            <TaskCard
+              task={item}
+              editMode={false}
+              date={selectedDate}
+              onTaskCompleted={() => loadTaskListByDay(selectedDate)}
+            />
           )}
           ListEmptyComponent={
             <Text>習慣が登録されていません。登録しましょう！</Text>
@@ -56,6 +61,7 @@ const Calendar = () => {
                 setCurrentMonth(month.month - 1)
               }}
               onDayPress={(day) => {
+                console.log('selected day', day)
                 handleDayPress(day.dateString)
               }}
               markedDates={markedDates}

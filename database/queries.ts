@@ -32,8 +32,6 @@ export const getTaskListByDay = async (
     console.log('taskLogs', taskLogs)
 
     const tasks = await db.getAllAsync(query, [dateStr, dayBit])
-    console.log('tasks', tasks)
-
     return tasks
   } catch (error) {
     throw error
@@ -85,7 +83,6 @@ export const completeTask = async (
         [taskId, taskScheduleId, date]
       )
     } else {
-      console.log('taskScheduleId', taskScheduleId)
       await db.runAsync(
         `INSERT INTO task_logs (task_schedule_id, date, is_completed) VALUES (?, ?, 1);`,
         [taskScheduleId, date]

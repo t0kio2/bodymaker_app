@@ -15,7 +15,6 @@ export const useTaskList = () => {
     setRefreshing(true)
     try {
       const taskData = await getAllTask(db)
-      console.log('taskData:', taskData)
       setAllTask(taskData)
     } catch (error) {
       console.error(error)
@@ -30,7 +29,8 @@ export const useTaskList = () => {
     try {
       const effectiveDate = dateStr || getLocalDateString(new Date())
       const taskData = await getTaskListByDay(db, effectiveDate)
-      setTaskList(taskData)
+      const uncompletedTask = taskData.filter((task) => !task.is_completed)
+      setTaskList(uncompletedTask)
     } catch (error) {
       console.error(error)
     } finally {

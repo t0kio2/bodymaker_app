@@ -129,7 +129,6 @@ export const formatDateToYYYYMMDD = (dateStr: undefined | Date): YYYYMMDD => {
   if (!dateStr) return '' as YYYYMMDD
   // ISO形式の日付文字列をDateオブジェクトに変換
   const date = new Date(dateStr)
-  console.log('date', date)
   // 年、月、日を取得
   const year = date.getFullYear()
   const month = String(date.getMonth() + 1).padStart(2, "0") // 月は0始まりなので+1
