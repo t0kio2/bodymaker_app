@@ -1,6 +1,6 @@
 import { Text, SafeAreaView, RefreshControl, SectionList } from 'react-native'
 import React from 'react'
-import {Calendar as CalendarComponent, LocaleConfig } from 'react-native-calendars'
+import { Calendar as CalendarComponent, LocaleConfig } from 'react-native-calendars'
 import TaskCard from '@/components/TaskCard'
 import { SafeAreaProvider } from 'react-native-safe-area-context'
 import { getLocalDateString } from '@/lib/utils'
@@ -61,6 +61,7 @@ const Calendar = () => {
                 setCurrentMonth(month.month - 1)
               }}
               onDayPress={(day) => {
+                console.log('selected day', day)
                 handleDayPress(day.dateString)
               }}
               markedDates={markedDates}
