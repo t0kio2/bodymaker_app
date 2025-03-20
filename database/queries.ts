@@ -1,6 +1,16 @@
 import { getDayBit } from "@/lib/utils"
 import { Task, Schedule, TaskWithSchedule } from "@/types"
 
+export const aggregateTaskLogs = async (db: any): Promise<any> => {
+  const query = `
+    SELECT
+      date,
+      count(*) AS record_count,
+    FROM task_logs
+    GROUP BY date
+  `
+}
+
 export const getTaskListByDay = async (
     db: any,
     dateStr: string
