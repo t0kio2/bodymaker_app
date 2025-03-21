@@ -1,7 +1,8 @@
-import { eachDayOfInterval, format, parseISO, set, subDays } from "date-fns"
+import { eachDayOfInterval, format, parseISO, subDays } from "date-fns"
 import { useDatabase } from "./useDatabase"
 import { useEffect, useState } from "react"
 import { useTaskList } from "./useTaskList"
+import { AggregatedLog } from "@/types"
 
 export const useRollingContinuityRate = () => {
   const { db } = useDatabase()
@@ -31,7 +32,7 @@ export const useRollingContinuityRate = () => {
       date BETWEEN ? AND ?;`,
       [taskId, startDateStr, endDateStr]
     )
-    const completedDates = new Set(logs.map((log: any) => log.date))
+    const completedDates = new Set(logs.map((log: AggregatedLog) => log.date))
 
     const days = eachDayOfInterval({ start: startDate, end: endDate })
 
