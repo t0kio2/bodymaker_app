@@ -1,8 +1,6 @@
-import { scaleLinear } from 'd3-scale'
 import { useDatabase } from './useDatabase'
 import { useEffect, useState } from 'react'
 import { aggregateTaskLogs } from '@/database/queries'
-import { AggregatedLog } from '@/types'
 
 export const useColorScale = () => {
   const { db } = useDatabase()
@@ -21,11 +19,9 @@ export const useColorScale = () => {
           }, {})
 
           const maxCount = Math.max(...Object.values(aggregatedObj))
-          const colorScale = scaleLinear<string>().domain([0, maxCount]).range(['#eeeeee', '#3b82f6'])
-
           const heatmapDataArr = Object.keys(aggregatedObj).map(date => {
             const count = aggregatedObj[date]
-            const color = colorScale(count)
+            const color = getColor(count)
             return { date, count, color}
           })
           setHeatmapData(heatmapDataArr)
@@ -37,6 +33,14 @@ export const useColorScale = () => {
       })()
     }
   }, [db])
+
+  const getColor = (recordCount: number) => {
+    if (recordCount >= 4) return "#196127"
+    else if (recordCount >= 3) return "#239a3b"
+    else if (recordCount >= 2) return "#7bc96f"
+    else if (recordCount >= 1) return "#c6e48b"
+    else return "#e0e0e0"
+  }
 
   return { heatmapData }
 
