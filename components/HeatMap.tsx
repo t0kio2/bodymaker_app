@@ -5,8 +5,13 @@ import {
   eachDayOfInterval, endOfYear, format, getDay, startOfYear, startOfMonth, 
   differenceInCalendarWeeks, subDays 
 } from 'date-fns'
+import { useColorScale } from '@/hooks/useColorScale'
 
 const HeatMap = () => {
+  const { heatMapData } = useColorScale()
+  console.log('heatMapData', heatMapData)
+
+
   const boxSize = 18
   const margin = 4
   const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
