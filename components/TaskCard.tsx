@@ -112,7 +112,7 @@ const TaskCard = ({ task, editMode = false, onTaskDeleted = () => {}, onTaskComp
         {/* メイン情報 */}
         <View className='w-[160px] h-full'>
           <View className='flex-1 justify-between'>
-            <Text className='text-xl mt-2'>{task.title} - {task.is_completed ? '完了':'未完了'}</Text>
+            <Text className='text-xl mt-2'>{task.title} - {task.task_log_id ? '完了':'未完了'}</Text>
             {/* カレンダーアイコン */}
             <Recurring schedule={task} />
           </View>
