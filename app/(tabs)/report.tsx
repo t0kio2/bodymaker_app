@@ -1,7 +1,7 @@
 import { View, Text, ScrollView, SafeAreaView, FlatList } from 'react-native'
 import React from 'react'
 import { SafeAreaProvider } from 'react-native-safe-area-context'
-import HeatMap from '@/components/HeatMap'
+import Heatmap from '@/components/Heatmap'
 
 const Report = () => {
   
@@ -9,9 +9,9 @@ const Report = () => {
     <SafeAreaProvider>
       <SafeAreaView className='h-full bg-white'>
         <View className='pl-4 pt-4'>
-          <Text className='text-2xl'>継続度カレンダー</Text>
+          <Text className='text-2xl'>ヒートマップ</Text>
         </View>
-        <HeatMap />
+        <Heatmap />
         <View className='pl-4 pt-4'>
           <FlatList
             data={ [1,2,3,4] }
