@@ -18,7 +18,11 @@ export interface TaskLog {
   date?: YYYYMMDD|string
 }
 
-export interface TaskWithSchedule extends Task, Schedule, TaskLog {}
+interface ContinuityRate {
+  rate?: number
+}
+
+export interface TaskWithSchedule extends Task, Schedule, TaskLog, ContinuityRate {}
 export interface Notification {
   id: string,
   taskId: string

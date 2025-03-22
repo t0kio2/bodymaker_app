@@ -2,20 +2,15 @@ import { eachDayOfInterval, format, parseISO, subDays } from "date-fns"
 import { useDatabase } from "./useDatabase"
 import { useEffect, useState } from "react"
 import { useTaskList } from "./useTaskList"
-import { AggregatedLog } from "@/types"
+import { AggregatedLog, TaskWithSchedule } from "@/types"
 
 export const useRollingContinuityRate = () => {
-  const { db } = useDatabase()
-  const { allTask } = useTaskList()
+  // const { db } = useDatabase()
+  // const { allTask } = useTaskList()
   const [rateByTask, setRateByTask] = useState<Record<string, number>>({})
 
-  const today = new Date()
-  // 今日を含めて過去30日間の日付を取得
-  const startDate = format(subDays(today, 29), 'yyyy-MM-dd')
-  const endDate = format(today, 'yyyy-MM-dd')
-
   const calculateContinuityRateInLast30Days = async (
-    db: any, taskId: number, startDateStr: string, endDateStr: string
+    db: any, taskId: string, startDateStr: string, endDateStr: string
   ): Promise<number> => {
     const startDate = parseISO(startDateStr)
     const endDate = parseISO(endDateStr)
@@ -56,22 +51,45 @@ export const useRollingContinuityRate = () => {
     return rate
   }
 
-  useEffect(() => {
-    if (!db || !allTask.length) return
+  const addContinuityRateToTask = async (
+    db: any,
+    task: TaskWithSchedule
+  ): Promise<TaskWithSchedule> => {
+      const today = new Date()
+      // 今日を含めて過去30日間の日付を取得
+      const startDate = format(subDays(today, 29), 'yyyy-MM-dd')
+      const endDate = format(today, 'yyyy-MM-dd')
 
-    const fetchAllRates = async () => {
-      const rates: Record<string, number> = {}
+      const continuityRate = await calculateContinuityRateInLast30Days(
+        db,
+        task.id,
+        startDate,
+        endDate
+      )
+      return { ...task, rate: continuityRate }
+  }
 
-      for (const task of allTask) {
-        const rate = await calculateContinuityRateInLast30Days(
-          db, parseInt(task.id), startDate, endDate
-        )
-        rates[task.id] = rate
-      }
-      setRateByTask(rates)
-    }
-    fetchAllRates()
-  }, [db, allTask])
+  // useEffect(() => {
+  //   if (!db || !allTask.length) return
+
+  //   const fetchAllRates = async () => {
+  //     const rates: Record<string, number> = {}
+
+  //     const today = new Date()
+  //     // 今日を含めて過去30日間の日付を取得
+  //     const startDate = format(subDays(today, 29), 'yyyy-MM-dd')
+  //     const endDate = format(today, 'yyyy-MM-dd')
+
+  //     for (const task of allTask) {
+  //       const rate = await calculateContinuityRateInLast30Days(
+  //         db, parseInt(task.id), startDate, endDate
+  //       )
+  //       rates[task.id] = rate
+  //     }
+  //     setRateByTask(rates)
+  //   }
+  //   fetchAllRates()
+  // }, [db, allTask])
   
-  return { rateByTask }
+  return { rateByTask, addContinuityRateToTask }
 }
