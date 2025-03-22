@@ -16,7 +16,6 @@ export interface TaskLog {
   task_log_id?: string,
   task_schedule_id?: string
   date?: YYYYMMDD|string
-  is_completed?: boolean
 }
 
 export interface TaskWithSchedule extends Task, Schedule, TaskLog {}

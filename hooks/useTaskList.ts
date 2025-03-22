@@ -29,7 +29,7 @@ export const useTaskList = () => {
     try {
       const effectiveDate = dateStr || getLocalDateString(new Date())
       const taskData = await getTaskListByDay(db, effectiveDate)
-      const uncompletedTask = taskData.filter((task) => !task.is_completed)
+      const uncompletedTask = taskData.filter((task) => !task.task_log_id)
       setTaskList(uncompletedTask)
     } catch (error) {
       console.error(error)

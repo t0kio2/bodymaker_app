@@ -15,12 +15,12 @@ export const taskSchedulesSchema = `
   FOREIGN KEY (task_id) REFERENCES tasks(id) ON DELETE CASCADE
 `
 
+// タスク完了時のみ記録
 export const taskLogsSchema = `
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   task_id INTEGER NOT NULL,
   task_schedule_id INTEGER NOT NULL,
   date TEXT NOT NULL,
-  is_completed BOOLean NOT NULL DEFAULT 0,
   FOREIGN KEY (task_schedule_id) REFERENCES task_schedules(id) ON DELETE CASCADE
 `
 
