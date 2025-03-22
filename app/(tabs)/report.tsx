@@ -9,9 +9,8 @@ import TaskCard from '@/components/TaskCard'
 export default function Report() {
   const { allTask } = useTaskList()
 
-  // フックに定義
-  const { rateByTask } = useRollingContinuityRate()
-  console.log('rateByTask in report', rateByTask)
+  // const { rateByTask } = useRollingContinuityRate()
+  // console.log('rateByTask in report', rateByTask)
   
   return (
     <SafeAreaProvider>
