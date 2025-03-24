@@ -3,9 +3,11 @@ import { useDatabase } from "./useDatabase"
 import { useEffect, useState } from "react"
 import { completeTask, getAllTask, getTaskListByDay } from "@/database/queries"
 import { getLocalDateString } from "@/lib/utils"
+import { useRollingContinuityRate } from "./useRollingContinuityRate"
 
 export const useTaskList = () => {
   const { db } = useDatabase()
+  const { addContinuityRateToTask } = useRollingContinuityRate()
   const [taskList, setTaskList] = useState<TaskWithSchedule[]>([])
   const [allTask, setAllTask] = useState<TaskWithSchedule[]>([])
   const [refreshing, setRefreshing] = useState(false)
@@ -15,7 +17,14 @@ export const useTaskList = () => {
     setRefreshing(true)
     try {
       const taskData = await getAllTask(db)
-      setAllTask(taskData)
+
+      const taskWithRatePromises = taskData.map(async (task) => {
+        const taskWithRate = await addContinuityRateToTask(db, task)
+        return taskWithRate
+      })
+      const taskWithRate = await Promise.all(taskWithRatePromises)
+      
+      setAllTask(taskWithRate)
     } catch (error) {
       console.error(error)
     } finally {
@@ -25,11 +34,19 @@ export const useTaskList = () => {
 
   const loadTaskListByDay = async (dateStr?: string) => {
     if (!db) return
-    setRefreshing(true)
+    // 日付クリックの度にローディングアイコンが表示されるのでコメントアウト
+    // setRefreshing(true)
     try {
       const effectiveDate = dateStr || getLocalDateString(new Date())
       const taskData = await getTaskListByDay(db, effectiveDate)
-      const uncompletedTask = taskData.filter((task) => !task.is_completed)
+
+      const taskWithRatePromises = taskData.map(async (task) => {
+        const taskWithRate = await addContinuityRateToTask(db, task)
+        return taskWithRate
+      })
+      const taskWithRate = await Promise.all(taskWithRatePromises)
+
+      const uncompletedTask = taskWithRate.filter((task) => !task.task_log_id)
       setTaskList(uncompletedTask)
     } catch (error) {
       console.error(error)
