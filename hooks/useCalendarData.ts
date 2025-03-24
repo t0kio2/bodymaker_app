@@ -7,10 +7,10 @@ export const useCalendarData = () => {
   const [currentMonth, setCurrentMonth] = useState(new Date().getMonth())
   const [markedDates, setMarkedDates] = useState<Record<string, any>>({})
   const [selectedDate, setSelectedDate] = useState(getLocalDateString(new Date()))
-  const { taskList, refreshing, loadTaskListByDay} = useTaskList()
+  const { taskList, allTask, refreshing, loadTaskListByDay} = useTaskList()
 
   const updateMarkedDates = (selectedDate: string) => {
-    const newMarkedDates = generateMarkedDatesForMonth(taskList, currentYear, currentMonth, selectedDate)
+    const newMarkedDates = generateMarkedDatesForMonth(allTask, currentYear, currentMonth, selectedDate)
     setMarkedDates(newMarkedDates)
   }
 

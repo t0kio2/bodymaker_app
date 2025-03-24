@@ -55,8 +55,8 @@ export const generateMarkedDatesForMonth = (
     const hasTask = taskList.some(task => (task.bitmask_days & dayBit) !== 0)
 
     marked[dateStr] = { 
-      marked: hasTask,
-      selected: dateStr === selectedDay,
+      marked: hasTask, // タスクがある日付
+      selected: dateStr === selectedDay, // タップで選択された日付
       selectedColor: "#239a3b"
     }
   }

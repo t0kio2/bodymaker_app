@@ -34,7 +34,8 @@ export const useTaskList = () => {
 
   const loadTaskListByDay = async (dateStr?: string) => {
     if (!db) return
-    setRefreshing(true)
+    // 日付クリックの度にローディングアイコンが表示されるのでコメントアウト
+    // setRefreshing(true)
     try {
       const effectiveDate = dateStr || getLocalDateString(new Date())
       const taskData = await getTaskListByDay(db, effectiveDate)
