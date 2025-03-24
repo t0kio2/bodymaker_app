@@ -1,8 +1,7 @@
 import { View, Text, ScrollView, SafeAreaView, FlatList, TouchableOpacity } from 'react-native'
-import React, { useEffect } from 'react'
+import React from 'react'
 import { SafeAreaProvider } from 'react-native-safe-area-context'
 import Heatmap from '@/components/Heatmap'
-import { useRollingContinuityRate } from '@/hooks/useRollingContinuityRate'
 import { useTaskList } from '@/hooks/useTaskList'
 import TaskCard from '@/components/TaskCard'
 
@@ -34,21 +33,25 @@ export default function Report() {
               />
             )}
           />
-          <TouchableOpacity
-            onPress={() => console.log('もっと読み込む')}
-            style={{
-              marginTop: 12,
-              padding: 10,
-              borderRadius: 10,
-              borderWidth: 1,
-              borderColor: "#ddd",
-              flexDirection: "row",
-              justifyContent: "center",
-              alignItems: "center"
-            }}
-          >
-            <Text style={{ fontSize: 16, color: "#555" }}>＋ もっと読み込む</Text>
-            </TouchableOpacity>
+          {
+            allTask.length > 3 && (
+              <TouchableOpacity
+                onPress={() => console.log('もっと読み込む')}
+                style={{
+                  marginTop: 12,
+                  padding: 10,
+                  borderRadius: 10,
+                  borderWidth: 1,
+                  borderColor: "#ddd",
+                  flexDirection: "row",
+                  justifyContent: "center",
+                  alignItems: "center"
+                }}
+              >
+                <Text style={{ fontSize: 16, color: "#555" }}>＋ もっと読み込む</Text>
+              </TouchableOpacity>
+            )
+          }
         </View>
       </SafeAreaView>
     </SafeAreaProvider>

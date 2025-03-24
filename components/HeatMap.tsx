@@ -16,7 +16,6 @@ const Heatmap = () => {
   const cellWidth = boxSize + margin
   const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
   const weekdays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
-  // const colors = ['#e0e0e0', '#c6e48b', '#7bc96f', '#239a3b', '#196127']
 
   const now = new Date()
   const startYear = startOfYear(now)
