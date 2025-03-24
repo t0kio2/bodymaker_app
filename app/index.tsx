@@ -14,12 +14,12 @@ import { useDatabase } from '@/hooks/useDatabase'
 
 export default function App () {
   // データベース初期化
-  const isDbReady = useDatabase()
+  const { db } = useDatabase()
   
   useEffect(() => {
     requestPermissionAsync()
   })
-  if (!isDbReady) return <Text>データベースの初期化中...</Text>
+  if (!db) return <Text>データベースの初期化中...</Text>
   
   return <Redirect href="/calendar" />
 

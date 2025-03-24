@@ -39,3 +39,9 @@ export const cancelScheduledNotification = async (notificationId: any) => {
     WHERE notification_id = ?;
   `, [notificationId])
 }
+
+export const requestPermissionAsync = async () => {
+  const { granted } = await Notifications.getPermissionsAsync()
+  if (granted) return
+  await Notifications.requestPermissionsAsync()
+}
