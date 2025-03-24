@@ -24,8 +24,13 @@ export const taskLogsSchema = `
   FOREIGN KEY (task_schedule_id) REFERENCES task_schedules(id) ON DELETE CASCADE
 `
 
-export const notificationsSchema = `
+export const scheduledNotificationsSchema = `
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   task_id INTEGER NOT NULL,
-  FOREIGN KEY (task_id) REFERENCES tasks(id) ON DELETE CASCADE
+  task_schedule_id INTEGER NOT NULL,
+  notification_id TEXT NOT NULL UNIQUE,
+  scheduled_at TEXT NOT NULL,
+  created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (task_id) REFERENCES tasks(id) ON DELETE CASCADE,
+  FOREIGN KEY (task_schedule_id) REFERENCES task_schedules(id) ON DELETE CASCADE
 `
