@@ -1,7 +1,97 @@
-import { Task, Notification } from '@/types'
-// import AsyncStorage from '@react-native-async-storage/async-storage'
+import { useDatabase } from '@/hooks/useDatabase';
+import { Schedule, TaskWithSchedule } from '@/types';
 import * as Notifications from 'expo-notifications'
+import { subMinutes } from 'date-fns'
+import { SchedulableTriggerInputTypes } from 'expo-notifications'
 
+const bitmaskToWeekDays = (bitmask: number) => {
+  const days = []
+  for (let i = 0; i < 7; i++) {
+    if ((bitmask >> i) & 1) {
+      days.push(i)
+    }
+  }
+  return days
+}
+
+export const scheduleNotification = async (task: TaskWithSchedule, schedule: any, nextDateTime: any) => {
+  const weekdays = bitmaskToWeekDays(schedule.bitmask_days)
+  const { hour, minute} = getNotificationTimeBefore(schedule.time, 60)
+
+  const notificationIds = []
+
+  for (const weekday of weekdays) {
+    const notificationId = await Notifications.scheduleNotificationAsync({
+      content: {
+        title: task.title,
+        body: task.title,
+        data: { taskId: task.id },
+      },
+      trigger: {
+        type: SchedulableTriggerInputTypes.WEEKLY,
+        weekday: weekday + 1, // Expoは日曜日が1から始まるため
+        hour,
+        minute,
+      }
+    })
+
+    // dbに通知予約を保存
+    await saveScheduledNotification({
+      task_id: task.id,
+      task_schedule_id: schedule.id,
+      notification_id: notificationId,
+      scheduled_weekday: weekday,
+      scheduled_hour: hour,
+      scheduled_minute: minute,
+      scheduled_at: nextDateTime.toDate()
+    })
+
+    notificationIds.push(notificationId)
+  }
+  return notificationIds
+}
+
+const saveScheduledNotification = async ({
+  task_id,
+  task_schedule_id,
+  notification_id,
+  scheduled_weekday,
+  scheduled_hour,
+  scheduled_minute,
+  scheduled_at
+}: any) => {
+  const { db } = useDatabase()
+  await db.execAsync(`
+    INSERT INTO scheduled_notifications (
+      task_id,
+      task_schedule_id,
+      notification_id,
+      scheduled_weekday,
+      scheduled_hour,
+      scheduled_minute,
+      scheduled_at
+    )
+    VALUES (?, ?, ?, ?, ?, ?, ?);
+  `, [
+      task_id,
+      task_schedule_id,
+      notification_id,
+      scheduled_weekday,
+      scheduled_hour,
+      scheduled_minute,
+      scheduled_at
+    ])
+}
+
+export const cancelScheduledNotification = async (notificationId: any) => {
+  const { db } = useDatabase()
+  await Notifications.cancelScheduledNotificationAsync(notificationId)
+
+  await db.execAsync(`
+    DELETE FROM scheduled_notifications
+    WHERE notification_id = ?;
+  `, [notificationId])
+}
 
 export const requestPermissionAsync = async () => {
   const { granted } = await Notifications.getPermissionsAsync()
@@ -9,80 +99,15 @@ export const requestPermissionAsync = async () => {
   await Notifications.requestPermissionsAsync()
 }
 
-export const registerNotification = async (task :Task) => {
-  console.log('通知登録', task)
-  const [hour, minute] = task.schedule.time.split(':').map(Number)
-  // 通知のスケジュール登録
-  const notificationIds = await Promise.all(
-    task.schedule.recurring.map(async (weekday: number) => {
-      const notificationId = await Notifications.scheduleNotificationAsync({
-        content: {
-          title: `${task.title}の時間です`,
-          body: '時間です！行動を始めましょう！',
-        },
-        trigger: {
-          type: Notifications.SchedulableTriggerInputTypes.CALENDAR,
-          weekday,
-          hour,
-          minute,
-          repeats: true
-        }
-      })
-      return notificationId
-    })
-  )
-  // 通知IDを保存
-  // const notificationsStr = await AsyncStorage.getTask('notifications')
-  // const notificationsStore = notificationsStr ? JSON.parse(notificationsStr) : []
-  // notificationIds.forEach(async (notificationId) => {
-  //   const notification = {
-  //     id: notificationId,
-  //     taskId: task.id
-  //   } as Notification
-  //   await AsyncStorage.setTask(
-  //     'notifications',
-  //     JSON.stringify([...notificationsStore, notification])
-  //   )
-    
-  // })
-}
+export const getNotificationTimeBefore = (time: string, offsetMinutes = 60) => {
+  const [hour, minute] = time.split(':').map(Number)
+  const baseDate = new Date()
+  baseDate.setHours(hour, minute, 0, 0)
 
-export const deleteNotificationById = async (taskId: string) => {
-  // try {
-  //   const notificationsStr = await AsyncStorage.getTask('notifications')
-  //   const notifications = notificationsStr ? JSON.parse(notificationsStr) : []
-  //   const notificationIds = notifications.map(async (notification: Notification) => {
-  //     // 通知のキャンセル
-  //     if (notification.taskId === taskId) {
-  //       await Notifications.cancelScheduledNotificationAsync(notification.id)
-  //       return notification.id
-  //     }
-  //   })
-  //   const updatedNotifications = notifications.filter((notification: Notification) => notification.taskId !== taskId)
-  //   await AsyncStorage.setTask('notifications', JSON.stringify(updatedNotifications))
+  const adjustedDate = subMinutes(baseDate, offsetMinutes)
 
-  // } catch (error) {
-  //   throw new Error('通知のキャンセルに失敗しました') 
-  // }
-}
-
-export const getAllSchedule = async () => {
-  const schedules = await Notifications.getAllScheduledNotificationsAsync()
-  const trigger = schedules.map((schedule) => {
-    return schedule.trigger
-  })
-  console.log('スケジュールされた通知', trigger)
-  return trigger
-}
-
-const notificationHandler = () => {
-  Notifications.setNotificationHandler({
-    handleNotification: async () => {
-      return {
-        shouldShowAlert: true,
-        shouldPlaySound: true,
-        shouldSetBadge: true
-      }
-    }
-  })
+  return {
+    hour: adjustedDate.getHours(),
+    minute: adjustedDate.getMinutes()
+  }
 }
