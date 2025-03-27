@@ -1,20 +1,10 @@
 import { useDatabase } from '@/hooks/useDatabase';
-import { Schedule, TaskWithSchedule } from '@/types';
+import { Task } from '@/types';
 import * as Notifications from 'expo-notifications'
 import { subMinutes } from 'date-fns'
 import { SchedulableTriggerInputTypes } from 'expo-notifications'
 
-const bitmaskToWeekDays = (bitmask: number) => {
-  const days = []
-  for (let i = 0; i < 7; i++) {
-    if ((bitmask >> i) & 1) {
-      days.push(i)
-    }
-  }
-  return days
-}
-
-export const scheduleNotification = async (task: TaskWithSchedule, schedule: any, nextDateTime: any) => {
+export const scheduleNotification = async (task: Task, schedule: any) => {
   const weekdays = bitmaskToWeekDays(schedule.bitmask_days)
   const { hour, minute} = getNotificationTimeBefore(schedule.time, 60)
 
@@ -34,7 +24,6 @@ export const scheduleNotification = async (task: TaskWithSchedule, schedule: any
         minute,
       }
     })
-
     // dbに通知予約を保存
     await saveScheduledNotification({
       task_id: task.id,
@@ -43,44 +32,11 @@ export const scheduleNotification = async (task: TaskWithSchedule, schedule: any
       scheduled_weekday: weekday,
       scheduled_hour: hour,
       scheduled_minute: minute,
-      scheduled_at: nextDateTime.toDate()
     })
 
     notificationIds.push(notificationId)
   }
   return notificationIds
-}
-
-const saveScheduledNotification = async ({
-  task_id,
-  task_schedule_id,
-  notification_id,
-  scheduled_weekday,
-  scheduled_hour,
-  scheduled_minute,
-  scheduled_at
-}: any) => {
-  const { db } = useDatabase()
-  await db.execAsync(`
-    INSERT INTO scheduled_notifications (
-      task_id,
-      task_schedule_id,
-      notification_id,
-      scheduled_weekday,
-      scheduled_hour,
-      scheduled_minute,
-      scheduled_at
-    )
-    VALUES (?, ?, ?, ?, ?, ?, ?);
-  `, [
-      task_id,
-      task_schedule_id,
-      notification_id,
-      scheduled_weekday,
-      scheduled_hour,
-      scheduled_minute,
-      scheduled_at
-    ])
 }
 
 export const cancelScheduledNotification = async (notificationId: any) => {
@@ -99,7 +55,46 @@ export const requestPermissionAsync = async () => {
   await Notifications.requestPermissionsAsync()
 }
 
-export const getNotificationTimeBefore = (time: string, offsetMinutes = 60) => {
+const saveScheduledNotification = async ({
+  task_id,
+  task_schedule_id,
+  notification_id,
+  scheduled_weekday,
+  scheduled_hour,
+  scheduled_minute,
+}: any) => {
+  const { db } = useDatabase()
+  await db.runAsync(`
+    INSERT INTO scheduled_notifications (
+      task_id,
+      task_schedule_id,
+      notification_id,
+      scheduled_weekday,
+      scheduled_hour,
+      scheduled_minute
+    )
+    VALUES (?, ?, ?, ?, ?, ?);
+  `, [
+      task_id,
+      task_schedule_id,
+      notification_id,
+      scheduled_weekday,
+      scheduled_hour,
+      scheduled_minute,
+    ])
+}
+
+const bitmaskToWeekDays = (bitmask: number) => {
+  const days = []
+  for (let i = 0; i < 7; i++) {
+    if ((bitmask >> i) & 1) {
+      days.push(i)
+    }
+  }
+  return days
+}
+
+const getNotificationTimeBefore = (time: string, offsetMinutes = 60) => {
   const [hour, minute] = time.split(':').map(Number)
   const baseDate = new Date()
   baseDate.setHours(hour, minute, 0, 0)

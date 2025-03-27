@@ -32,7 +32,6 @@ export const scheduledNotificationsSchema = `
   scheduled_weekday INTEGER NOT NULL,
   scheduled_hour INTEGER NOT NULL,
   scheduled_minute INTEGER NOT NULL,
-  scheduled_at TEXT NOT NULL,
   created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (task_id) REFERENCES tasks(id) ON DELETE CASCADE,
   FOREIGN KEY (task_schedule_id) REFERENCES task_schedules(id) ON DELETE CASCADE

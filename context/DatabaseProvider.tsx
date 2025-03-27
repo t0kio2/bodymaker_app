@@ -39,7 +39,7 @@ export const DatabaseProvider = ({ children }: { children: ReactNode }) => {
         console.error(error);
       }
     }
-    // deleteDB()
+    deleteDB()
     initDatabase()
   }, []) // []を渡すことで初回レンダー時のみ実行される
   

@@ -1,4 +1,5 @@
 import { getDayBit } from "@/lib/utils"
+import { scheduleNotification } from "@/lib/notification"
 import { Task, Schedule, TaskWithSchedule } from "@/types"
 
 export const aggregateTaskLogs = async (db: any): Promise<any> => {
@@ -143,13 +144,12 @@ export const insertTask = async (db: any, task: Omit<Task, 'id'>, schedule: Sche
 
     if (!scheduleId) throw new Error('スケジュールID取得に失敗しました')
 
-    // notificationsのスキーマをどうするか
-    await db.execAsync(`
-      INSERT INTO notifications (
-        task_id
-      )
-      VALUES (${taskId});
-    `)
+    if (task.is_push_notification) {
+      const taskWithId = { ...task, id: taskId }
+      const scheduleWithId = { ...schedule, id: scheduleId }
+      
+      scheduleNotification(taskWithId, scheduleWithId)
+    }
 
     console.log('タスク追加に成功')
     return taskId
