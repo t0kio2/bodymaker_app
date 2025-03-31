@@ -32,7 +32,7 @@ export const useForm = (mode: 'create' | 'edit', initialTask?: TaskWithSchedule 
       })
       setSelectedDays(initialTask.bitmask_days)
       setTimeStr(initialTask.time)
-      setPushNotification(initialTask.is_push_notification)
+      setPushNotification(!!initialTask.is_push_notification)
     }
   }, [mode, initialTask])
 

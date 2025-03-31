@@ -5,7 +5,7 @@ import { SafeAreaProvider } from 'react-native-safe-area-context'
 import { ScrollView } from 'react-native'
 import { Redirect, router } from 'expo-router'
 import CustomButton from '@/components/CustomButton'
-import { requestPermissionAsync } from '@/lib/pushNotification'
+import { requestPermissionAsync } from '@/lib/notification'
 
 import { Session } from '@supabase/supabase-js'
 import { supabase } from '@/lib/supabase'

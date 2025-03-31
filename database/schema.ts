@@ -7,7 +7,7 @@ export const applyInitialSchema = async (db: any) => {
     await createTableIfNotExists(db, 'tasks', tasksSchema)
     await createTableIfNotExists(db, 'task_schedules', taskSchedulesSchema)
     await createTableIfNotExists(db, 'task_logs', taskLogsSchema)
-    await createTableIfNotExists(db, 'notifications', scheduledNotificationsSchema)
+    await createTableIfNotExists(db, 'scheduled_notifications', scheduledNotificationsSchema)
     
     db.execAsync('COMMIT;')
     console.log('初期スキーマの適用が完了しました')
