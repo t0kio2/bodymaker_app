@@ -4,6 +4,7 @@ import Icon from 'react-native-vector-icons/FontAwesome5'
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
 import { formattedDate } from '@/lib/utils'
+import * as Notifications from 'expo-notifications'
 
 const TabLayout = () => {
   return (
@@ -45,21 +46,19 @@ const TabLayout = () => {
             headerRight: () => (
               <TouchableOpacity
                 onPress={async () => {
-                  
+                  const notice = await Notifications.getAllScheduledNotificationsAsync()
+                  // Alert.alert('通知予約', JSON.stringify(notice
+                  //   .map((n) => ({
+                  //     id: n.identifier,
+                  //     content: n.content.title,
+                  //     scheduled: n?.trigger?.date,
+                  //   }))
+                  // ))
+                  Alert.alert('通知予約', JSON.stringify(notice))
                 }}
                 className="mr-4"
               >
-                <Text>show push</Text>
-              </TouchableOpacity>
-            ),
-            headerLeft: () => (
-              <TouchableOpacity
-                onPress={async () => {
-                  // TODO
-                }}
-                className="ml-4"
-              >
-                <Text>delete tables</Text>
+                <Text>プッシュ通知内容</Text>
               </TouchableOpacity>
             ),
           }}
