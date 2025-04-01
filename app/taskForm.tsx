@@ -3,6 +3,7 @@ import React from 'react'
 import { SafeAreaProvider } from 'react-native-safe-area-context'
 import Form from '@/components/Form'
 import { router, useLocalSearchParams } from 'expo-router'
+import { eventEmitter } from '@/lib/EventEmitter'
 
 const TaskForm = () => {
   const { mode, id } = useLocalSearchParams()
@@ -14,7 +15,10 @@ const TaskForm = () => {
           <Form
             mode={mode as 'create' | 'edit'}
             id={id as string}
-            onTaskAdded={() => router.push('/list')}
+            onTaskAdded={() => {
+              eventEmitter.emit('taskUpdated')
+              router.push('/list')
+            }}
           />
         </ScrollView>
       </SafeAreaView>

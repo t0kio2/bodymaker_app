@@ -6,7 +6,9 @@ import { SchedulableTriggerInputTypes } from 'expo-notifications'
 
 export const scheduleNotification = async (task: Task, schedule: any) => {
   const weekdays = bitmaskToWeekDays(schedule.bitmask_days)
-  const { hour, minute} = getNotificationTimeBefore(schedule.time, 60)
+  
+  // TODO: 2 を消す
+  const { hour, minute} = getNotificationTimeBefore(schedule.time, 2)
 
   const notificationIds = []
 

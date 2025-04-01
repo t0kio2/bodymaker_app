@@ -26,14 +26,6 @@ export const getDayBit = (date: Date): number => {
   return 1 << date.getDay()
 }
 
-// ローカル日付文字列を取得
-export const getLocalDateString = (date: Date): string => {
-  const y = date.getFullYear();
-  const m = (date.getMonth() + 1).toString().padStart(2, '0');
-  const d = date.getDate().toString().padStart(2, '0');
-  return `${y}-${m}-${d}`;
-}
-
 export const generateMarkedDatesForMonth = (
   taskList: TaskWithSchedule[],
   year: number,
@@ -51,7 +43,7 @@ export const generateMarkedDatesForMonth = (
   for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
     // Date.getDay() は 0 (Sunday) ～ 6 (Saturday) を返す
     const dayBit = 1 << d.getDay()
-    const dateStr = getLocalDateString(d)
+    const dateStr = formatDateToYYYYMMDD(d)
     const hasTask = taskList.some(task => (task.bitmask_days & dayBit) !== 0)
 
     marked[dateStr] = { 
@@ -81,13 +73,15 @@ export const getCurrentTimeStr = () => {
 }
 
 // M月D日 (ddd)
-export const formattedDate = () => {
-  const date = new Date()
+export const formattedDate = (date: Date) => {
   const month = date.getMonth() + 1
   const day = date.getDate()
   const weekdays = ['日', '月', '火', '水', '木', '金', '土']
   const weekday = weekdays[date.getDay()] // 曜日
   return `${month}月${day}日 (${weekday})`
+}
+
+export const formatLocalDateString = (date: string): string => {
 }
 
 // ビットマスクから曜日を取得

@@ -1,4 +1,4 @@
-import { View, Text, ScrollView, SafeAreaView, FlatList, TouchableOpacity } from 'react-native'
+import { View, Text, ScrollView, SafeAreaView, FlatList, TouchableOpacity, RefreshControl } from 'react-native'
 import React from 'react'
 import { SafeAreaProvider } from 'react-native-safe-area-context'
 import Heatmap from '@/components/Heatmap'
@@ -6,10 +6,7 @@ import { useTaskList } from '@/hooks/useTaskList'
 import TaskCard from '@/components/TaskCard'
 
 export default function Report() {
-  const { allTask } = useTaskList()
-
-  // const { rateByTask } = useRollingContinuityRate()
-  // console.log('rateByTask in report', rateByTask)
+  const { allTask, refreshing, loadAllTask } = useTaskList()
   
   return (
     <SafeAreaProvider>
@@ -32,6 +29,12 @@ export default function Report() {
                 date=''
               />
             )}
+            ListEmptyComponent={
+              <Text>習慣が登録されていません。登録しましょう！</Text>
+            }
+            refreshControl={
+              <RefreshControl refreshing={refreshing} onRefresh={loadAllTask} />
+            }
           />
           {
             allTask.length > 3 && (
