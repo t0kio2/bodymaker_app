@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react"
 import { useTaskList } from "./useTaskList"
-import { generateMarkedDatesForMonth, getLocalDateString } from "@/lib/utils"
+import { generateMarkedDatesForMonth, formatDateToYYYYMMDD } from "@/lib/utils"
 
 export const useCalendarData = () => {
   const [currentYear, setCurrentYear] = useState(new Date().getFullYear())
   const [currentMonth, setCurrentMonth] = useState(new Date().getMonth())
   const [markedDates, setMarkedDates] = useState<Record<string, any>>({})
-  const [selectedDate, setSelectedDate] = useState(getLocalDateString(new Date()))
+  const [selectedDate, setSelectedDate] = useState<string>(formatDateToYYYYMMDD(new Date()))
   const { taskList, allTask, refreshing, loadTaskListByDay} = useTaskList()
 
   const updateMarkedDates = (selectedDate: string) => {

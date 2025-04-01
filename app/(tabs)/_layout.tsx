@@ -3,7 +3,6 @@ import { Tabs } from 'expo-router'
 import Icon from 'react-native-vector-icons/FontAwesome5'
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
-import { formattedDate } from '@/lib/utils'
 import * as Notifications from 'expo-notifications'
 
 const TabLayout = () => {
@@ -26,7 +25,7 @@ const TabLayout = () => {
         <Tabs.Screen
           name='calendar'
           options={{
-            title: formattedDate(),
+            title: 'カレンダー',
             headerShown: true,
             headerShadowVisible: false,
             tabBarIcon: ({ color, focused }) => (

@@ -2,7 +2,7 @@ import { TaskWithSchedule } from "@/types"
 import { useDatabase } from "./useDatabase"
 import { useEffect, useState } from "react"
 import { completeTask, getAllTask, getTaskListByDay } from "@/database/queries"
-import { getLocalDateString } from "@/lib/utils"
+import { formatDateToYYYYMMDD } from "@/lib/utils"
 import { useRollingContinuityRate } from "./useRollingContinuityRate"
 
 export const useTaskList = () => {
@@ -37,7 +37,7 @@ export const useTaskList = () => {
     // 日付クリックの度にローディングアイコンが表示されるのでコメントアウト
     // setRefreshing(true)
     try {
-      const effectiveDate = dateStr || getLocalDateString(new Date())
+      const effectiveDate = dateStr || formatDateToYYYYMMDD(new Date())
       const taskData = await getTaskListByDay(db, effectiveDate)
 
       const taskWithRatePromises = taskData.map(async (task) => {
@@ -66,6 +66,7 @@ export const useTaskList = () => {
   }
 
   useEffect(() => {
+    console.log('useTaskList: 更新')
     if (db) {
       loadTaskListByDay()
       loadAllTask()
