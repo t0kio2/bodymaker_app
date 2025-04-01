@@ -24,6 +24,7 @@
     "@rneui/themed": "^4.0.0-rc.8",
     "@supabase/supabase-js": "^2.47.10",
     "date-fns": "^4.1.0",
+    "events": "^3.3.0",
     "expo": "~52.0.23",
     "expo-blur": "~14.0.1",
     "expo-checkbox": "~4.0.1",

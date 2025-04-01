@@ -10,6 +10,7 @@ import Modal from 'react-native-modal'
 import Checkbox from 'expo-checkbox'
 import { useTask } from '@/hooks/useTask'
 import { useTaskList } from '@/hooks/useTaskList'
+import { eventEmitter } from '@/lib/EventEmitter'
 
 
 // LayoutAnimationの有効化 TODO: APP起点で有効化する
@@ -21,7 +22,7 @@ interface TaskCardProps {
   task: TaskWithSchedule
   editMode?: boolean
   onTaskDeleted?: () => void
-  onTaskCompleted?: () => void // TODO: 未実装
+  onTaskCompleted?: () => void
   date: string,
   readonly?: boolean
 }
@@ -85,7 +86,9 @@ const TaskCard = ({
         LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut)
         
         Alert.alert("タスク完了", "タスクを完了しました")
-        if (onTaskCompleted) onTaskCompleted()
+        if (onTaskCompleted) { 
+          onTaskCompleted()
+        }
       } else {
         Alert.alert("エラー", "タスクの完了に失敗しました")}
     }
@@ -93,7 +96,7 @@ const TaskCard = ({
 
   return (
     <>
-      <View className='flex-row items-center m-2 pb-5 border-b-[0.5px] border-b-gray-400'>
+      <View className='flex-row items-center m-2'>
         {
           readonly || (
             editMode ? (
@@ -122,9 +125,12 @@ const TaskCard = ({
         {/* メイン情報 */}
         <View className='w-[160px] h-full'>
           <View className='flex-1 justify-between'>
-            <Text className='text-xl mt-2'>{task.title} - {task.task_log_id ? '完了':'未完了'}</Text>
+            <Text className='text-xl mt-2'>{task.title}</Text>
             {/* カレンダーアイコン */}
-            <Recurring schedule={task} />
+            <View className='mt-2'>
+              <Recurring schedule={task} />
+              <Text >通知{task.is_push_notification ? 'する' : 'しない'}</Text>
+            </View>
           </View>
         </View>
         {/* サブ情報 */}

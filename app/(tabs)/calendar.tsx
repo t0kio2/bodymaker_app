@@ -1,10 +1,12 @@
-import { Text, SafeAreaView, RefreshControl, SectionList } from 'react-native'
+import { View, Text, SafeAreaView, RefreshControl, SectionList } from 'react-native'
 import React from 'react'
 import { Calendar as CalendarComponent, LocaleConfig } from 'react-native-calendars'
 import TaskCard from '@/components/TaskCard'
 import { SafeAreaProvider } from 'react-native-safe-area-context'
-import { getLocalDateString } from '@/lib/utils'
+import { formatDateToYYYYMMDD } from '@/lib/utils'
 import { useCalendarData } from '@/hooks/useCalendarData'
+import { formattedDate } from '@/lib/utils'
+import { eventEmitter } from '@/lib/EventEmitter'
 
 LocaleConfig.locales.jp = {
   monthNames: ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月'],
@@ -28,8 +30,8 @@ const Calendar = () => {
 
   const sections = [
     {
-      title: selectedDate ===  getLocalDateString(new Date()) ? 
-        '今日のトレーニング' : `${selectedDate}のトレーニング`,
+      title: selectedDate ===  formatDateToYYYYMMDD(new Date()) ? 
+        '今日のトレーニング' : `${formattedDate(new Date(selectedDate))}のトレーニング`,
       data: taskList
     }
   ]
@@ -45,7 +47,11 @@ const Calendar = () => {
               task={item}
               editMode={false}
               date={selectedDate}
-              onTaskCompleted={() => loadTaskListByDay(selectedDate)}
+              onTaskCompleted={() => {
+                loadTaskListByDay(selectedDate)
+                eventEmitter.emit('taskUpdated')
+                
+              }}
             />
           )}
           ListEmptyComponent={
@@ -56,11 +62,11 @@ const Calendar = () => {
           )}
           ListHeaderComponent={
             <CalendarComponent
-              onMonthChange={(month) => {
+              onMonthChange={(month: any) => {
                 setCurrentYear(month.year)
                 setCurrentMonth(month.month - 1)
               }}
-              onDayPress={(day) => {
+              onDayPress={(day: any) => {
                 console.log('selected day', day)
                 handleDayPress(day.dateString)
               }}
