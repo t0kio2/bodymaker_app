@@ -40,7 +40,11 @@ export default function RootLayout() {
             options={({ route }: any) => ({
               title: route.params?.mode === 'create' ? '習慣の作成' : '習慣の編集',
               headerBackTitle: '戻る',
+              headerTintColor: '#333333',
               headerShadowVisible: false,
+              headerStyle: {
+                backgroundColor: '#F7F9FC', // ヘッダー背景の色を指定
+              },
             })}
           />
           <Stack.Screen name="+not-found" />

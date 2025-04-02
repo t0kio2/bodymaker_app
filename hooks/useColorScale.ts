@@ -8,11 +8,11 @@ export const useColorScale = () => {
   const [heatmapData, setHeatmapData] = useState<any>([])
 
   const getColor = (recordCount: number) => {
-    if (recordCount >= 4) return "#196127"
-    else if (recordCount >= 3) return "#239a3b"
-    else if (recordCount >= 2) return "#7bc96f"
-    else if (recordCount >= 1) return "#c6e48b"
-    else return "#e0e0e0"
+    if (recordCount >= 4) return '#6098C8'   // 明るめのパステルブルー（濃いめ）
+    else if (recordCount === 3) return '#8EB8E0'  // 明るめのパステルブルー（中間）
+    else if (recordCount === 2) return '#B7D4EE'  // 淡いパステルブルー
+    else if (recordCount === 1) return '#DCEBFA'  // 非常に淡いパステルブルー
+    else return '#F0F4F9'                         // デフォルトの淡いグレー
   }
 
   const fetchHeatmapData = async () => {

@@ -9,27 +9,19 @@ type Props = {
 
 const ScheduleSelector: React.FC<Props> = ({ selectedDays, onToggle }) => {
   return (
-    <View className='mt-3 flex-row flex-wrap justify-center gap-1'>
+    <View className="mt-3 flex-row flex-nowrap justify-center gap-1">
       {Object.entries(DAY_OF_WEEK_BIT.ja).map(([day, bit]) => (
         <TouchableOpacity
           key={day}
-          className={`px-4 bg-[#D9D9D9] rounded-full w-14 h-14
-              justify-center items-center
-              ${selectedDays & bit ? 'bg-blue-500' : 'bg-gray-300'}
-              `}
+          className={`w-14 h-14 rounded-full justify-center items-center ${
+            selectedDays & bit ? 'bg-[#7FB3C0]' : 'bg-[#F3F4F6]'
+          }`}
           onPress={() => onToggle(bit)}
         >
           <Text
-            className={
-              `text-xl
-                font-bold
-                ${
-                  selectedDays & bit ?
-                    "text-white" :
-                    "text-black"
-                }
-              `
-            }
+            className={`text-xl font-bold ${
+              selectedDays & bit ? 'text-white' : 'text-black'
+            }`}
           >
             {day.slice(0, 3)}
           </Text>

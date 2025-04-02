@@ -9,7 +9,11 @@ import { useForm } from '@/hooks/useForm'
 import ScheduleSelector from './ScheduleSelector'
 import { Schedule } from '@/types'
 
-const Form = ({ mode, id, onTaskAdded }: { 
+const Form = ({
+  mode,
+  id,
+  onTaskAdded,
+}: {
   mode: 'create' | 'edit'
   id?: string
   onTaskAdded: () => void
@@ -30,80 +34,87 @@ const Form = ({ mode, id, onTaskAdded }: {
   } = useForm(mode, task)
 
   const handleSubmit = async () => {
-    const errorMessage = validateForm() 
+    const errorMessage = validateForm()
     if (errorMessage) {
       return Alert.alert('入力内容に不備があります', errorMessage)
     }
 
     const taskData = {
       ...formData,
-      is_push_notification: pushNotification
+      is_push_notification: pushNotification,
     }
-    
+
     const schedule = {
       bitmask_days: selectedDays,
-      time: timeStr
+      time: timeStr,
     } as Schedule
-    
+
     const success = await saveTask(taskData, schedule)
     if (success) {
-      Alert.alert("保存しました！")
+      Alert.alert('保存しました！')
       onTaskAdded()
     } else {
-      Alert.alert("保存に失敗しました")
+      Alert.alert('保存に失敗しました')
     }
   }
 
   return (
     <>
       <FormField
-        title='習慣名'
+        title="習慣名"
         value={formData.title}
-        placeholder='習慣名を入力'
+        placeholder="習慣名を入力"
         handleChangeText={(e: string) => handleChange('title', e)}
-        containerStyle='mb-4'
+        containerStyle="mb-4"
       />
-      <View className='mt-5'>
-        <TimePicker
-          timeStr={timeStr}
-          handleTimeChange={(e) => setTimeStr(e)}
+      
+      <View className="mt-4">
+        <TimePicker timeStr={timeStr} handleTimeChange={(e) => setTimeStr(e)} />
+      </View>
+
+      <View className="mt-4">
+        <ScheduleSelector selectedDays={selectedDays} onToggle={handleToggleDays} />
+      </View>
+
+      <View className="mt-6 flex-row items-center justify-between bg-white rounded-lg px-4 py-3 shadow-sm">
+        <Text className="text-[#333333] text-base">毎日</Text>
+        <Switch
+          trackColor={{ true: '#6C8BA7', false: '#B0B9C1' }}
+          thumbColor="#FFFFFF"
+          ios_backgroundColor="#B0B9C1"
+          onValueChange={selectAllDays}
+          value={isEveryday}
         />
       </View>
-      <ScheduleSelector selectedDays={selectedDays} onToggle={handleToggleDays} />
-      <View className='mt-5 flex-row items-center'>
-        <Text>毎日</Text>
-        <View className='ml-3'>
-          <Switch
-            trackColor={{true: '#3b82f6'}}
-            thumbColor={isEveryday ? '#d1d5db' : '#f4f3f4'}
-            ios_backgroundColor="#d1d5db"
-            onValueChange={selectAllDays}
-            value={isEveryday}
-          />
-        </View>
+
+      <View className="mt-4 flex-row items-center justify-between bg-white rounded-lg px-4 py-3 shadow-sm">
+        <Text className="text-[#333333] text-base">通知</Text>
+        <Switch
+          trackColor={{ true: '#6C8BA7', false: '#B0B9C1' }}
+          thumbColor="#FFFFFF"
+          ios_backgroundColor="#B0B9C1"
+          onValueChange={() => setPushNotification((prev) => !prev)}
+          value={pushNotification}
+        />
       </View>
-      <View className='mt-5 flex-row items-center'>
-        <Text>通知</Text>
-        <View className='ml-3'>
-          <Switch
-            trackColor={{true: '#3b82f6'}}
-            thumbColor={isEveryday ? '#d1d5db' : '#f4f3f4'}
-            ios_backgroundColor="#d1d5db"
-            onValueChange={() => setPushNotification((prev) => !prev)} 
-            value={pushNotification}
-          />
-        </View>
+
+      <View className="mt-8">
+        <CustomButton
+          title={mode === 'create' ? '登録' : '更新'}
+          handlePress={() => handleSubmit()}
+          containerStyle="bg-[#6C8BA7] py-3 rounded-lg"
+          textStyle="text-[#333333] text-lg"
+        />
       </View>
-      <CustomButton
-        title={mode === 'create' ? '登録' : '更新'}
-        handlePress={() => handleSubmit()}
-        containerStyle='mt-7 bg-primary'
-      />
-      <CustomButton
-        title='とじる'
-        handlePress={() => router.replace('/list')}
-        containerStyle='mt-2 bg-gray-500'
-      />
+
+      <View className="mt-4">
+        <CustomButton
+          title="とじる"
+          handlePress={() => router.replace('/list')}
+          containerStyle="bg-[#D1D5DB] py-3 rounded-lg"
+          textStyle="text-[#333333] text-lg"
+        />
+      </View>
     </>
   )
 }
