@@ -13,16 +13,16 @@ const Recurring: React.FC<RecurringProps> = ({ schedule }) => {
   return (
     <View className='flex-row items-center'>
       <View className='flex justify-end'>
-        <MaterialIcons name='autorenew' size={20} color='#161622' />
+        <MaterialIcons name='autorenew' size={20} color='#333333' />
       </View>
-      <Text className='ml-1'>
+      <Text className='ml-1 text-[#333333]'>
         {
           isEverydayChecked(schedule.bitmask_days)
           ? '毎日'
           : getSelectedDays(schedule.bitmask_days)
         }
       </Text>
-      <Text className='ml-2'>
+      <Text className='ml-2 text-[#333333]'>
         {schedule.time}
       </Text>
     </View>

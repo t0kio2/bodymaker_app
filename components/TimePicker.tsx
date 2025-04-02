@@ -23,28 +23,29 @@ const TimePicker: React.FC<TimePickerProps> = ({ timeStr, handleTimeChange }) =>
         Platform.OS === 'android' && 
           <TouchableOpacity onPress={showTimePicker}>
             <View className='flex-row items-center'>
-              <Icon
+              {/* <Icon
                 name='clock'
                 size={20}
                 color='#161622'
                 style={{ width: 24, textAlign: "center" }}
                 className='flex mr-1'
-              />
-              <Text className='text-4xl'>{timeStr}</Text>
+              /> */}
+              <Text className='text-2xl'>{timeStr}</Text>
             </View>
           </TouchableOpacity>
       }
 
       { timePickerVisible && (
         <View className='flex-row items-center'>
-          {  Platform.OS === 'ios' && 
+          {/* {  Platform.OS === 'ios' && 
             <Icon
               name='clock'
               size={20}
               color='#161622'
               style={{ width: 24, textAlign: "center" }}
               className='flex'
-            />}
+            />
+          } */}
           <DateTimePicker
             value={selectedTime}
             mode='time'

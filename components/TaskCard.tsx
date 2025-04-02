@@ -10,7 +10,6 @@ import Modal from 'react-native-modal'
 import Checkbox from 'expo-checkbox'
 import { useTask } from '@/hooks/useTask'
 import { useTaskList } from '@/hooks/useTaskList'
-import { eventEmitter } from '@/lib/EventEmitter'
 
 
 // LayoutAnimationの有効化 TODO: APP起点で有効化する
@@ -96,65 +95,52 @@ const TaskCard = ({
 
   return (
     <>
-      <View className='flex-row items-center m-2'>
-        {
-          readonly || (
-            editMode ? (
-              <Icon
-                name='align-justify'
-                size={20}
-                color='#161622'
-                className='mr-6'
-              />
-            ):(
-              <Checkbox
-                value={isChecked}
-                onValueChange={handleCheckboxChange}
-                color={isChecked ? '#7bc96f' : undefined}
-                className='mr-4'
-                style={{ 
-                  width: 25, // サイズ調整
-                  height: 25,
-                  borderRadius: 15, // 円形にする
-                  borderWidth: 1, // 枠線を表示
-                }}
-              />
-            )
+      <View className='flex-row items-center bg-white rounded-lg shadow-xs border border-gray-200 m-2 p-3'>
+        {!readonly && (
+          editMode ? (
+            <Icon name='align-justify' size={20} color='#6C8BA7' className='mr-4' />
+          ) : (
+            <Checkbox
+              value={isChecked}
+              onValueChange={handleCheckboxChange}
+              color={isChecked ? '#6C8BA7' : undefined}
+              className='mr-4'
+              style={{
+                width: 22,
+                height: 22,
+                borderRadius: 6,
+                borderWidth: 1,
+                borderColor: '#6C8BA7'
+              }}
+            />
           )
-        }
+        )}
+
         {/* メイン情報 */}
-        <View className='w-[160px] h-full'>
-          <View className='flex-1 justify-between'>
-            <Text className='text-xl mt-2'>{task.title}</Text>
-            {/* カレンダーアイコン */}
-            <View className='mt-2'>
-              <Recurring schedule={task} />
-              <Text >通知{task.is_push_notification ? 'する' : 'しない'}</Text>
-            </View>
-          </View>
+        <View className='flex-1'>
+          <Text className='text-lg font-medium text-[#333333]'>{task.title}</Text>
+          <Recurring schedule={task} />
+          <Text className='text-sm text-[#555555] mt-1'>
+            通知: {task.is_push_notification ? 'オン' : 'オフ'}
+          </Text>
         </View>
+
         {/* サブ情報 */}
-        <View className='ml-4'>
-          <Text className='mt-1'>継続率 {task.rate}%</Text>
-          <Text className='mt-1'>クリアした回数 108回</Text>
-          <Text className='mt-1'>開始日 {formatDate(task.created_at)}</Text>
+        <View className='ml-auto mr-5 items-end'>
+          <Text className='text-sm text-[#555555]'>継続率 {task.rate}%</Text>
+          <Text className='text-sm text-[#555555]'>クリア {}回</Text>
+          <Text className='text-sm text-[#555555]'>開始 {formatDate(task.created_at)}</Text>
         </View>
+
         {/* 3点リーダー */}
-        {
-          readonly ||
-            editMode && (
-              <TouchableOpacity
-                className='flex-1 h-full absolute right-0 top-1'
-                onPress={(e) => showDialog(e)}
-              >
-                <Entypo
-                  name='dots-three-vertical'
-                  size={20}
-                  color='#161622'
-                />
-              </TouchableOpacity>
-            )
-        }
+        {!readonly && editMode && (
+          <TouchableOpacity
+            className='absolute top-2 right-1 p-1'
+            onPress={(e) => showDialog(e)}
+          >
+            <Entypo name='dots-three-vertical' size={18} color='#6C8BA7' />
+          </TouchableOpacity>
+        )}
       </View>
       <Modal
         isVisible={isModalVisible}
