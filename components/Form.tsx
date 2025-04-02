@@ -67,11 +67,6 @@ const Form = ({
         handleChangeText={(e: string) => handleChange('title', e)}
         containerStyle="mb-4"
       />
-      
-      <View className="mt-4">
-        <TimePicker timeStr={timeStr} handleTimeChange={(e) => setTimeStr(e)} />
-      </View>
-
       <View className="mt-4">
         <ScheduleSelector selectedDays={selectedDays} onToggle={handleToggleDays} />
       </View>
@@ -85,6 +80,11 @@ const Form = ({
           onValueChange={selectAllDays}
           value={isEveryday}
         />
+      </View>
+
+      <View className="mt-6 flex-row items-center justify-between bg-white rounded-lg px-4 py-3 shadow-sm">
+        <Text className="text-[#333333] text-base">時間</Text>
+        <TimePicker timeStr={timeStr} handleTimeChange={(e) => setTimeStr(e)} />
       </View>
 
       <View className="mt-4 flex-row items-center justify-between bg-white rounded-lg px-4 py-3 shadow-sm">
