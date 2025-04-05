@@ -36,8 +36,6 @@ const Calendar = () => {
     allTask
   } = useTaskList()
 
-  console.log('allTask', allTask)
-
   const displayData = () => {
     if (taskList.length) {
       const displayData = []
