@@ -1,4 +1,5 @@
-import { Alert, Text, TouchableOpacity, } from 'react-native'
+import React from 'react'
+import { Alert, Text, TouchableOpacity } from 'react-native'
 import { Tabs } from 'expo-router'
 import Icon from 'react-native-vector-icons/FontAwesome5'
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
@@ -11,15 +12,21 @@ const TabLayout = () => {
       <Tabs
         screenOptions={{
           tabBarShowLabel: false,
-          tabBarActiveTintColor: '#FFA001',
-          tabBarInactiveTintColor: '#CDCDE0',
+          tabBarActiveTintColor: '#3A4B5E', // 濃い青灰色
+          tabBarInactiveTintColor: '#8C97A8', // 濃い灰色
           tabBarStyle: {
-            backgroundColor: '#161622',
+            backgroundColor: '#F7F9FC',
             borderTopWidth: 1,
-            borderTopColor: '#232533',
+            borderTopColor: '#E0E6ED',
             height: 60,
-            paddingTop: 10
-          }
+            paddingVertical: 8,
+          },
+          headerStyle: {
+            backgroundColor: '#F7F9FC',
+          },
+          headerTitleStyle: {
+            color: '#333333',
+          },
         }}
       >
         <Tabs.Screen
@@ -28,8 +35,11 @@ const TabLayout = () => {
             title: 'カレンダー',
             headerShown: true,
             headerShadowVisible: false,
-            tabBarIcon: ({ color, focused }) => (
-              <Icon name='calendar' size={20} color={color} />
+            headerTitleStyle: {
+              color: '#496279',
+            },
+            tabBarIcon: ({ color }) => (
+              <Icon name='calendar-alt' size={22} color={color} />
             ),
           }}
         />
@@ -39,25 +49,25 @@ const TabLayout = () => {
             title: 'トレーニング一覧',
             headerShown: true,
             headerShadowVisible: false,
-            tabBarIcon: ({ color, focused }) => (
-              <MaterialCommunityIcons name='format-list-bulleted-square' size={25} color={color} />
+            headerTitleStyle: {
+              color: '#496279',
+            },
+            tabBarIcon: ({ color }) => (
+              <MaterialCommunityIcons
+                name='format-list-checkbox'
+                size={25}
+                color={color}
+              />
             ),
             headerRight: () => (
               <TouchableOpacity
                 onPress={async () => {
                   const notice = await Notifications.getAllScheduledNotificationsAsync()
-                  // Alert.alert('通知予約', JSON.stringify(notice
-                  //   .map((n) => ({
-                  //     id: n.identifier,
-                  //     content: n.content.title,
-                  //     scheduled: n?.trigger?.date,
-                  //   }))
-                  // ))
                   Alert.alert('通知予約', JSON.stringify(notice))
                 }}
-                className="mr-4"
+                className="mr-4 px-2 py-1"
               >
-                <Text>プッシュ通知内容</Text>
+                <Text className="text-[#6C8BA7]">通知内容</Text>
               </TouchableOpacity>
             ),
           }}
@@ -65,11 +75,14 @@ const TabLayout = () => {
         <Tabs.Screen
           name='report'
           options={{
-            title: 'Report',
+            title: 'レポート',
             headerShown: true,
             headerShadowVisible: false,
-            tabBarIcon: ({ color, focused }) => (
-              <MaterialIcons name='insert-chart' size={25} color={color} />
+            headerTitleStyle: {
+              color: '#496279',
+            },
+            tabBarIcon: ({ color }) => (
+              <MaterialIcons name='insert-chart-outlined' size={25} color={color} />
             ),
           }}
         />

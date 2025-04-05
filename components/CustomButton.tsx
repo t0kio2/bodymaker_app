@@ -13,19 +13,22 @@ const CustomButton = ({
       onPress={handlePress}
       activeOpacity={0.7}
       className={`
-        bg-primary
+        bg-white
+        border
+        border-gray-300
         rounded-xl
         min-h-[52px]
         justify-center
         items-center
         flex
         flex-row
+        shadow-sm
         ${containerStyle}
         ${isLoading ? 'opacity-50' : ''}
       `}
       disabled={isLoading}
     >
-      <Text className={`${textStyle} text-white text-lg`}>
+      <Text className={`${textStyle} text-gray-800 text-lg font-medium`}>
         {title}
       </Text>
     </TouchableOpacity>

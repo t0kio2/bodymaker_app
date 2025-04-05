@@ -1,10 +1,11 @@
-import { FlatList, RefreshControl, Text, TouchableOpacity, SafeAreaView } from 'react-native'
+import { FlatList, RefreshControl, Text, TouchableOpacity, SafeAreaView, View } from 'react-native'
 import React from 'react'
 import { SafeAreaProvider } from 'react-native-safe-area-context'
 import Icon from 'react-native-vector-icons/FontAwesome5'
 import { router } from 'expo-router'
 import TaskCard from '@/components/TaskCard'
 import { useTaskList } from '@/hooks/useTaskList'
+import EmptyList from '@/components/EmptyList'
 
 export default function List() {
   const { allTask, refreshing, loadAllTask } = useTaskList()
@@ -12,9 +13,8 @@ export default function List() {
   return (
     // デバイス毎に余白をよしなにしてくれる
     <SafeAreaProvider>
-      <SafeAreaView className='h-full bg-white'>
+      <SafeAreaView className='h-full bg-[#F7F9FC]'>
         <FlatList
-          // className='border border-red-500'
           data={ allTask }
           keyExtractor={ task => task.id.toString()}
           renderItem={({ item }) => (
@@ -27,18 +27,17 @@ export default function List() {
           )}
           // ListHeaderComponent={<Text>Header</Text>}
           ListEmptyComponent={
-            <Text>習慣が登録されていません。登録しましょう！</Text>
+            <EmptyList />
           }
           refreshControl={
             <RefreshControl refreshing={refreshing} onRefresh={loadAllTask} />
           }
         />
         <TouchableOpacity
-          className='absolute bottom-8 right-8 shadow-lg w-20 h-20 bg-[#161622] rounded-full
-          flex items-center justify-center'
+          className='absolute bottom-8 right-8 shadow-sm w-16 h-16 bg-[#6C8BA7] rounded-full flex items-center justify-center'
           onPress={() => router.push('/taskForm?mode=create')}
         >
-          <Icon name='plus' size={20} color='#FFF' />
+          <Icon name='plus' size={24} color='#FFFFFF' />
         </TouchableOpacity>
       </SafeAreaView>
     </SafeAreaProvider>

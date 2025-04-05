@@ -10,7 +10,7 @@ const TaskForm = () => {
 
   return (
     <SafeAreaProvider>
-      <SafeAreaView className='h-full bg-white'>
+      <SafeAreaView className='h-full bg-[#F7F9FC]'>
         <ScrollView className='px-4 my-6'>
           <Form
             mode={mode as 'create' | 'edit'}
