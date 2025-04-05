@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react"
 import { useTaskList } from "./useTaskList"
 import { generateMarkedDatesForMonth, formatDateToYYYYMMDD } from "@/lib/utils"
+import { TaskWithSchedule } from "@/types"
 
 export const useCalendarData = () => {
   const [currentYear, setCurrentYear] = useState(new Date().getFullYear())
@@ -9,6 +10,9 @@ export const useCalendarData = () => {
   const [selectedDate, setSelectedDate] = useState<string>(formatDateToYYYYMMDD(new Date()))
   const { taskList, allTask, refreshing, loadTaskListByDay} = useTaskList()
 
+  const [uncompletedTask, setUncompletedTask] = useState<TaskWithSchedule[]>([])
+  const [completedTask, setCompletedTask] = useState<TaskWithSchedule[]>([])
+
   const updateMarkedDates = (selectedDate: string) => {
     const newMarkedDates = generateMarkedDatesForMonth(allTask, currentYear, currentMonth, selectedDate)
     setMarkedDates(newMarkedDates)
@@ -16,7 +20,15 @@ export const useCalendarData = () => {
 
   useEffect(() => {
     updateMarkedDates(selectedDate)
-  }, [currentYear, currentMonth, taskList, selectedDate])
+  }, [currentYear, currentMonth, allTask, selectedDate])
+
+  useEffect(() => {
+    const uncompleted = taskList.filter(task => !task.task_log_id)
+    const completed = taskList.filter(task => task.task_log_id)
+
+    setUncompletedTask(uncompleted)
+    setCompletedTask(completed)
+  }, [taskList])
 
   const handleDayPress = (dateStr: string ) => {
     setSelectedDate(dateStr)
@@ -31,6 +43,8 @@ export const useCalendarData = () => {
     handleDayPress,
     selectedDate,
     loadTaskListByDay,
-    taskList
+    taskList,
+    uncompletedTask,
+    completedTask,
   }
 }

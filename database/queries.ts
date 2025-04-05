@@ -43,9 +43,9 @@ export const getTaskListByDay = async (
     WHERE ts.bitmask_days & ? != 0
     GROUP BY t.id, ts.id
     ;`
-    const taskLogsQuery = `SELECT * FROM task_logs;`
-    const taskLogs = await db.getAllAsync(taskLogsQuery)
-    console.log('taskLogs', taskLogs)
+    // const taskLogsQuery = `SELECT * FROM task_logs;`
+    // const taskLogs = await db.getAllAsync(taskLogsQuery)
+    // console.log('taskLogs', taskLogs)
 
     const tasks = await db.getAllAsync(query, [dateStr, dayBit])
     return tasks
