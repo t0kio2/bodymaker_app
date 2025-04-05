@@ -36,6 +36,8 @@ const Calendar = () => {
     allTask
   } = useTaskList()
 
+  console.log('allTask', allTask)
+
   const displayData = () => {
     if (taskList.length) {
       const displayData = []
@@ -79,7 +81,7 @@ const Calendar = () => {
           />
         )}
         ListEmptyComponent={() => {
-          if (allTask) {
+          if (allTask.length) {
             return (
               <View className="py-10 items-center">
                 <Text className="text-lg text-[#76828F]">今日はおやすみ〜</Text>

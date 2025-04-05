@@ -3,7 +3,8 @@ export interface Task {
   title: string
   goal: string
   start_date: YYYYMMDD|string
-  is_push_notification: boolean
+  is_push_notification: boolean,
+  completedCount?: number,
   created_at?: Date
 }
 

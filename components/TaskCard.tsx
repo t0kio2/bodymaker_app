@@ -103,7 +103,7 @@ const TaskCard = ({
 
   return (
     <>
-      <View className='flex-row items-center bg-white rounded-lg shadow-xs border border-gray-200 m-2 p-3'>
+      <View className='flex-row items-center bg-white rounded-lg shadow-xs border border-gray-200 ml-2 mr-2 mb-2 p-3'>
         {/* チェックボックス部分：完了済みの場合はチェック済みかつ変更不可 */}
         {!readonly && (
           editMode ? (
@@ -157,7 +157,7 @@ const TaskCard = ({
         {/* サブ情報 */}
         <View className='ml-auto mr-5 items-end'>
           <Text className='text-sm text-[#555555]'>継続率 {task.rate}%</Text>
-          <Text className='text-sm text-[#555555]'>クリア {}回</Text>
+          <Text className='text-sm text-[#555555]'>クリア {task.completedCount ?? '---'}回</Text>
           <Text className='text-sm text-[#555555]'>開始 {formatDate(task.created_at)}</Text>
         </View>
 
