@@ -1,5 +1,5 @@
-import { View, Text, TouchableOpacity, Image, Alert, Platform, UIManager, LayoutAnimation } from 'react-native'
-import React, { useState } from 'react'
+import { View, Text, TouchableOpacity, Alert, Platform, UIManager, LayoutAnimation } from 'react-native'
+import React, { useState, useEffect } from 'react'
 import Icon from 'react-native-vector-icons/FontAwesome5'
 import Recurring from './Recurring'
 import { TaskWithSchedule } from '@/types'
@@ -11,8 +11,7 @@ import Checkbox from 'expo-checkbox'
 import { useTask } from '@/hooks/useTask'
 import { useTaskList } from '@/hooks/useTaskList'
 
-
-// LayoutAnimationの有効化 TODO: APP起点で有効化する
+// LayoutAnimationの有効化
 if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
   UIManager.setLayoutAnimationEnabledExperimental(true)
 }
@@ -37,8 +36,17 @@ const TaskCard = ({
   const { handleTaskCompleted } = useTaskList()
   const [isModalVisible, setIsModalVisible] = useState(false)
   const [iconPosition, setIconPosition] = useState({ x: 0, y: 0 })
+  // タスク完了の状態を管理するための state
   const [isChecked, setIsChecked] = useState(false)
   const { removeTask } = useTask(task.id as string)
+
+  // task.task_log_idがある場合は完了済みと判断
+  const isCompleted = !!task.task_log_id
+
+  // 初回レンダリング時、もしくはtask.task_log_idが変わったらチェック状態を更新
+  useEffect(() => {
+    setIsChecked(!!task.task_log_id)
+  }, [isCompleted])
 
   const showDialog = (e: any) => {
     const { pageX, pageY } = e.nativeEvent
@@ -83,26 +91,28 @@ const TaskCard = ({
       const success = await handleTaskCompleted(task.id, taskScheduleId, date)
       if (success) {
         LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut)
-        
         Alert.alert("タスク完了", "タスクを完了しました")
         if (onTaskCompleted) { 
           onTaskCompleted()
         }
       } else {
-        Alert.alert("エラー", "タスクの完了に失敗しました")}
+        Alert.alert("エラー", "タスクの完了に失敗しました")
+      }
     }
   }
 
   return (
     <>
-      <View className='flex-row items-center bg-white rounded-lg shadow-xs border border-gray-200 m-2 p-3'>
+      <View className='flex-row items-center bg-white rounded-lg shadow-xs border border-gray-200 ml-2 mr-2 mb-2 p-3'>
+        {/* チェックボックス部分：完了済みの場合はチェック済みかつ変更不可 */}
         {!readonly && (
           editMode ? (
             <Icon name='align-justify' size={20} color='#6C8BA7' className='mr-4' />
           ) : (
             <Checkbox
               value={isChecked}
-              onValueChange={handleCheckboxChange}
+              onValueChange={!isCompleted ? handleCheckboxChange : undefined}
+              disabled={isCompleted}
               color={isChecked ? '#6C8BA7' : undefined}
               className='mr-4'
               style={{
@@ -118,7 +128,26 @@ const TaskCard = ({
 
         {/* メイン情報 */}
         <View className='flex-1'>
-          <Text className='text-lg font-medium text-[#333333]'>{task.title}</Text>
+          {/* タスクタイトルに完了済みの場合、取り消し線と色変更を適用 */}
+          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+            <Text
+              className='text-lg font-medium'
+              style={[
+                { color: '#333333' },
+                isCompleted && { textDecorationLine: 'line-through', color: '#999999' }
+              ]}
+            >
+              {task.title}
+            </Text>
+            {isCompleted && (
+              <Icon
+                name="check-circle"
+                size={20}
+                color="#6C8BA7"
+                style={{ marginLeft: 8 }}
+              />
+            )}
+          </View>
           <Recurring schedule={task} />
           <Text className='text-sm text-[#555555] mt-1'>
             通知: {task.is_push_notification ? 'オン' : 'オフ'}
@@ -128,11 +157,11 @@ const TaskCard = ({
         {/* サブ情報 */}
         <View className='ml-auto mr-5 items-end'>
           <Text className='text-sm text-[#555555]'>継続率 {task.rate}%</Text>
-          <Text className='text-sm text-[#555555]'>クリア {}回</Text>
+          <Text className='text-sm text-[#555555]'>クリア {task.completedCount ?? '---'}回</Text>
           <Text className='text-sm text-[#555555]'>開始 {formatDate(task.created_at)}</Text>
         </View>
 
-        {/* 3点リーダー */}
+        {/* 編集モードの場合の3点リーダー */}
         {!readonly && editMode && (
           <TouchableOpacity
             className='absolute top-2 right-1 p-1'

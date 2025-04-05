@@ -45,9 +45,7 @@ export const useTaskList = () => {
         return taskWithRate
       })
       const taskWithRate = await Promise.all(taskWithRatePromises)
-
-      const uncompletedTask = taskWithRate.filter((task) => !task.task_log_id)
-      setTaskList(uncompletedTask)
+      setTaskList(taskWithRate)
     } catch (error) {
       console.error(error)
     } finally {

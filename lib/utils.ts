@@ -38,7 +38,6 @@ export const generateMarkedDatesForMonth = (
   const start = new Date(year, month, 1)
   const end = new Date(year, month + 1, 0)
 
-
   // 月初から月末までの日付をループ
   for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
     // Date.getDay() は 0 (Sunday) ～ 6 (Saturday) を返す
@@ -79,9 +78,6 @@ export const formattedDate = (date: Date) => {
   const weekdays = ['日', '月', '火', '水', '木', '金', '土']
   const weekday = weekdays[date.getDay()] // 曜日
   return `${month}月${day}日 (${weekday})`
-}
-
-export const formatLocalDateString = (date: string): string => {
 }
 
 // ビットマスクから曜日を取得

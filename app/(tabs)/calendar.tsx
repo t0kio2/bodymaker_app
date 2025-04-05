@@ -1,4 +1,4 @@
-import { Text, SafeAreaView, RefreshControl, SectionList } from 'react-native'
+import { Text, SafeAreaView, RefreshControl, SectionList, View } from 'react-native'
 import React from 'react'
 import { Calendar as CalendarComponent, LocaleConfig } from 'react-native-calendars'
 import TaskCard from '@/components/TaskCard'
@@ -8,6 +8,7 @@ import { useCalendarData } from '@/hooks/useCalendarData'
 import { formattedDate } from '@/lib/utils'
 import { eventEmitter } from '@/lib/EventEmitter'
 import EmptyList from '@/components/EmptyList'
+import { useTaskList } from '@/hooks/useTaskList'
 
 LocaleConfig.locales.jp = {
   monthNames: ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月'],
@@ -26,16 +27,41 @@ const Calendar = () => {
     selectedDate,
     handleDayPress,
     taskList,
+    uncompletedTask,
+    completedTask,
     loadTaskListByDay
   } = useCalendarData()
 
-  const sections = taskList.length ? [
-    {
-      title: selectedDate ===  formatDateToYYYYMMDD(new Date()) ? 
-        '今日のトレーニング' : `${formattedDate(new Date(selectedDate))}のトレーニング`,
-      data: taskList
+  const { 
+    allTask
+  } = useTaskList()
+
+  console.log('allTask', allTask)
+
+  const displayData = () => {
+    if (taskList.length) {
+      const displayData = []
+      if (uncompletedTask.length) {
+        displayData.push({
+          title: selectedDate ===  formatDateToYYYYMMDD(new Date()) ? 
+          '今日のトレーニング' : `${formattedDate(new Date(selectedDate))}のトレーニング`,
+          data: uncompletedTask
+        })
+      }
+      if (completedTask.length) {
+        displayData.push({
+          title: '完了',
+          data: completedTask
+        })
+      }
+      return displayData
     }
-  ] : []
+    return []
+  }
+
+  
+
+  const sections = displayData()
 
   return (
     <SafeAreaProvider>
@@ -54,7 +80,16 @@ const Calendar = () => {
             }}
           />
         )}
-        ListEmptyComponent={<EmptyList />}          
+        ListEmptyComponent={() => {
+          if (allTask.length) {
+            return (
+              <View className="py-10 items-center">
+                <Text className="text-lg text-[#76828F]">今日はおやすみ〜</Text>
+              </View>
+            )
+          }
+          return <EmptyList />
+        }}          
         renderSectionHeader={({ section: { title } }) => (
           <Text className="text-2xl pl-4 pt-4 text-[#496279]">{title}</Text> // 少し濃い色に
         )}

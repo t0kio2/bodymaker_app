@@ -34,7 +34,8 @@ export const getTaskListByDay = async (
       t.is_push_notification,
       t.created_at,
       ts.bitmask_days,
-      ts.time
+      ts.time,
+      (SELECT COUNT(*) FROM task_logs tl_all WHERE tl_all.task_schedule_id = ts.id) AS completedCount
     FROM tasks t
     LEFT JOIN task_schedules ts
       ON t.id = ts.task_id
@@ -43,9 +44,9 @@ export const getTaskListByDay = async (
     WHERE ts.bitmask_days & ? != 0
     GROUP BY t.id, ts.id
     ;`
-    const taskLogsQuery = `SELECT * FROM task_logs;`
-    const taskLogs = await db.getAllAsync(taskLogsQuery)
-    console.log('taskLogs', taskLogs)
+    // const taskLogsQuery = `SELECT * FROM task_logs;`
+    // const taskLogs = await db.getAllAsync(taskLogsQuery)
+    // console.log('taskLogs', taskLogs)
 
     const tasks = await db.getAllAsync(query, [dateStr, dayBit])
     return tasks
@@ -67,7 +68,8 @@ export const getAllTask = async (
       t.is_push_notification,
       t.created_at,
       ts.bitmask_days,
-      ts.time
+      ts.time,
+      (SELECT COUNT(*) FROM task_logs tl_all WHERE tl_all.task_schedule_id = ts.id) AS completedCount
     FROM tasks t
     LEFT JOIN task_schedules ts ON t.id = ts.task_id;`
     const tasks = await db.getAllAsync(query)
