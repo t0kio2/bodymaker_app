@@ -1,0 +1,20 @@
+<svg width="128" height="128" viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg">
+  <!-- 外枠（丸） -->
+  <circle cx="64" cy="64" r="64" fill="#E8F5E9"/>
+
+  <!-- 3×3グリッド（右下寄せ） -->
+  <!-- 各セル: 16×16px, 角丸rx=4, ギャップ4px -->
+  <!-- 位置: バウンディングボックス(53,53)→(109,109) -->
+  <!-- 1行目 -->
+  <rect x="53" y="53" width="16" height="16" rx="4" fill="#C8E6C9"/>
+  <rect x="73" y="53" width="16" height="16" rx="4" fill="#A5D6A7"/>
+  <rect x="93" y="53" width="16" height="16" rx="4" fill="#81C784"/>
+  <!-- 2行目 -->
+  <rect x="53" y="73" width="16" height="16" rx="4" fill="#A5D6A7"/>
+  <rect x="73" y="73" width="16" height="16" rx="4" fill="#81C784"/>
+  <rect x="93" y="73" width="16" height="16" rx="4" fill="#66BB6A"/>
+  <!-- 3行目 -->
+  <rect x="53" y="93" width="16" height="16" rx="4" fill="#81C784"/>
+  <rect x="73" y="93" width="16" height="16" rx="4" fill="#66BB6A"/>
+  <rect x="93" y="93" width="16" height="16" rx="4" fill="#4CAF50"/>
+</svg>
