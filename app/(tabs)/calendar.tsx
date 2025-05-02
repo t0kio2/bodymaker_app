@@ -44,7 +44,7 @@ const Calendar = () => {
       if (uncompletedTasks.length) {
         displayData.push({
           title: selectedDate ===  formatDateToYYYYMMDD(new Date()) ? 
-          '今日のトレーニング' : `${formattedDate(new Date(selectedDate))}のトレーニング`,
+          '今日' : formattedDate(new Date(selectedDate)),
           data: uncompletedTasks
         })
       }
