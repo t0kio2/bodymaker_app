@@ -8,8 +8,8 @@ import { formatDate } from '@/lib/utils'
 import Entypo from 'react-native-vector-icons/Entypo'
 import Modal from 'react-native-modal'
 import Checkbox from 'expo-checkbox'
-import { useTaskActions } from '@/hooks/useTaskActions'
-import { useTaskStore } from '@/hooks/useTaskStore'
+import { useTask } from '@/hooks/useTask'
+import { useTaskList } from '@/hooks/useTaskList'
 
 // LayoutAnimationの有効化
 if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
@@ -33,11 +33,12 @@ const TaskCard = ({
   date,
   readonly = false
 }: TaskCardProps) => {
-  const { completeTaskForDate, removeTask } = useTaskStore()
+  const { handleTaskCompleted } = useTaskList()
   const [isModalVisible, setIsModalVisible] = useState(false)
   const [iconPosition, setIconPosition] = useState({ x: 0, y: 0 })
   // タスク完了の状態を管理するための state
   const [isChecked, setIsChecked] = useState(false)
+  const { removeTask } = useTask(task.id as string)
 
   // task.task_log_idがある場合は完了済みと判断
   const isCompleted = !!task.task_log_id
@@ -87,7 +88,7 @@ const TaskCard = ({
         console.error('taskScheduleId is not found')
         return
       }
-      const success = await completeTaskForDate(task.id, taskScheduleId, date)
+      const success = await handleTaskCompleted(task.id, taskScheduleId, date)
       if (success) {
         LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut)
         Alert.alert("タスク完了", "タスクを完了しました")
@@ -149,7 +150,7 @@ const TaskCard = ({
           </View>
           <Recurring schedule={task} />
           <Text className='text-sm text-[#555555] mt-1'>
-            通知: {task.is_push_notification ? `${task.notification_offset || 60}分前` : 'オフ'}
+            通知: {task.is_push_notification ? 'オン' : 'オフ'}
           </Text>
         </View>
 

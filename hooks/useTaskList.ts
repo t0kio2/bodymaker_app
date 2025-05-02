@@ -4,7 +4,6 @@ import { useEffect, useState } from "react"
 import { completeTask, getAllTask, getTaskListByDay } from "@/database/queries"
 import { formatDateToYYYYMMDD } from "@/lib/utils"
 import { useRollingContinuityRate } from "./useRollingContinuityRate"
-import { eventEmitter } from "@/lib/EventEmitter"
 
 export const useTaskList = () => {
   const { db } = useDatabase()
@@ -69,20 +68,6 @@ export const useTaskList = () => {
     if (db) {
       loadTaskListByDay()
       loadAllTask()
-    }
-  }, [db])
-  
-  useEffect(() => {
-    const handleTaskUpdated = () => {
-      console.log('Task updated event received, refreshing data')
-      loadAllTask()
-      loadTaskListByDay()
-    }
-    
-    eventEmitter.on('taskUpdated', handleTaskUpdated)
-    
-    return () => {
-      eventEmitter.off('taskUpdated', handleTaskUpdated)
     }
   }, [db])
 

@@ -4,7 +4,6 @@ export interface Task {
   goal: string
   start_date: YYYYMMDD|string
   is_push_notification: boolean,
-  notification_offset: number,
   completedCount?: number,
   created_at?: Date
 }

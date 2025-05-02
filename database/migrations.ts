@@ -45,5 +45,6 @@ const performMigrations = async (db: any, currentVersion: number) => {
   */
 
   if (currentVersion < 2) {
+    // TODO
   }
 }
