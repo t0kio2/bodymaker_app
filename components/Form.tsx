@@ -4,10 +4,9 @@ import FormField from './FormField'
 import TimePicker from './TimePicker'
 import CustomButton from './CustomButton'
 import { router } from 'expo-router'
-import { useTaskActions } from '@/hooks/useTaskActions'
-import { useFormState } from '@/hooks/useFormState'
+import { useTask } from '@/hooks/useTask'
+import { useForm } from '@/hooks/useForm'
 import ScheduleSelector from './ScheduleSelector'
-import NotificationTimingSelector from './NotificationTimingSelector'
 import { Schedule } from '@/types'
 
 const Form = ({
@@ -19,32 +18,36 @@ const Form = ({
   id?: string
   onTaskAdded: () => void
 }) => {
-  const { task, saveTask } = useTaskActions(id, mode)
+  const { task, saveTask } = useTask(id as string, mode)
   const {
     formData,
     timeStr,
     selectedDays,
     isEveryday,
     pushNotification,
-    notificationOffset,
-    validationError,
     setTimeStr,
     setPushNotification,
-    setNotificationOffset,
     handleChange,
     validateForm,
     selectAllDays,
     handleToggleDays,
-    getSubmitData
-  } = useFormState(mode, task)
+  } = useForm(mode, task)
 
   const handleSubmit = async () => {
-    const submitData = getSubmitData()
-    if (!submitData) {
-      return Alert.alert('入力内容に不備があります', validationError)
+    const errorMessage = validateForm()
+    if (errorMessage) {
+      return Alert.alert('入力内容に不備があります', errorMessage)
     }
 
-    const { task: taskData, schedule } = submitData
+    const taskData = {
+      ...formData,
+      is_push_notification: pushNotification,
+    }
+
+    const schedule = {
+      bitmask_days: selectedDays,
+      time: timeStr,
+    } as Schedule
 
     const success = await saveTask(taskData, schedule)
     if (success) {
@@ -94,16 +97,6 @@ const Form = ({
           value={pushNotification}
         />
       </View>
-
-      {pushNotification && (
-        <View className="mt-4 flex-row items-center flex-col bg-white rounded-lg px-4 py-3 shadow-sm">
-          <Text className="text-[#333333] text-base self-start mb-2">通知タイミング</Text>
-          <NotificationTimingSelector 
-            selectedOffset={notificationOffset}
-            onSelect={(offset) => setNotificationOffset(offset)}
-          />
-        </View>
-      )}
 
       <View className="mt-8">
         <CustomButton

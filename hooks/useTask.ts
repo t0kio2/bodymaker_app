@@ -2,7 +2,6 @@ import { deleteTask, getTaskById, insertTask, updateTask } from "@/database/quer
 import { Schedule, Task, TaskWithSchedule } from "@/types"
 import { useEffect, useState } from "react"
 import { useDatabase } from "./useDatabase"
-import { eventEmitter } from "@/lib/EventEmitter"
 
 // タスクデータの取得・更新・保存を行うカスタムフック
 export const useTask = (id: string | undefined, mode?: 'create' | 'edit') => {
@@ -46,7 +45,6 @@ export const useTask = (id: string | undefined, mode?: 'create' | 'edit') => {
     if (!db) return false
     try {
       await deleteTask(db, id)
-      eventEmitter.emit('taskUpdated')
       return true
     } catch (error) {
       console.error(error)

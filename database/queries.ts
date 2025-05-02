@@ -1,7 +1,6 @@
 import { getDayBit } from "@/lib/utils"
 import { scheduleNotification } from "@/lib/notification"
 import { Task, Schedule, TaskWithSchedule } from "@/types"
-import * as Notifications from 'expo-notifications'
 
 export const aggregateTaskLogs = async (db: any): Promise<any> => {
   const query = `
@@ -33,7 +32,6 @@ export const getTaskListByDay = async (
       t.goal,
       t.start_date,
       t.is_push_notification,
-      t.notification_offset,
       t.created_at,
       ts.bitmask_days,
       ts.time,
@@ -68,7 +66,6 @@ export const getAllTask = async (
       t.goal,
       t.start_date,
       t.is_push_notification,
-      t.notification_offset,
       t.created_at,
       ts.bitmask_days,
       ts.time,
@@ -108,8 +105,7 @@ export const getTaskById = async (db: any, id: string): Promise<TaskWithSchedule
           t.title, 
           t.goal, 
           t.start_date, 
-          t.is_push_notification,
-          t.notification_offset, 
+          t.is_push_notification, 
           t.created_at, 
           ts.bitmask_days, 
           ts.time
@@ -130,9 +126,9 @@ export const insertTask = async (db: any, task: Omit<Task, 'id'>, schedule: Sche
   try {
     await db.execAsync(`
     INSERT INTO tasks (
-      title, goal, start_date, is_push_notification, notification_offset
+      title, goal, start_date, is_push_notification
     )
-    VALUES ('${task.title}', '${task.goal}', '${task.start_date}', ${task.is_push_notification}, ${task.notification_offset || 60});
+    VALUES ('${task.title}', '${task.goal}', '${task.start_date}', ${task.is_push_notification});
   `)
     const taskIdResult = await db.getFirstAsync(`SELECT last_insert_rowid() as id;`)
     const taskId = taskIdResult?.id
@@ -172,8 +168,7 @@ export const updateTask = async (db: any, task: Task, schedule: Schedule) => {
       SET title = '${task.title}',
           goal = '${task.goal}',
           start_date = '${task.start_date}',
-          is_push_notification = ${task.is_push_notification},
-          notification_offset = ${task.notification_offset || 60}
+          is_push_notification = ${task.is_push_notification}
       WHERE id = ${task.id};
     `)
 
@@ -192,42 +187,11 @@ export const updateTask = async (db: any, task: Task, schedule: Schedule) => {
 
 export const deleteTask = async (db: any, id: string) => {
   try {
-    const notifications = await db.getAllAsync(
-      `SELECT notification_id FROM scheduled_notifications WHERE task_id = ?;`,
-      [id]
-    )
-    
-    if (notifications && notifications.length > 0) {
-      for (const notification of notifications) {
-        try {
-          await Notifications.cancelScheduledNotificationAsync(notification.notification_id)
-        } catch (notifError) {
-          console.error("Error canceling notification:", notifError)
-        }
-      }
-    }
-    
-    await db.runAsync(
-      `DELETE FROM scheduled_notifications WHERE task_id = ?;`,
-      [id]
-    )
-    
-    await db.runAsync(
-      `DELETE FROM task_logs WHERE task_id = ?;`,
-      [id]
-    )
-    
-    await db.runAsync(
-      `DELETE FROM task_schedules WHERE task_id = ?;`,
-      [id]
-    )
-    
     await db.runAsync(
       `DELETE FROM tasks WHERE id = ?;`,
       [id]
     )
   } catch (error) {
-    console.error("Error deleting task:", error)
     throw error
   }
 }

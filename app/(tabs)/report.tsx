@@ -2,38 +2,25 @@ import { View, Text, SafeAreaView, FlatList, TouchableOpacity, RefreshControl } 
 import React from 'react'
 import { SafeAreaProvider } from 'react-native-safe-area-context'
 import Heatmap from '@/components/Heatmap'
-import { useTaskStore } from '@/hooks/useTaskStore'
+import { useTaskList } from '@/hooks/useTaskList'
 import TaskCard from '@/components/TaskCard'
 import EmptyList from '@/components/EmptyList'
-import { useEffect, useState } from 'react'
 
 export default function Report() {
-  const { allTasks, isLoading, loadAllTasks } = useTaskStore()
-  const [displayedCount, setDisplayedCount] = useState(3)
-
-  const loadMore = () => {
-    setDisplayedCount((prevCount: number) => prevCount + 3)
-  }
-
-  const loadLess = () => {
-    setDisplayedCount(3)
-  }
-
-  const displayedTasks = allTasks.slice(0, displayedCount)
+  const { allTask, refreshing, loadAllTask } = useTaskList()
 
   return (
     <SafeAreaProvider>
       <SafeAreaView className='h-full bg-[#F7F9FC]'>
-        {/* <View className='px-5 py-4'>
+        <View className='px-5 py-4'>
           <Text className='text-2xl font-semibold text-[#333333]'>ヒートマップ</Text>
-        </View> */}
+        </View>
 
         <Heatmap />
 
         <View className='flex-1 px-5 py-4'>
-          <Text className='text-2xl font-semibold text-[#333333]'>ランキング</Text>
           <FlatList
-            data={displayedTasks}
+            data={allTask}
             keyExtractor={(item) => item.id.toString()}
             renderItem={({ item }) => (
               <TaskCard task={item} editMode={true} readonly={true} date='' />
@@ -42,30 +29,18 @@ export default function Report() {
               <EmptyList />
             }
             refreshControl={
-              <RefreshControl refreshing={isLoading} onRefresh={loadAllTasks} />
+              <RefreshControl refreshing={refreshing} onRefresh={loadAllTask} />
             }
-            ListFooterComponent={() => (
-              <>
-                {displayedCount > 3 ? (
-                  <TouchableOpacity
-                    onPress={loadLess}
-                    className='mt-4 py-3 border border-[#B0B9C1] rounded-lg items-center'
-                  >
-                    <Text className='text-base text-[#555555]'>← 元に戻す</Text>
-                  </TouchableOpacity>
-                ) : (
-                  displayedCount < allTask.length && (
-                    <TouchableOpacity
-                      onPress={loadMore}
-                      className='mt-4 py-3 border border-[#B0B9C1] rounded-lg items-center'
-                    >
-                      <Text className='text-base text-[#555555]'>＋ もっと読み込む</Text>
-                    </TouchableOpacity>
-                  )
-                )}
-              </>
-            )}
           />
+
+          {allTask.length > 3 && (
+            <TouchableOpacity
+              onPress={() => console.log('もっと読み込む')}
+              className='mt-4 py-3 border border-[#B0B9C1] rounded-lg items-center'
+            >
+              <Text className='text-base text-[#555555]'>＋ もっと読み込む</Text>
+            </TouchableOpacity>
+          )}
         </View>
       </SafeAreaView>
     </SafeAreaProvider>
