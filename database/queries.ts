@@ -1,6 +1,7 @@
 import { getDayBit } from "@/lib/utils"
 import { scheduleNotification } from "@/lib/notification"
 import { Task, Schedule, TaskWithSchedule } from "@/types"
+import * as Notifications from 'expo-notifications'
 
 export const aggregateTaskLogs = async (db: any): Promise<any> => {
   const query = `
@@ -187,6 +188,21 @@ export const updateTask = async (db: any, task: Task, schedule: Schedule) => {
 
 export const deleteTask = async (db: any, id: string) => {
   try {
+    const notifications = await db.getAllAsync(
+      `SELECT notification_id FROM scheduled_notifications WHERE task_id = ?;`,
+      [id]
+    )
+    
+    if (notifications && notifications.length > 0) {
+      for (const notification of notifications) {
+        try {
+          await Notifications.cancelScheduledNotificationAsync(notification.notification_id)
+        } catch (notifError) {
+          console.error("Error canceling notification:", notifError)
+        }
+      }
+    }
+    
     await db.runAsync(
       `DELETE FROM scheduled_notifications WHERE task_id = ?;`,
       [id]
