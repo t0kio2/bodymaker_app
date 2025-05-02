@@ -7,6 +7,7 @@ import { router } from 'expo-router'
 import { useTask } from '@/hooks/useTask'
 import { useForm } from '@/hooks/useForm'
 import ScheduleSelector from './ScheduleSelector'
+import NotificationTimingSelector from './NotificationTimingSelector'
 import { Schedule } from '@/types'
 
 const Form = ({
@@ -25,8 +26,10 @@ const Form = ({
     selectedDays,
     isEveryday,
     pushNotification,
+    notificationOffset,
     setTimeStr,
     setPushNotification,
+    setNotificationOffset,
     handleChange,
     validateForm,
     selectAllDays,
@@ -42,6 +45,7 @@ const Form = ({
     const taskData = {
       ...formData,
       is_push_notification: pushNotification,
+      notification_offset: notificationOffset,
     }
 
     const schedule = {
@@ -97,6 +101,16 @@ const Form = ({
           value={pushNotification}
         />
       </View>
+
+      {pushNotification && (
+        <View className="mt-4 flex-row items-center flex-col bg-white rounded-lg px-4 py-3 shadow-sm">
+          <Text className="text-[#333333] text-base self-start mb-2">通知タイミング</Text>
+          <NotificationTimingSelector 
+            selectedOffset={notificationOffset}
+            onSelect={(offset) => setNotificationOffset(offset)}
+          />
+        </View>
+      )}
 
       <View className="mt-8">
         <CustomButton
