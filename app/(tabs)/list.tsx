@@ -4,24 +4,24 @@ import { SafeAreaProvider } from 'react-native-safe-area-context'
 import Icon from 'react-native-vector-icons/FontAwesome5'
 import { router } from 'expo-router'
 import TaskCard from '@/components/TaskCard'
-import { useTaskList } from '@/hooks/useTaskList'
+import { useTaskStore } from '@/hooks/useTaskStore'
 import EmptyList from '@/components/EmptyList'
 
 export default function List() {
-  const { allTask, refreshing, loadAllTask } = useTaskList()
+  const { allTasks, isLoading, loadAllTasks } = useTaskStore()
 
   return (
     // デバイス毎に余白をよしなにしてくれる
     <SafeAreaProvider>
       <SafeAreaView className='h-full bg-[#F7F9FC]'>
         <FlatList
-          data={ allTask }
+          data={ allTasks }
           keyExtractor={ task => task.id.toString()}
           renderItem={({ item }) => (
             <TaskCard
               task={item}
               editMode={true}
-              onTaskDeleted={loadAllTask}
+              onTaskDeleted={loadAllTasks}
               date=''
             />
           )}
@@ -30,7 +30,7 @@ export default function List() {
             <EmptyList />
           }
           refreshControl={
-            <RefreshControl refreshing={refreshing} onRefresh={loadAllTask} />
+            <RefreshControl refreshing={isLoading} onRefresh={loadAllTasks} />
           }
         />
         <TouchableOpacity

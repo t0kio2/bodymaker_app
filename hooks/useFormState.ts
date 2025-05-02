@@ -1,10 +1,13 @@
-import { DAY_OF_WEEK_BIT } from "@/constants/common";
-import { allDaysMask, getCurrentTimeStr, toggleDays, formatDateToYYYYMMDD } from "@/lib/utils";
-import { TaskWithSchedule } from "@/types";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react"
+import { DAY_OF_WEEK_BIT } from "@/constants/common"
+import { allDaysMask, getCurrentTimeStr, toggleDays, formatDateToYYYYMMDD } from "@/lib/utils"
+import { TaskWithSchedule } from "@/types"
 
-// フォームの状態・バリデーション・入力変更ロジックを管理するカスタムフック
-export const useForm = (mode: 'create' | 'edit', initialTask?: TaskWithSchedule | null) => {
+/**
+ * Form state management hook
+ * Handles form state, validation, and input changes
+ */
+export const useFormState = (mode: 'create' | 'edit', initialTask?: TaskWithSchedule | null) => {
   const [formData, setFormData] = useState<TaskWithSchedule>({
     id: '',
     title: '', 
@@ -15,23 +18,25 @@ export const useForm = (mode: 'create' | 'edit', initialTask?: TaskWithSchedule 
     is_push_notification: false,
     notification_offset: 60,
   })
+  
   const [timeStr, setTimeStr] = useState(getCurrentTimeStr())
   const [selectedDays, setSelectedDays] = useState(0)
   const [isEveryday, setIsEveryday] = useState(false)
   const [pushNotification, setPushNotification] = useState(true)
   const [notificationOffset, setNotificationOffset] = useState(60)
+  const [validationError, setValidationError] = useState<string>('')
 
   useEffect(() => {
     if (mode === 'edit' && initialTask) {
       setFormData({
         id: initialTask.id,
         title: initialTask.title,
-        goal: initialTask.goal,
+        goal: initialTask.goal || '',
         start_date: formatDateToYYYYMMDD(new Date(initialTask.start_date)),
         bitmask_days: initialTask.bitmask_days,
         time: initialTask.time,
         is_push_notification: initialTask.is_push_notification,
-        notification_offset: initialTask.notification_offset || 60
+        notification_offset: initialTask.notification_offset || 60,
       })
       setSelectedDays(initialTask.bitmask_days)
       setTimeStr(initialTask.time)
@@ -40,11 +45,17 @@ export const useForm = (mode: 'create' | 'edit', initialTask?: TaskWithSchedule 
     }
   }, [mode, initialTask])
 
-  const handleChange = (field: string, value: string) => {
+  /**
+   * Handle form field changes
+   */
+  const handleChange = useCallback((field: string, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }))
-  }
+  }, [])
 
-  const validateForm = (): string => {
+  /**
+   * Validate form fields
+   */
+  const validateForm = useCallback((): string => {
     if (!formData.title) {
       return 'タイトルを入力してください'
     }
@@ -55,9 +66,12 @@ export const useForm = (mode: 'create' | 'edit', initialTask?: TaskWithSchedule 
       return '曜日を選択してください'
     }
     return ''
-  }
+  }, [formData.title, timeStr, selectedDays])
 
-  const selectAllDays = () => {
+  /**
+   * Toggle all days selection
+   */
+  const selectAllDays = useCallback(() => {
     setIsEveryday(prev => {
       const nextState = !prev
       setSelectedDays(nextState ?
@@ -66,15 +80,46 @@ export const useForm = (mode: 'create' | 'edit', initialTask?: TaskWithSchedule 
       )
       return nextState
     })
-  }
+  }, [])
 
-  const handleToggleDays = (day: number) => {
+  /**
+   * Toggle individual day selection
+   */
+  const handleToggleDays = useCallback((day: number) => {
     setSelectedDays(prev => {
-      const updateDays = toggleDays(prev, day)
-      setIsEveryday(updateDays === allDaysMask)
-      return updateDays
+      const updatedDays = toggleDays(prev, day)
+      setIsEveryday(updatedDays === allDaysMask)
+      return updatedDays
     })
-  }
+  }, [])
+
+  /**
+   * Get final form data for submission
+   */
+  const getSubmitData = useCallback(() => {
+    const error = validateForm()
+    setValidationError(error)
+    
+    if (error) {
+      return null
+    }
+    
+    const taskData = {
+      ...formData,
+      is_push_notification: pushNotification,
+      notification_offset: notificationOffset,
+    }
+    
+    const scheduleData = {
+      bitmask_days: selectedDays,
+      time: timeStr,
+    }
+    
+    return {
+      task: taskData,
+      schedule: scheduleData,
+    }
+  }, [formData, pushNotification, notificationOffset, selectedDays, timeStr, validateForm])
 
   return {
     formData,
@@ -83,12 +128,14 @@ export const useForm = (mode: 'create' | 'edit', initialTask?: TaskWithSchedule 
     isEveryday,
     pushNotification,
     notificationOffset,
+    validationError,
     setTimeStr,
     setPushNotification,
     setNotificationOffset,
     handleChange,
     validateForm,
     selectAllDays,
-    handleToggleDays
+    handleToggleDays,
+    getSubmitData,
   }
 }

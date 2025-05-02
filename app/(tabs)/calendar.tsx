@@ -4,11 +4,11 @@ import { Calendar as CalendarComponent, LocaleConfig } from 'react-native-calend
 import TaskCard from '@/components/TaskCard'
 import { SafeAreaProvider } from 'react-native-safe-area-context'
 import { formatDateToYYYYMMDD } from '@/lib/utils'
-import { useCalendarData } from '@/hooks/useCalendarData'
 import { formattedDate } from '@/lib/utils'
 import { eventEmitter } from '@/lib/EventEmitter'
 import EmptyList from '@/components/EmptyList'
-import { useTaskList } from '@/hooks/useTaskList'
+import { useCalendarStore } from '@/hooks/useCalendarStore'
+import { useTaskStore } from '@/hooks/useTaskStore'
 
 LocaleConfig.locales.jp = {
   monthNames: ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月'],
@@ -20,36 +20,38 @@ LocaleConfig.defaultLocale = 'jp'
 
 const Calendar = () => {
   const {
-    refreshing,
-    setCurrentYear,
-    setCurrentMonth,
+    currentYear,
+    currentMonth,
     markedDates,
     selectedDate,
+    isLoading,
+    uncompletedTasks,
+    completedTasks,
+    setCurrentYear,
+    setCurrentMonth,
     handleDayPress,
-    taskList,
-    uncompletedTask,
-    completedTask,
-    loadTaskListByDay
-  } = useCalendarData()
+    loadTasksByDay
+  } = useCalendarStore()
 
   const { 
-    allTask
-  } = useTaskList()
+    allTasks
+  } = useTaskStore()
 
   const displayData = () => {
+    const taskList = [...uncompletedTasks, ...completedTasks]
     if (taskList.length) {
       const displayData = []
-      if (uncompletedTask.length) {
+      if (uncompletedTasks.length) {
         displayData.push({
           title: selectedDate ===  formatDateToYYYYMMDD(new Date()) ? 
-          '今日のトレーニング' : `${formattedDate(new Date(selectedDate))}のトレーニング`,
-          data: uncompletedTask
+          '今日' : formattedDate(new Date(selectedDate)),
+          data: uncompletedTasks
         })
       }
-      if (completedTask.length) {
+      if (completedTasks.length) {
         displayData.push({
           title: '完了',
-          data: completedTask
+          data: completedTasks
         })
       }
       return displayData
@@ -73,13 +75,13 @@ const Calendar = () => {
             editMode={false}
             date={selectedDate}
             onTaskCompleted={() => {
-              loadTaskListByDay(selectedDate)
+              loadTasksByDay(selectedDate)
               eventEmitter.emit('taskUpdated')
             }}
           />
         )}
         ListEmptyComponent={() => {
-          if (allTask.length) {
+          if (allTasks.length) {
             return (
               <View className="py-10 items-center">
                 <Text className="text-lg text-[#76828F]">今日はおやすみ〜</Text>
@@ -125,7 +127,7 @@ const Calendar = () => {
             enableSwipeMonths
           />
         }
-        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={loadTaskListByDay} />}
+        refreshControl={<RefreshControl refreshing={isLoading} onRefresh={loadTasksByDay} />}
       />
       </SafeAreaView>
     </SafeAreaProvider>

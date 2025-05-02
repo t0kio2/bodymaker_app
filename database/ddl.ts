@@ -4,6 +4,7 @@ export const tasksSchema = `
   goal TEXT,
   start_date TEXT NOT NULL,
   is_push_notification BOOLEAN NOT NULL DEFAULT 1,
+  notification_offset INTEGER NOT NULL DEFAULT 60,
   created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
 `
 
