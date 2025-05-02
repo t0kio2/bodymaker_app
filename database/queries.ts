@@ -32,6 +32,7 @@ export const getTaskListByDay = async (
       t.goal,
       t.start_date,
       t.is_push_notification,
+      t.notification_offset,
       t.created_at,
       ts.bitmask_days,
       ts.time,
@@ -66,6 +67,7 @@ export const getAllTask = async (
       t.goal,
       t.start_date,
       t.is_push_notification,
+      t.notification_offset,
       t.created_at,
       ts.bitmask_days,
       ts.time,
@@ -105,7 +107,8 @@ export const getTaskById = async (db: any, id: string): Promise<TaskWithSchedule
           t.title, 
           t.goal, 
           t.start_date, 
-          t.is_push_notification, 
+          t.is_push_notification,
+          t.notification_offset, 
           t.created_at, 
           ts.bitmask_days, 
           ts.time
@@ -126,9 +129,9 @@ export const insertTask = async (db: any, task: Omit<Task, 'id'>, schedule: Sche
   try {
     await db.execAsync(`
     INSERT INTO tasks (
-      title, goal, start_date, is_push_notification
+      title, goal, start_date, is_push_notification, notification_offset
     )
-    VALUES ('${task.title}', '${task.goal}', '${task.start_date}', ${task.is_push_notification});
+    VALUES ('${task.title}', '${task.goal}', '${task.start_date}', ${task.is_push_notification}, ${task.notification_offset || 60});
   `)
     const taskIdResult = await db.getFirstAsync(`SELECT last_insert_rowid() as id;`)
     const taskId = taskIdResult?.id
@@ -168,7 +171,8 @@ export const updateTask = async (db: any, task: Task, schedule: Schedule) => {
       SET title = '${task.title}',
           goal = '${task.goal}',
           start_date = '${task.start_date}',
-          is_push_notification = ${task.is_push_notification}
+          is_push_notification = ${task.is_push_notification},
+          notification_offset = ${task.notification_offset || 60}
       WHERE id = ${task.id};
     `)
 

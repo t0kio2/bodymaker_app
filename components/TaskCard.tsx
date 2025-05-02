@@ -150,7 +150,7 @@ const TaskCard = ({
           </View>
           <Recurring schedule={task} />
           <Text className='text-sm text-[#555555] mt-1'>
-            通知: {task.is_push_notification ? 'オン' : 'オフ'}
+            通知: {task.is_push_notification ? `${task.notification_offset || 60}分前` : 'オフ'}
           </Text>
         </View>
 
