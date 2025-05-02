@@ -2,12 +2,12 @@ import { View, Text, SafeAreaView, FlatList, TouchableOpacity, RefreshControl } 
 import React from 'react'
 import { SafeAreaProvider } from 'react-native-safe-area-context'
 import Heatmap from '@/components/Heatmap'
-import { useTaskList } from '@/hooks/useTaskList'
+import { useTaskStore } from '@/hooks/useTaskStore'
 import TaskCard from '@/components/TaskCard'
 import EmptyList from '@/components/EmptyList'
 
 export default function Report() {
-  const { allTask, refreshing, loadAllTask } = useTaskList()
+  const { allTasks, isLoading, loadAllTasks } = useTaskStore()
 
   return (
     <SafeAreaProvider>
@@ -20,7 +20,7 @@ export default function Report() {
 
         <View className='flex-1 px-5 py-4'>
           <FlatList
-            data={allTask}
+            data={allTasks}
             keyExtractor={(item) => item.id.toString()}
             renderItem={({ item }) => (
               <TaskCard task={item} editMode={true} readonly={true} date='' />
@@ -29,11 +29,11 @@ export default function Report() {
               <EmptyList />
             }
             refreshControl={
-              <RefreshControl refreshing={refreshing} onRefresh={loadAllTask} />
+              <RefreshControl refreshing={isLoading} onRefresh={loadAllTasks} />
             }
           />
 
-          {allTask.length > 3 && (
+          {allTasks.length > 3 && (
             <TouchableOpacity
               onPress={() => console.log('もっと読み込む')}
               className='mt-4 py-3 border border-[#B0B9C1] rounded-lg items-center'
