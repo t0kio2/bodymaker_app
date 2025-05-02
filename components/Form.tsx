@@ -4,8 +4,8 @@ import FormField from './FormField'
 import TimePicker from './TimePicker'
 import CustomButton from './CustomButton'
 import { router } from 'expo-router'
-import { useTask } from '@/hooks/useTask'
-import { useForm } from '@/hooks/useForm'
+import { useTaskActions } from '@/hooks/useTaskActions'
+import { useFormState } from '@/hooks/useFormState'
 import ScheduleSelector from './ScheduleSelector'
 import NotificationTimingSelector from './NotificationTimingSelector'
 import { Schedule } from '@/types'
@@ -19,7 +19,7 @@ const Form = ({
   id?: string
   onTaskAdded: () => void
 }) => {
-  const { task, saveTask } = useTask(id as string, mode)
+  const { task, saveTask } = useTaskActions(id, mode)
   const {
     formData,
     timeStr,
@@ -27,6 +27,7 @@ const Form = ({
     isEveryday,
     pushNotification,
     notificationOffset,
+    validationError,
     setTimeStr,
     setPushNotification,
     setNotificationOffset,
@@ -34,24 +35,16 @@ const Form = ({
     validateForm,
     selectAllDays,
     handleToggleDays,
-  } = useForm(mode, task)
+    getSubmitData
+  } = useFormState(mode, task)
 
   const handleSubmit = async () => {
-    const errorMessage = validateForm()
-    if (errorMessage) {
-      return Alert.alert('入力内容に不備があります', errorMessage)
+    const submitData = getSubmitData()
+    if (!submitData) {
+      return Alert.alert('入力内容に不備があります', validationError)
     }
 
-    const taskData = {
-      ...formData,
-      is_push_notification: pushNotification,
-      notification_offset: notificationOffset,
-    }
-
-    const schedule = {
-      bitmask_days: selectedDays,
-      time: timeStr,
-    } as Schedule
+    const { task: taskData, schedule } = submitData
 
     const success = await saveTask(taskData, schedule)
     if (success) {
