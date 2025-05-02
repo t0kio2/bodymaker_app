@@ -1,5 +1,5 @@
 // データベースのマイグレーションを管理
-const SCHEMA_VERSION = 2
+const SCHEMA_VERSION = 1
 
 export const applyMigrations = async (db: any) => {
   try {
@@ -45,15 +45,5 @@ const performMigrations = async (db: any, currentVersion: number) => {
   */
 
   if (currentVersion < 2) {
-    console.log('Applying migration to add notification_offset column')
-    try {
-      await db.execAsync(`
-        ALTER TABLE tasks 
-        ADD COLUMN notification_offset INTEGER NOT NULL DEFAULT 60;
-      `)
-      console.log('Migration: notification_offset column added successfully')
-    } catch (error) {
-      console.error('Migration failed:', error)
-    }
   }
 }

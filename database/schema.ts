@@ -1,5 +1,4 @@
 import { scheduledNotificationsSchema, taskLogsSchema, taskSchedulesSchema, tasksSchema } from "./ddl"
-import { applyMigrations } from "./migrations"
 
 export const applyInitialSchema = async (db: any) => {
   try {
@@ -12,8 +11,6 @@ export const applyInitialSchema = async (db: any) => {
     
     db.execAsync('COMMIT;')
     console.log('初期スキーマの適用が完了しました')
-    
-    await applyMigrations(db)
   } catch (error) {
     console.error('初期スキーマの適用に失敗しました:', error)
     try {
