@@ -188,10 +188,26 @@ export const updateTask = async (db: any, task: Task, schedule: Schedule) => {
 export const deleteTask = async (db: any, id: string) => {
   try {
     await db.runAsync(
+      `DELETE FROM scheduled_notifications WHERE task_id = ?;`,
+      [id]
+    )
+    
+    await db.runAsync(
+      `DELETE FROM task_logs WHERE task_id = ?;`,
+      [id]
+    )
+    
+    await db.runAsync(
+      `DELETE FROM task_schedules WHERE task_id = ?;`,
+      [id]
+    )
+    
+    await db.runAsync(
       `DELETE FROM tasks WHERE id = ?;`,
       [id]
     )
   } catch (error) {
+    console.error("Error deleting task:", error)
     throw error
   }
 }
