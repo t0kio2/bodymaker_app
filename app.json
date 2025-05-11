@@ -55,6 +55,10 @@
     },
     "updates": {
       "url": "https://u.expo.dev/1f5d0c99-4ef9-4f20-a804-74906c7ec605"
+    },
+    "notification": {
+      "icon": "./assets/notification-icon.png",
+      "color": "#006A5E"
     }
   }
 }
