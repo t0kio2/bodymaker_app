@@ -1,7 +1,7 @@
 import { View, Text, SafeAreaView, FlatList, TouchableOpacity, RefreshControl } from 'react-native'
 import React from 'react'
 import { SafeAreaProvider } from 'react-native-safe-area-context'
-import Heatmap from '@/components/Heatmap'
+import Heatmap from '@/components/HeatMap'
 import { useTaskList } from '@/hooks/useTaskList'
 import TaskCard from '@/components/TaskCard'
 import EmptyList from '@/components/EmptyList'
