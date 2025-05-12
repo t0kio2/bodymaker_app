@@ -32,7 +32,7 @@ const TabLayout = () => {
         <Tabs.Screen
           name='calendar'
           options={{
-            title: '',
+            title: 'カレンダー',
             headerShown: true,
             headerShadowVisible: false,
             headerTitleStyle: {
